@@ -30,4 +30,4 @@ clean:
 .PHONY: install
 install:
 	sudo cp $(TARGET) /usr/lib 
-	sudo cp $(INCLUDEDIR)/*.hpp /usr/include
+	sudo cp -R $(INCLUDEDIR)/$(PROJECT)/ /usr/include/
