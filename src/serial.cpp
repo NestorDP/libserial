@@ -34,7 +34,7 @@ void serial::Serial::send_msg(std::shared_ptr<std::string> msg_ptr) {
 }
 
 std::string serial::Serial::receive_msg() {
-  char read_buf[200];
+  char read_buf[kLengthBuffer_];
   std::string message;
   memset(read_buf, '\0', sizeof(read_buf));
   n_ = read(fd_serial_port_, &read_buf, sizeof(read_buf));
