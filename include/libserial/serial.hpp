@@ -18,6 +18,7 @@
 #include <unistd.h>
 
 #include <iostream>
+#include <memory>
 #include <string>
 
 #define BUFFER_LEN 512
@@ -57,7 +58,7 @@ class Serial {
    * 
    * @param const char *msg
    */
-  void send_msg(std::string msg);
+  void send_msg(std::shared_ptr<std::string> msg);
 
   /**
    * @brief Receive string over serial port

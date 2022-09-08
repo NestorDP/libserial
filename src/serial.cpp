@@ -5,7 +5,7 @@
 #include "libserial/serial.hpp"
 
 serial::Serial::Serial() {
-  printf("open object");
+  std::cout << "Created Serial object" << std::endl;
 }
 
 serial::Serial::~Serial() {
@@ -18,12 +18,12 @@ void serial::Serial::open_port(std::string port) {
     printf("Error opening port %s: %s", port.data(), strerror(errno));
   } else {
     fcntl(fd_serial_port_, F_SETFL, 0);
-    printf("Open port %s", port.data());
+    std::cout << "Open port"  << port << std::endl;
   }
 }
 
-void serial::Serial::send_msg(std::string msg) {
-  n_ = write(fd_serial_port_ , msg.c_str(), msg.length());
+void serial::Serial::send_msg(std::shared_ptr<std::string> msg_ptr) {
+  n_ = write(fd_serial_port_ , msg_ptr.get()->c_str(), msg_ptr.get()->length());
   if (n_ < 0) {
     printf("Error send mensage: %s", strerror(errno));
   }
