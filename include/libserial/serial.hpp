@@ -58,14 +58,14 @@ class Serial {
    * 
    * @param const char *msg
    */
-  void send_msg(std::shared_ptr<std::string> msg);
+  void send_msg(std::shared_ptr<std::string> msg_ptr);
 
   /**
    * @brief Receive string over serial port
    * 
    * @param
    */
-  void receive_msg(std::string msg);
+  std::string receive_msg();
 
  private:
   /** File descriptor for the port */
