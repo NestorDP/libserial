@@ -25,3 +25,52 @@ sudo cp lib/libserial.so /usr/lib
 [sudo] password for foo: 
 sudo cp -R include/libserial/ /usr/include/
 ```
+## Unit testing
+
+
+## Run an example application
+You can run an example application to test the libserial library in your environment.
+
+### Create a virtual serial port
+Even without a hardware device you can to test the serial communication with a virtual serial port using the *socat* for this. 
+
+Frist install the *socat*
+``` console
+foo@bar:~$ sudo apt install socat
+```
+
+Then you can to create the virtual ports par:
+``` console
+foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
+2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/2
+2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/3
+2022/09/09 11:13:10 socat[19050] N starting data transfer loop with FDs [5,5] and [7,7]
+```
+
+### Example source code
+
+``` c
+#include <iostream>
+#include <memory>
+#include <string>
+
+#include <libserial/serial.hpp>
+
+int main(int argc, char const *argv[]) {
+  serial::Serial s;
+  std::shared_ptr<std::string> msg_send_ptr(new std::string("mensagem teste"));
+  std::string texto;
+
+  s.open_port("/dev/pts/5");
+  s.send_msg(msg_send_ptr);
+  texto = s.receive_msg();
+
+  std::cout << "MENSAGEM: " << texto << std::endl;
+
+
+  return 0;
+}
+```
+
+
+gif do exemplo rodando 
