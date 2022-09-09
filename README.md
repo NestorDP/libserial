@@ -70,7 +70,10 @@ int main(int argc, char const *argv[]) {
 }
 ```
 ### Compile example
-
+Frist install the *socat*
+``` console
+foo@bar:~$ g++ -g -Wall -std=c++14 -o serial_app main.cpp -lserial
+```
 
 ### Run example
 gif do exemplo rodando 
