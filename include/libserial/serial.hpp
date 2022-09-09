@@ -21,10 +21,6 @@
 #include <memory>
 #include <string>
 
-#define BUFFER_LEN 512
-#define TCP 1
-#define UDP 0
-
 /**
  * @brief Ethernet Interface Library SERIAL namespace
  * @author Nestor Pereira Neto
