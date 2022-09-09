@@ -52,7 +52,7 @@ class Serial {
   /**
    * @brief Send string over serial port
    * 
-   * @param const char *msg
+   * @param std::shared_ptr<std::string> msg_ptr
    */
   void send_msg(std::shared_ptr<std::string> msg_ptr);
 
