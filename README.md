@@ -46,7 +46,7 @@ foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 2022/09/09 11:13:10 socat[19050] N starting data transfer loop with FDs [5,5] and [7,7]
 ```
 After this, your system have two serial ports virtualy connected (/dev/pts/2 and /dev/pts/3)
-### Example source code
+### Source code
 
 ``` c
 #include <iostream>
@@ -57,23 +57,25 @@ After this, your system have two serial ports virtualy connected (/dev/pts/2 and
 
 int main(int argc, char const *argv[]) {
   serial::Serial s;
-  std::shared_ptr<std::string> msg_send_ptr(new std::string("mensagem teste"));
-  std::string text;
+  std::string texto;
+  std::shared_ptr<std::string> send_ptr;
 
   s.open_port("/dev/pts/2");
-  s.send_msg(msg_send_ptr);
-  text = s.receive_msg();
 
-  std::cout << "MENSAGEM: " << text << std::endl;
+  texto = s.receive_msg();
+  std::cout << texto << std::endl;
+  send_ptr = std::make_shared<std::string>(texto);
+  s.send_msg(send_ptr);
 
   return 0;
 }
 ```
-### Compile example
+
+### Compile
 Frist install the *socat*
 ``` console
 foo@bar:~$ g++ -g -Wall -std=c++14 -o serial_app main.cpp -lserial
 ```
 
-### Run example
+### Run 
 gif do exemplo rodando 
