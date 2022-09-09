@@ -25,28 +25,27 @@ sudo cp lib/libserial.so /usr/lib
 [sudo] password for foo: 
 sudo cp -R include/libserial/ /usr/include/
 ```
-## Unit testing
+<!-- ## Unit testing -->
 
 
 ## Run an example application
-You can run an example application to test the libserial library in your environment.
+You can run an example application to test the libserial library in your environment. Even without a hardware device you can to test the serial communication with a virtual serial port using the *socat* for to create an pair of virtual ports.
 
 ### Create a virtual serial port
-Even without a hardware device you can to test the serial communication with a virtual serial port using the *socat* for this. 
 
 Frist install the *socat*
 ``` console
 foo@bar:~$ sudo apt install socat
 ```
 
-Then you can to create the virtual ports par:
+Then you can to create the virtual ports pair:
 ``` console
 foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/2
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/3
 2022/09/09 11:13:10 socat[19050] N starting data transfer loop with FDs [5,5] and [7,7]
 ```
-
+After this, your system have two serial ports virtualy connected (/dev/pts/2 and /dev/pts/3)
 ### Example source code
 
 ``` c
@@ -59,18 +58,19 @@ foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 int main(int argc, char const *argv[]) {
   serial::Serial s;
   std::shared_ptr<std::string> msg_send_ptr(new std::string("mensagem teste"));
-  std::string texto;
+  std::string text;
 
-  s.open_port("/dev/pts/5");
+  s.open_port("/dev/pts/2");
   s.send_msg(msg_send_ptr);
-  texto = s.receive_msg();
+  text = s.receive_msg();
 
-  std::cout << "MENSAGEM: " << texto << std::endl;
-
+  std::cout << "MENSAGEM: " << text << std::endl;
 
   return 0;
 }
 ```
+### Compile example
 
 
+### Run example
 gif do exemplo rodando 
