@@ -57,7 +57,6 @@ int main(int argc, char const *argv[]) {
 ```
 
 ### Compile
-Frist install the *socat*
 ``` console
 foo@bar:~$ g++ -g -Wall -std=c++14 -o serial_app main.cpp -lserial
 ```
@@ -69,14 +68,14 @@ Frist install the *socat*
 foo@bar:~$ sudo apt install socat
 ```
 
-Then you can to create the virtual ports pair:
+Then you can to create the virtual ports pair, open a new console and run this command:
 ``` console
 foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/2
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/3
 2022/09/09 11:13:10 socat[19050] N starting data transfer loop with FDs [5,5] and [7,7]
 ```
-After this, your system have two serial ports virtualy connected (/dev/pts/2 and /dev/pts/3)
+After this, your system have two serial ports virtuals connected, in this case we have the /dev/pts/2 and /dev/pts/3. Change in yours example code the port to match with one of these ports.
 
 ### Run 
-gif do exemplo rodando 
+
