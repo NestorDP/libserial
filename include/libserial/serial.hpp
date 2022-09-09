@@ -32,19 +32,19 @@ namespace serial {
 class Serial {
  public:
   /**
-   * @brief Construct a new Ethernet Interface object
+   * @brief Constructor of the serial class
    * 
    */
   Serial();
 
   /**
-   * @brief Destroy the Ethernet Interface object
+   * @brief Destroyer of the serial class
    * 
    */
   ~Serial();
 
-    /**
-   * @brief Destroy the Ethernet Interface object
+  /**
+   * @brief Method to open the serial communication
    * 
    */
   void open_port(std::string port);
@@ -59,7 +59,8 @@ class Serial {
   /**
    * @brief Receive string over serial port
    * 
-   * @param
+   * @param N/D
+   * @return std::string 
    */
   std::string receive_msg();
 

@@ -1,5 +1,9 @@
+// @ Copyright 2020
+
 /**
- * @ Copyright 2020
+ * 
+ *
+ * \file serial.cpp
  */
 
 #include "libserial/serial.hpp"
@@ -9,6 +13,7 @@ serial::Serial::Serial() {
 }
 
 serial::Serial::~Serial() {
+  // Contructor
   close(fd_serial_port_);
 }
 
