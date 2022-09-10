@@ -82,6 +82,8 @@ foo@bar:~$ g++ -g -Wall -std=c++14 -o serial_app main.cpp -lserial
 Execute the serial_app
 ``` console
 foo@bar:~$ ./serial_app
+Created Serial Object
+Open port /dev/pts/2
 ```
 
 Open another terminal and write
@@ -95,3 +97,5 @@ Now you will need another terminal to send a string to the serial aplication
 ``` console
 foo@bar:~$ echo "Test" > /dev/pts/3
 ```
+
+![run](https://user-images.githubusercontent.com/37759765/189499039-cacb1552-f256-4709-9ca7-401a1081c050.gif)
