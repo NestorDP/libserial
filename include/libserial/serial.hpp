@@ -62,7 +62,7 @@ class Serial {
    * @param N/D
    * @return std::string 
    */
-  std::string receive_msg();
+  void receive_msg(std::string* msg_ptr);
 
  private:
   /** File descriptor for the port */
