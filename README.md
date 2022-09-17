@@ -58,14 +58,12 @@ After this, your system have two serial ports virtuals connected, in this case w
 
 int main(int argc, char const *argv[]) {
   serial::Serial s;
-  std::string texto;
-  std::shared_ptr<std::string> send_ptr;
+  std::string *texto = new std::string();
+  std::shared_ptr<std::string> send_ptr(new std::string("texto"));
 
-  s.open_port("/dev/pts/2");
-
-  texto = s.receive_msg();
-  std::cout << texto << std::endl;
-  send_ptr = std::make_shared<std::string>(texto);
+  s.open_port("/dev/pts/4");
+  s.receive_msg(texto);
+  std::cout << *texto << std::endl;
   s.send_msg(send_ptr);
 
   return 0;
