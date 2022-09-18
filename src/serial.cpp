@@ -13,7 +13,6 @@ serial::Serial::Serial() {
 }
 
 serial::Serial::~Serial() {
-  // Contructor
   close(fd_serial_port_);
 }
 
