@@ -42,5 +42,5 @@ void serial::Serial::receive_msg(std::string* msg_ptr) {
                 reinterpret_cast<char *>(malloc(kLengthBuffer_*sizeof(char)));
   memset(read_buf, '\0', kLengthBuffer_);
   n_ = read(fd_serial_port_, read_buf, kLengthBuffer_);
-  *msg_ptr = &read_buf[0];
+  *msg_ptr = read_buf;
 }
