@@ -40,7 +40,7 @@ void serial::Serial::send_msg(std::shared_ptr<std::string> msg_ptr) {
 
 void serial::Serial::receive_msg(std::string* msg_ptr) {
   char *read_buf =
-                reinterpret_cast<char *>(malloc(sizeof(char)*kLengthBuffer_));
+                reinterpret_cast<char *>(malloc(kLengthBuffer_*sizeof(char)));
   memset(read_buf, '\0', kLengthBuffer_);
   n_ = read(fd_serial_port_, read_buf, kLengthBuffer_);
   *msg_ptr = &read_buf[0];
