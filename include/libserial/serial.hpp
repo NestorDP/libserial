@@ -54,7 +54,7 @@ class Serial {
    * 
    * @param std::shared_ptr<std::string> msg_ptr
    */
-  void send_msg(std::shared_ptr<std::string> msg_ptr);
+  void send_msg(std::shared_ptr<std::string> msgPtr);
 
   /**
    * @brief Receive string over serial port
@@ -62,11 +62,22 @@ class Serial {
    * @param N/D
    * @return std::string 
    */
-  void receive_msg(std::string* msg_ptr);
+  void receive_msg(std::string* msgPtr);
+
+  /**
+   * @brief Configure the number of bits per byte
+   * 
+   * @param int num_bits
+   * @return std::string 
+   */
+  // void receive_msg(std::string* msgPtr);
 
  private:
+  /** Struct t */
+  struct termios tty_;
+
   /** File descriptor for the port */
-  int fd_serial_port_;
+  int fdSerialPort_;
 
   /** Length of buffer */
   int kLengthBuffer_ = 200;
