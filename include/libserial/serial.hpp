@@ -70,7 +70,7 @@ class Serial {
    * @param int num_bits
    * @return std::string 
    */
-  // void receive_msg(std::string* msgPtr);
+  void set_bits_number(std::string* msgPtr);
 
  private:
   /** Struct t */

@@ -26,8 +26,8 @@ void serial::Serial::open_port(std::string port) {
   }
 }
 
-void serial::Serial::send_msg(std::shared_ptr<std::string> msg_ptr) {
-  n_ = write(fdSerialPort_ , msg_ptr->data(), msg_ptr->length());
+void serial::Serial::send_msg(std::shared_ptr<std::string> msgPtr) {
+  n_ = write(fdSerialPort_ , msgPtr->data(), msgPtr->length());
   if (n_ < 0) {
     printf("Error send mensage: %s", strerror(errno));
   }
@@ -37,10 +37,10 @@ void serial::Serial::send_msg(std::shared_ptr<std::string> msg_ptr) {
   }
 }
 
-void serial::Serial::receive_msg(std::string* msg_ptr) {
+void serial::Serial::receive_msg(std::string* msgPtr) {
   char *read_buf =
                 reinterpret_cast<char *>(malloc(kLengthBuffer_*sizeof(char)));
   memset(read_buf, '\0', kLengthBuffer_);
   n_ = read(fdSerialPort_, read_buf, kLengthBuffer_);
-  *msg_ptr = read_buf;
+  *msgPtr = read_buf;
 }
