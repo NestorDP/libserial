@@ -30,6 +30,19 @@
 namespace serial {
 
 class Serial {
+ private:
+  /** Struct t */
+  struct termios tty_;
+
+  /** File descriptor for the port */
+  int fd_serial_port_;
+
+  /** Length of buffer */
+  int kLengthBuffer_ = 200;
+
+  /**  */
+  int n_;
+
  public:
   /**
    * @brief Constructor of the serial class
@@ -47,43 +60,30 @@ class Serial {
    * @brief Method to open the serial communication
    * 
    */
-  void open_port(std::string port);
+  void OpenPort(std::string port);
 
   /**
    * @brief Send string over serial port
    * 
    * @param std::shared_ptr<std::string> msg_ptr
    */
-  void send_msg(std::shared_ptr<std::string> msgPtr);
+  void SendMsg(std::shared_ptr<std::string> msgPtr);
 
   /**
    * @brief Receive string over serial port
    * 
    * @param N/D
-   * @return std::string 
+   * @return void 
    */
-  void receive_msg(std::string* msgPtr);
+  void ReceiveMsg(std::string* msgPtr);
 
   /**
    * @brief Configure the number of bits per byte
    * 
-   * @param int num_bits
-   * @return std::string 
+   * @param int numBitsits
+   * @return void
    */
-  void set_bits_number(std::string* msgPtr);
-
- private:
-  /** Struct t */
-  struct termios tty_;
-
-  /** File descriptor for the port */
-  int fdSerialPort_;
-
-  /** Length of buffer */
-  int kLengthBuffer_ = 200;
-
-  /**  */
-  int n_;
+  void SetNumberBits(int mumBits);
 };
 
 }  // namespace serial
