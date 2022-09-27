@@ -31,7 +31,7 @@ void serial::Serial::OpenPort(std::string port) {
 
 
 void serial::Serial::SendMsg(std::shared_ptr<std::string> msg_ptr) {
-  n_ = write(fd_serial_port_ , msg_ptr->data(), msg_ptr->length());
+  n_ = write(fd_serial_port_ , msg_ptr->c_str(), msg_ptr->length());
   if (n_ < 0) {
     printf("Error send mensage: %s", strerror(errno));
   }
@@ -50,7 +50,18 @@ void serial::Serial::ReceiveMsg(std::string* msg_ptr) {
   *msg_ptr = read_buf;
 }
 
+
+void serial::Serial::GetTermios2(struct termio2 *tty) {
+  ioctl(fd_serial_port_, TCGETS2, tty);
+}
+
+void serial::Serial::SetTermios2(struct termio2 *tty) {
+  ioctl(fd_serial_port_, TCSETS2, tty);
+}
+
+
 void serial::Serial::SetNumberBits(int num_bits) {
+
   tty_.c_cflag &= ~CSIZE;
   switch (num_bits) {
   case 5:
@@ -68,4 +79,7 @@ void serial::Serial::SetNumberBits(int num_bits) {
   default:
     tty_.c_cflag |= CS8;
   }
+
 }
+
+

@@ -14,8 +14,10 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <termios.h>
 #include <unistd.h>
+#include <asm/ioctls.h>
+#include <asm/termbits.h>
+#include <sys/ioctl.h>
 
 #include <iostream>
 #include <memory>
@@ -28,21 +30,16 @@
  */
 
 namespace serial {
+  enum class NumBits {
+      kFive,
+      kSix,
+      kSeven,
+      kEight,
+  };
+
+
 
 class Serial {
- private:
-  /** Struct t */
-  struct termios tty_;
-
-  /** File descriptor for the port */
-  int fd_serial_port_;
-
-  /** Length of buffer */
-  int kLengthBuffer_ = 200;
-
-  /**  */
-  int n_;
-
  public:
   /**
    * @brief Constructor of the serial class
@@ -78,12 +75,43 @@ class Serial {
   void ReceiveMsg(std::string* msgPtr);
 
   /**
-   * @brief Configure the number of bits per byte
+   * @brief Configure the number of bits per byte. 
    * 
-   * @param int numBitsits
+   * @param int numBits
    * @return void
    */
-  void SetNumberBits(int mumBits);
+  void GetTermios2(struct termio2 *tty);
+
+  /**
+   * @brief Configure the number of bits per byte. 
+   * 
+   * @param int numBits
+   * @return void
+   */
+  void SetTermios2(struct termio2 *tty);
+
+  /**
+   * @brief Configure the number of bits per byte. 
+   * 
+   * @param int numBits
+   * @return void
+   */
+  void SetNumberBits(int mum_bits);
+
+
+ private:
+  /** Termios struct needed to access serial communication
+   *  configuration parameters */
+  struct termios tty_;
+
+  /** File descriptor for the port */
+  int fd_serial_port_;
+
+  /** Length of buffer */
+  int kLengthBuffer_ = 200;
+
+  /**  */
+  int n_;
 };
 
 }  // namespace serial
