@@ -80,7 +80,7 @@ class Serial {
    * @param int numBits
    * @return void
    */
-  void GetTermios2(struct termio2 *tty);
+  void GetTermios2();
 
   /**
    * @brief Configure the number of bits per byte. 
@@ -88,7 +88,7 @@ class Serial {
    * @param int numBits
    * @return void
    */
-  void SetTermios2(struct termio2 *tty);
+  void SetTermios2();
 
   /**
    * @brief Configure the number of bits per byte. 
@@ -96,13 +96,13 @@ class Serial {
    * @param int numBits
    * @return void
    */
-  void SetNumberBits(int mum_bits);
+  void SetNumberBits(NumBits mum_bits);
 
 
  private:
   /** Termios struct needed to access serial communication
    *  configuration parameters */
-  struct termios tty_;
+  struct termios2 tty_;
 
   /** File descriptor for the port */
   int fd_serial_port_;
@@ -111,7 +111,7 @@ class Serial {
   int kLengthBuffer_ = 200;
 
   /**  */
-  int n_;
+  int error_;
 };
 
 }  // namespace serial
