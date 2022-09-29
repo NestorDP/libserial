@@ -68,27 +68,76 @@ void serial::Serial::SetTermios2() {
 
 
 void serial::Serial::SetNumberBits(NumBits num_bits) {
-  serial::Serial::GetTermios2();
+  this->GetTermios2();
 
+  // Clear bits
   tty_.c_cflag &= ~CSIZE;
 
-  // switch (num_bits) {
-  // case 5:
-  //   tty_.c_cflag |= CS5;
-  //   break;
-  // case 6:
-  //   tty_.c_cflag |= CS6;
-  //   break;
-  // case 7:
-  //   tty_.c_cflag |= CS7;
-  //   break;
-  // case 8:
-  //   tty_.c_cflag |= CS8;
-  //   break;
-  // default:
-  //   tty_.c_cflag |= CS8;
-  // }
-
+  switch (num_bits) {
+    case NumBits::kFive:
+      tty_.c_cflag |= CS5;
+      break;
+    case NumBits::kSix:
+      tty_.c_cflag |= CS6;
+      break;
+    case NumBits::kSeven:
+      tty_.c_cflag |= CS7;
+      break;
+    case NumBits::kEight:
+      tty_.c_cflag |= CS8;
+      break;
+    default:
+      tty_.c_cflag |= CS8;
+      break;
+  }
+  this->SetTermios2();
 }
 
 
+void serial::Serial::SetParity(Parity parity) {
+  this->GetTermios2();
+  switch (parity) {
+    case Parity::kDisable:
+      tty_.c_cflag &= ~PARENB;
+      break;
+    case Parity::kEnable:
+      tty_.c_cflag |= PARENB;
+      break;
+    default:
+      tty_.c_cflag &= ~PARENB;
+      break;
+  }
+  this->SetTermios2();
+}
+
+
+void serial::Serial::SetTwoStopBits(StopBits stop_bits) {
+  this->GetTermios2();
+  switch (stop_bits) {
+  case StopBits::kDisable:
+    tty_.c_cflag &= ~CSTOP;
+    break;
+  case StopBits::kEnable:
+    tty_.c_cflag |= CSTOP;
+  default:
+    tty_.c_cflag &= ~CSTOP;
+    break;
+  }
+  this->SetTermios2();
+}
+
+
+void serial::Serial::SetFlowControl(FlowControl flow_control) {
+  this->GetTermios2();
+  switch (flow_control) {
+  case FlowControl::kSoftware:
+    tty_.c_cflag &= ~CRTSCTS;
+    break;
+  case FlowControl::kHardware:
+    tty_.c_cflag |= CRTSCTS;
+  default:
+    tty_.c_cflag &= ~CRTSCTS;
+    break;
+  }
+  this->SetTermios2();
+}

@@ -30,20 +30,38 @@
  */
 
 namespace serial {
+  /**
+   * @brief Enum class
+   */
   enum class NumBits {
-      kFive,
-      kSix,
-      kSeven,
-      kEight,
+    kFive,
+    kSix,
+    kSeven,
+    kEight,
   };
 
+  /**
+   * @brief Enum class
+   */
+  enum class Parity {
+    kEnable,
+    kDisable,
+  };
 
+  enum class StopBits {
+    kEnable,
+    kDisable,
+  };
+
+  enum class FlowControl {
+    kHardware,
+    kSoftware,
+  };
 
 class Serial {
  public:
   /**
    * @brief Constructor of the serial class
-   * 
    */
   Serial();
 
@@ -93,10 +111,22 @@ class Serial {
   /**
    * @brief Configure the number of bits per byte. 
    * 
-   * @param int numBits
+   * @param  num_bits
    * @return void
    */
   void SetNumberBits(NumBits mum_bits);
+
+    /**
+   * @brief Configure the parity. 
+   * 
+   * @param int numBits
+   * @return void
+   */
+  void SetParity(Parity parity);
+
+  void SetTwoStopBits(StopBits stop_bits);
+
+  void SetFlowControl(FlowControl flow_control);
 
 
  private:
