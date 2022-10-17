@@ -54,6 +54,7 @@ class Ports {
 
  private:
   std::vector<std::string> * port_list_ ;
+  const char *cmd_;  
 };
 
 }  // namespace serial

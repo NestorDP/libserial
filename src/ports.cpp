@@ -10,6 +10,7 @@
 
 serial::Ports::Ports() {
   port_list_ = new std::vector<std::string>();
+  cmd_= "ls -l /dev/serial/by-id";
 }
 
 serial::Ports::~Ports() { 
@@ -17,30 +18,35 @@ serial::Ports::~Ports() {
 }
 
 void serial::Ports::list_ports() {
-  char device_name[100];
+  FILE *fp_;
+  char device_name_[100];
 
-  // List available serial ports 
-  FILE *fp;
-  const char *command = "ls -l /dev/serial/by-id";
-  fp = popen(command,"r"); 
-  fscanf(fp, "%s", device_name);
-  
+
+  fp_ = popen(cmd_,"r"); 
+  fscanf(fp_, "%s", device_name_);
+
+  // port_list_->push_back(device_name_);
+  //std::cout << port_list_->at(0) << std::endl;
 
   // Get device name
-  if (strcmp (device_name, "total\n")) {
+  if (strcmp (device_name_, "total\n")) {
     for (int i = 0; i <10; i++) {
-      fscanf(fp, "%s", device_name);
+      fscanf(fp_, "%s", device_name_);
     }
   }
-  printf("%s\n", device_name);
 
-  // Get port name
-  fscanf(fp, "%s", device_name);
-  fscanf(fp, "%s", device_name);
-  printf("%s\n", device_name);
+  port_list_->push_back(device_name_);
+  //std::cout << port_list_->at(1) << std::endl;
 
+  // // Get port name
+  fscanf(fp_, "%s", device_name_);
+  fscanf(fp_, "%s", device_name_);
 
- 
+  port_list_->push_back(device_name_);
 
-  fclose(fp);
+  for(auto x: *port_list_) {
+    std::cout << x << std::endl;
+  }
+
+  fclose(fp_);
 }
