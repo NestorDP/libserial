@@ -30,6 +30,13 @@
 
 namespace serial {
 
+struct device {
+  std::string name;
+  std::string port;
+  std::string path;
+}; 
+
+
 class Ports {
  public:
   /**
@@ -53,7 +60,7 @@ class Ports {
   void list_ports();
 
  private:
-  std::vector<std::string> * port_list_ ;
+  std::vector<std::string> * list_ ;
   const char *cmd_;  
 };
 

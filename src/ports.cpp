@@ -9,7 +9,7 @@
 #include "libserial/ports.hpp"
 
 serial::Ports::Ports() {
-  port_list_ = new std::vector<std::string>();
+  list_ = new std::vector<std::string>();
   cmd_= "ls -l /dev/serial/by-id";
 }
 
@@ -25,9 +25,6 @@ void serial::Ports::list_ports() {
   fp_ = popen(cmd_,"r"); 
   fscanf(fp_, "%s", device_name_);
 
-  // port_list_->push_back(device_name_);
-  //std::cout << port_list_->at(0) << std::endl;
-
   // Get device name
   if (strcmp (device_name_, "total\n")) {
     for (int i = 0; i <10; i++) {
@@ -35,16 +32,15 @@ void serial::Ports::list_ports() {
     }
   }
 
-  port_list_->push_back(device_name_);
-  //std::cout << port_list_->at(1) << std::endl;
+  list_->push_back(device_name_);
 
   // // Get port name
   fscanf(fp_, "%s", device_name_);
   fscanf(fp_, "%s", device_name_);
 
-  port_list_->push_back(device_name_);
+  list_->push_back(device_name_);
 
-  for(auto x: *port_list_) {
+  for(auto x: *list_) {
     std::cout << x << std::endl;
   }
 
