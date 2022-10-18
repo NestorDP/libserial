@@ -19,30 +19,32 @@ serial::Ports::~Ports() {
 
 void serial::Ports::list_ports() {
   FILE *fp_;
-  char device_name_[100];
+  char ls_output_[100];
+  std::string dev = "/dev";
 
 
-  fp_ = popen(cmd_,"r"); 
-  fscanf(fp_, "%s", device_name_);
+  fp_ = popen("ls -l /dev/serial/by-id","r"); 
+  fscanf(fp_, "%s", ls_output_);
 
   // Get device name
-  if (strcmp (device_name_, "total\n")) {
+  if (strcmp (ls_output_, "total\n")) {
     for (int i = 0; i <10; i++) {
-      fscanf(fp_, "%s", device_name_);
+      fscanf(fp_, "%s", ls_output_);
     }
   }
 
-  list_->push_back(device_name_);
+  serial::device.name = ls_output_;
 
-  // // Get port name
-  fscanf(fp_, "%s", device_name_);
-  fscanf(fp_, "%s", device_name_);
 
-  list_->push_back(device_name_);
+  // Get port name
+  fscanf(fp_, "%s", ls_output_);
+  fscanf(fp_, "%s", ls_output_);
 
-  for(auto x: *list_) {
-    std::cout << x << std::endl;
-  }
+  serial::device.port = ls_output_;
 
+  serial::device.port.replace(0, 5, dev);
+
+  std::cout << serial::device.port << ' ' << serial::device.name << std::endl;
+  
   fclose(fp_);
 }

@@ -30,11 +30,11 @@
 
 namespace serial {
 
-struct device {
+struct DeviceStruct {
   std::string name;
   std::string port;
   std::string path;
-}; 
+} device;
 
 
 class Ports {
