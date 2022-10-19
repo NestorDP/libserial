@@ -49,11 +49,7 @@ void serial::Ports::list_ports() {
       fscanf(fp_path, "%s", ls_output);
       serial::device.path = ls_output;
 
-      std::cout << "Device ID: " << serial::device.id << std::endl;
-      std::cout << "Device name: " << serial::device.name << std::endl;
-      std::cout << "Device Port: " << serial::device.port << std::endl;
-      std::cout << "Device Path: " << serial::device.path << std::endl;
-      std::cout << std::endl;
+      device_list_.push_back(serial::device);
 
       fscanf(fp_id, "%s", ls_output);
       serial::device.id++;
@@ -69,4 +65,14 @@ void serial::Ports::list_ports() {
     serial::device.name = "NaN";
     serial::device.port = "NaN";
   }  
+
+  std::cout << "Number of devices" << device_list_.size() << std::endl;
+
+  for (auto i : device_list_ ) {
+    std::cout << "Device ID: " << i.id<< std::endl;
+    std::cout << "Device name: " << i.name<< std::endl;
+    std::cout << "Device port: " << i.port<< std::endl;
+    std::cout << "Device path: " << i.path<< std::endl;
+  }
+
 }

@@ -62,7 +62,7 @@ class Ports {
 
 
  private:
-  std::vector<DeviceStruct> device_list ;
+  std::vector<DeviceStruct> device_list_ ;
 };
 
 }  // namespace serial
