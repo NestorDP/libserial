@@ -34,6 +34,7 @@ struct DeviceStruct {
   std::string name;
   std::string port;
   std::string path;
+  int id;
 } device;
 
 
@@ -62,7 +63,6 @@ class Ports {
 
  private:
   std::vector<DeviceStruct> device_list ;
-  int num_devices_ = 1;
 };
 
 }  // namespace serial

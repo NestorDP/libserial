@@ -32,6 +32,7 @@ void serial::Ports::list_ports() {
   if (strcmp (ls_output, "total") == 0) {
     fscanf(fp_id, "%s", ls_output);
     fscanf(fp_id, "%s", ls_output);
+    serial::device.id = 1;
     do {
       for (int i = 0; i < 8; i++) {
         fscanf(fp_id, "%s", ls_output);
@@ -48,14 +49,15 @@ void serial::Ports::list_ports() {
       fscanf(fp_path, "%s", ls_output);
       serial::device.path = ls_output;
 
-      std::cout << "Device: " << serial::device.name << std::endl;
-      std::cout << "Port: " << serial::device.port << std::endl;
-      std::cout << "Path: " << serial::device.path << std::endl;
+      std::cout << "Device ID: " << serial::device.id << std::endl;
+      std::cout << "Device name: " << serial::device.name << std::endl;
+      std::cout << "Device Port: " << serial::device.port << std::endl;
+      std::cout << "Device Path: " << serial::device.path << std::endl;
       std::cout << std::endl;
 
       fscanf(fp_id, "%s", ls_output);
+      serial::device.id++;
 
-      num_devices_++;
     } while (strcmp (serial::device.path.c_str(), ls_output));
  
     
