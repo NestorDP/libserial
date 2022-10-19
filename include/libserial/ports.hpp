@@ -59,9 +59,10 @@ class Ports {
    */
   void list_ports();
 
+
  private:
-  std::vector<std::string> * list_ ;
-  const char *cmd_;  
+  std::vector<DeviceStruct> device_list ;
+  int num_devices_ = 1;
 };
 
 }  // namespace serial

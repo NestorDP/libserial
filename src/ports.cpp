@@ -9,8 +9,7 @@
 #include "libserial/ports.hpp"
 
 serial::Ports::Ports() {
-  list_ = new std::vector<std::string>();
-  cmd_= "ls -l /dev/serial/by-id";
+  
 }
 
 serial::Ports::~Ports() { 
@@ -18,33 +17,54 @@ serial::Ports::~Ports() {
 }
 
 void serial::Ports::list_ports() {
-  FILE *fp_;
-  char ls_output_[100];
+  FILE *fp_id;
+  FILE *fp_path;
+  char ls_output[100];
   std::string dev = "/dev";
 
+  fp_id = popen("ls -l /dev/serial/by-id","r"); 
+  fp_path = popen("ls /dev/serial/by-path","r"); 
+  fscanf(fp_id, "%s", ls_output);
 
-  fp_ = popen("ls -l /dev/serial/by-id","r"); 
-  fscanf(fp_, "%s", ls_output_);
+  std::cout << std::endl;
 
   // Get device name
-  if (strcmp (ls_output_, "total\n")) {
-    for (int i = 0; i <10; i++) {
-      fscanf(fp_, "%s", ls_output_);
-    }
+  if (strcmp (ls_output, "total") == 0) {
+    fscanf(fp_id, "%s", ls_output);
+    fscanf(fp_id, "%s", ls_output);
+    do {
+      for (int i = 0; i < 8; i++) {
+        fscanf(fp_id, "%s", ls_output);
+      }
+      serial::device.name = ls_output;
+
+      // Get port name
+      fscanf(fp_id, "%s", ls_output);
+      fscanf(fp_id, "%s", ls_output);
+      serial::device.port = ls_output;
+      serial::device.port.replace(0, 5, dev);
+
+      // Get device path
+      fscanf(fp_path, "%s", ls_output);
+      serial::device.path = ls_output;
+
+      std::cout << "Device: " << serial::device.name << std::endl;
+      std::cout << "Port: " << serial::device.port << std::endl;
+      std::cout << "Path: " << serial::device.path << std::endl;
+      std::cout << std::endl;
+
+      fscanf(fp_id, "%s", ls_output);
+
+      num_devices_++;
+    } while (strcmp (serial::device.path.c_str(), ls_output));
+ 
+    
+    fclose(fp_id);
+    fclose(fp_path);
   }
-
-  serial::device.name = ls_output_;
-
-
-  // Get port name
-  fscanf(fp_, "%s", ls_output_);
-  fscanf(fp_, "%s", ls_output_);
-
-  serial::device.port = ls_output_;
-
-  serial::device.port.replace(0, 5, dev);
-
-  std::cout << serial::device.port << ' ' << serial::device.name << std::endl;
-  
-  fclose(fp_);
+  else {
+    serial::device.path = "NaN";
+    serial::device.name = "NaN";
+    serial::device.port = "NaN";
+  }  
 }
