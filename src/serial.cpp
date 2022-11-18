@@ -163,3 +163,15 @@ void serial::Serial::SetCanonicalMode(CanonicalMode canonical_mode){
 void serial::Serial::SetTerminator(Terminator term) {
   terminator_ = (int)term;
 }
+
+void serial::Serial::SetTimeOut(int time){
+  this->GetTermios2();
+  options_.c_cc[VTIME] = time;
+  this->SetTermios2();
+}
+
+void serial::Serial::SetMinNumberCharRead(int num) {
+  this->GetTermios2();
+  options_.c_cc[VMIN] = num;
+  this->SetTermios2();
+}

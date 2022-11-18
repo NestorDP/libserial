@@ -142,6 +142,10 @@ class Serial {
 
   void SetTerminator(Terminator term);
 
+  void SetTimeOut(int time);
+
+  void SetMinNumberCharRead(int num);
+
 
  private:
   /** Termios struct needed to access serial communication
