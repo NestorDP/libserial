@@ -58,6 +58,11 @@ namespace serial {
     kSoftware,
   };
 
+  enum class CanonicalMode {
+    kEnable,
+    kDisable,
+  };
+
 class Serial {
  public:
   /**
@@ -71,6 +76,22 @@ class Serial {
    */
   ~Serial();
 
+    /**
+   * @brief Configure the number of bits per byte. 
+   * 
+   * @param int numBits
+   * @return void
+   */
+  void GetTermios2();
+
+  /**
+   * @brief Configure the number of bits per byte. 
+   * 
+   * @param int numBits
+   * @return void
+   */
+  void SetTermios2();
+  
   /**
    * @brief Method to open the serial communication
    * 
@@ -95,22 +116,6 @@ class Serial {
   /**
    * @brief Configure the number of bits per byte. 
    * 
-   * @param int numBits
-   * @return void
-   */
-  void GetTermios2();
-
-  /**
-   * @brief Configure the number of bits per byte. 
-   * 
-   * @param int numBits
-   * @return void
-   */
-  void SetTermios2();
-
-  /**
-   * @brief Configure the number of bits per byte. 
-   * 
    * @param  num_bits
    * @return void
    */
@@ -128,11 +133,13 @@ class Serial {
 
   void SetFlowControl(FlowControl flow_control);
 
+  void SetCanonicalMode(CanonicalMode canonical_mode);
+
 
  private:
   /** Termios struct needed to access serial communication
    *  configuration parameters */
-  struct termios2 tty_;
+  struct termios2 options_;
 
   /** File descriptor for the port */
   int fd_serial_port_;

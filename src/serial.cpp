@@ -52,7 +52,7 @@ void serial::Serial::ReceiveMsg(std::string* msg_ptr) {
 
 
 void serial::Serial::GetTermios2() {
-  error_ = ioctl(fd_serial_port_, TCGETS2, &tty_);
+  error_ = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error_ < 0) {
     printf("Error get Termios2: %s", strerror(errno));
   }
@@ -60,7 +60,7 @@ void serial::Serial::GetTermios2() {
 
 
 void serial::Serial::SetTermios2() {
-  error_ = ioctl(fd_serial_port_, TCSETS2, &tty_);
+  error_ = ioctl(fd_serial_port_, TCSETS2, &options_);
   if (error_ < 0) {
     printf("Error set Termios2: %s", strerror(errno));
   }
@@ -71,23 +71,23 @@ void serial::Serial::SetNumberBits(NumBits num_bits) {
   this->GetTermios2();
 
   // Clear bits
-  tty_.c_cflag &= ~CSIZE;
+  options_.c_cflag &= ~CSIZE;
 
   switch (num_bits) {
     case NumBits::kFive:
-      tty_.c_cflag |= CS5;
+      options_.c_cflag |= CS5;
       break;
     case NumBits::kSix:
-      tty_.c_cflag |= CS6;
+      options_.c_cflag |= CS6;
       break;
     case NumBits::kSeven:
-      tty_.c_cflag |= CS7;
+      options_.c_cflag |= CS7;
       break;
     case NumBits::kEight:
-      tty_.c_cflag |= CS8;
+      options_.c_cflag |= CS8;
       break;
     default:
-      tty_.c_cflag |= CS8;
+      options_.c_cflag |= CS8;
       break;
   }
   this->SetTermios2();
@@ -98,13 +98,13 @@ void serial::Serial::SetParity(Parity parity) {
   this->GetTermios2();
   switch (parity) {
     case Parity::kDisable:
-      tty_.c_cflag &= ~PARENB;
+      options_.c_cflag &= ~PARENB;
       break;
     case Parity::kEnable:
-      tty_.c_cflag |= PARENB;
+      options_.c_cflag |= PARENB;
       break;
     default:
-      tty_.c_cflag &= ~PARENB;
+      options_.c_cflag &= ~PARENB;
       break;
   }
   this->SetTermios2();
@@ -115,12 +115,12 @@ void serial::Serial::SetTwoStopBits(StopBits stop_bits) {
   this->GetTermios2();
   switch (stop_bits) {
   case StopBits::kDisable:
-    tty_.c_cflag &= ~CSTOP;
+    options_.c_cflag &= ~CSTOP;
     break;
   case StopBits::kEnable:
-    tty_.c_cflag |= CSTOP;
+    options_.c_cflag |= CSTOP;
   default:
-    tty_.c_cflag &= ~CSTOP;
+    options_.c_cflag &= ~CSTOP;
     break;
   }
   this->SetTermios2();
@@ -131,12 +131,28 @@ void serial::Serial::SetFlowControl(FlowControl flow_control) {
   this->GetTermios2();
   switch (flow_control) {
   case FlowControl::kSoftware:
-    tty_.c_cflag &= ~CRTSCTS;
+    options_.c_cflag &= ~CRTSCTS;
+    options_.c_iflag |= (IXON | IXOFF | IXANY);
+    options_.c_cc[VEOF] = 13;     /* Ctrl-M CR */
     break;
   case FlowControl::kHardware:
-    tty_.c_cflag |= CRTSCTS;
+    options_.c_cflag |= CRTSCTS;
+    options_.c_iflag &= ~(IXON | IXOFF | IXANY);    
   default:
-    tty_.c_cflag &= ~CRTSCTS;
+    options_.c_cflag &= ~CRTSCTS;
+    break;
+  }
+  this->SetTermios2();
+}
+
+void serial::Serial::SetCanonicalMode(CanonicalMode canonical_mode){
+  this->GetTermios2();
+  switch (canonical_mode) {
+  case CanonicalMode::kEnable:
+    options_.c_lflag |=  (ICANON | ECHO | ECHOE);
+    break;
+  case CanonicalMode::kDisable:
+    options_.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
     break;
   }
   this->SetTermios2();
