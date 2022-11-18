@@ -1,7 +1,7 @@
 PROJECT = libserial
 CC = g++
 # ARCH = arm
-CFLAGS = -g -Wall -Werror -fpic -std=c++14
+CFLAGS = -g -Wall -fpic -std=c++14
 LDFLAGS = -g -Wall -shared
 
 LIBDIR = lib
