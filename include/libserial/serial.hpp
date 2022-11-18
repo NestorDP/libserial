@@ -34,33 +34,33 @@ namespace serial {
    * @brief Enum class
    */
   enum class NumBits {
-    kFive,
-    kSix,
-    kSeven,
-    kEight,
+    Five,
+    Six,
+    Seven,
+    Eight,
   };
 
   /**
    * @brief Enum class
    */
   enum class Parity {
-    kEnable,
-    kDisable,
+    Enable,
+    Disable,
   };
 
   enum class StopBits {
-    kEnable,
-    kDisable,
+    Enable,
+    Disable,
   };
 
   enum class FlowControl {
-    kHardware,
-    kSoftware,
+    Hardware,
+    Software,
   };
 
   enum class CanonicalMode {
-    kEnable,
-    kDisable,
+    Enable,
+    Disable,
   };
 
   enum class Terminator {
