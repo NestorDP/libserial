@@ -63,6 +63,11 @@ namespace serial {
     kDisable,
   };
 
+  enum class Terminator {
+    EOT = 4,
+    CR  = 13,
+  };
+
 class Serial {
  public:
   /**
@@ -135,6 +140,8 @@ class Serial {
 
   void SetCanonicalMode(CanonicalMode canonical_mode);
 
+  void SetTerminator(Terminator term);
+
 
  private:
   /** Termios struct needed to access serial communication
@@ -149,6 +156,8 @@ class Serial {
 
   /**  */
   int error_;
+
+  int terminator_;
 };
 
 }  // namespace serial

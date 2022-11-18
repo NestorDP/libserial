@@ -11,6 +11,7 @@
 
 serial::Serial::Serial() {
   std::cout << "Created Serial object" << std::endl;
+  terminator_ = (int) serial::Terminator::CR;
 }
 
 
@@ -48,6 +49,7 @@ void serial::Serial::ReceiveMsg(std::string* msg_ptr) {
   memset(read_buf, '\0', kLengthBuffer_);
   error_ = read(fd_serial_port_, read_buf, kLengthBuffer_);
   *msg_ptr = read_buf;
+  ioctl(fd_serial_port_, TCFLSH);
 }
 
 
@@ -133,7 +135,7 @@ void serial::Serial::SetFlowControl(FlowControl flow_control) {
   case FlowControl::kSoftware:
     options_.c_cflag &= ~CRTSCTS;
     options_.c_iflag |= (IXON | IXOFF | IXANY);
-    options_.c_cc[VEOF] = 13;     /* Ctrl-M CR */
+    options_.c_cc[VEOF] = terminator_;     /* Ctrl-M CR */
     break;
   case FlowControl::kHardware:
     options_.c_cflag |= CRTSCTS;
@@ -156,4 +158,8 @@ void serial::Serial::SetCanonicalMode(CanonicalMode canonical_mode){
     break;
   }
   this->SetTermios2();
+}
+
+void serial::Serial::SetTerminator(Terminator term) {
+  terminator_ = (int)term;
 }
