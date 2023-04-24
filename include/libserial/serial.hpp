@@ -108,7 +108,7 @@ class Serial {
    * 
    * @param std::shared_ptr<std::string> msg_ptr
    */
-  void SendMsg(std::shared_ptr<std::string> msgPtr);
+  void SendMsg(std::string *msg_ptr);
 
   /**
    * @brief Receive string over serial port
@@ -116,7 +116,7 @@ class Serial {
    * @param N/D
    * @return void 
    */
-  void ReceiveMsg(std::string* msgPtr);
+  void ReceiveMsg(std::string* msg_ptr);
 
   /**
    * @brief Configure the number of bits per byte. 
@@ -156,12 +156,12 @@ class Serial {
   int fd_serial_port_;
 
   /** Length of buffer */
-  int kLengthBuffer_ = 200;
+  int kLengthBuffer_ = 64;
 
   /**  */
   int error_;
 
-  int terminator_;
+  int terminator_ = 13;
 };
 
 }  // namespace serial
