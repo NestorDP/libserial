@@ -27,6 +27,7 @@ Serial::~Serial() {
 
 void Serial::OpenPort(std::string port) {
   fd_serial_port_ = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
+  
   if (fd_serial_port_ == -1) {
     throw SerialException("Error opening port " + port + ": " + strerror(errno));
   } else {
@@ -37,13 +38,16 @@ void Serial::OpenPort(std::string port) {
 
 void Serial::SendMsg(std::string *msg_ptr) {
   error_ = write(fd_serial_port_ , msg_ptr->c_str(), msg_ptr->length());
+
   std::cout << msg_ptr->data() << std::endl;
+
   if (error_ < 0) {
-    printf("Error send mensage: %s", strerror(errno));
+    throw SerialException("Error send mensage: " + std::string(strerror(errno)));
   }
+
   error_ = write(fd_serial_port_ , "\r", 1);
   if (error_ < 0) {
-    printf("Error send mensage: %s", strerror(errno));
+    throw SerialException("Error send mensage: " + std::string(strerror(errno)));
   }
 }
 
@@ -59,14 +63,14 @@ void Serial::ReceiveMsg(std::string* msg_ptr) {
 void Serial::GetTermios2() {
   error_ = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error_ < 0) {
-    printf("Error get Termios2: %s", strerror(errno));
+    throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
   }
 }
 
 void Serial::SetTermios2() {
   error_ = ioctl(fd_serial_port_, TCSETS2, &options_);
   if (error_ < 0) {
-    printf("Error set Termios2: %s", strerror(errno));
+    throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
   }
 }
 
