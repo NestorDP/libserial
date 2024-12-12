@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 
+#include "libserial/serial_exception.hpp"
 #include "libserial/serial_types.hpp"
 
 /**

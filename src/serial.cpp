@@ -28,7 +28,7 @@ Serial::~Serial() {
 void Serial::OpenPort(std::string port) {
   fd_serial_port_ = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
   if (fd_serial_port_ == -1) {
-    printf("Error opening port %s: %s", port.data(), strerror(errno));
+    throw SerialException("Error opening port " + port + ": " + strerror(errno));
   } else {
     fcntl(fd_serial_port_, F_SETFL, 0);
     std::cout << "Open port"  << port << std::endl;
