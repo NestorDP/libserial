@@ -25,7 +25,6 @@ Serial::~Serial() {
   close(fd_serial_port_);
 }
 
-
 void Serial::OpenPort(std::string port) {
   fd_serial_port_ = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
   if (fd_serial_port_ == -1) {
@@ -35,7 +34,6 @@ void Serial::OpenPort(std::string port) {
     std::cout << "Open port"  << port << std::endl;
   }
 }
-
 
 void Serial::SendMsg(std::string *msg_ptr) {
   error_ = write(fd_serial_port_ , msg_ptr->c_str(), msg_ptr->length());
@@ -49,7 +47,6 @@ void Serial::SendMsg(std::string *msg_ptr) {
   }
 }
 
-
 void Serial::ReceiveMsg(std::string* msg_ptr) {
   char *read_buf =
                 reinterpret_cast<char *>(malloc(kLengthBuffer_*sizeof(char)));
@@ -59,7 +56,6 @@ void Serial::ReceiveMsg(std::string* msg_ptr) {
   ioctl(fd_serial_port_, TCFLSH, 0);
 }
 
-
 void Serial::GetTermios2() {
   error_ = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error_ < 0) {
@@ -67,14 +63,12 @@ void Serial::GetTermios2() {
   }
 }
 
-
 void Serial::SetTermios2() {
   error_ = ioctl(fd_serial_port_, TCSETS2, &options_);
   if (error_ < 0) {
     printf("Error set Termios2: %s", strerror(errno));
   }
 }
-
 
 void Serial::SetNumberBits(NumBits num_bits) {
   this->GetTermios2();
@@ -102,7 +96,6 @@ void Serial::SetNumberBits(NumBits num_bits) {
   this->SetTermios2();
 }
 
-
 void Serial::SetParity(Parity parity) {
   this->GetTermios2();
   switch (parity) {
@@ -119,7 +112,6 @@ void Serial::SetParity(Parity parity) {
   this->SetTermios2();
 }
 
-
 void Serial::SetTwoStopBits(StopBits stop_bits) {
   this->GetTermios2();
   switch (stop_bits) {
@@ -135,7 +127,6 @@ void Serial::SetTwoStopBits(StopBits stop_bits) {
   this->SetTermios2();
 }
 
-
 void Serial::SetFlowControl(FlowControl flow_control) {
   this->GetTermios2();
   switch (flow_control) {
@@ -143,8 +134,7 @@ void Serial::SetFlowControl(FlowControl flow_control) {
     // options_.c_cflag &= ~CRTSCTS;
     // options_.c_oflag |= (OPOST | ONLCR);
     // options_.c_iflag |= (IXON | IXOFF );
-
-      options_.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
+  options_.c_cflag &= ~PARENB; // Clear parity bit, disabling parity (most common)
   options_.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
   options_.c_cflag &= ~CSIZE; // Clear all bits that set the data size 
   options_.c_cflag |= CS8; // 8 bits per byte (most common)
@@ -168,7 +158,6 @@ void Serial::SetFlowControl(FlowControl flow_control) {
   options_.c_cc[VMIN] = 0;
   // options_.c_cc[VEOF] = '\r';
 
-
     break;
   case FlowControl::Hardware:
     options_.c_cflag |= CRTSCTS;
@@ -179,7 +168,6 @@ void Serial::SetFlowControl(FlowControl flow_control) {
   }
   this->SetTermios2();
 }
-
 
 void Serial::SetCanonicalMode(CanonicalMode canonical_mode){
   this->GetTermios2();
@@ -196,18 +184,15 @@ void Serial::SetCanonicalMode(CanonicalMode canonical_mode){
   this->SetTermios2();
 }
 
-
 void Serial::SetTerminator(Terminator term) {
   terminator_ = (int)term;
 }
-
 
 void Serial::SetTimeOut(int time){
   this->GetTermios2();
   options_.c_cc[VTIME] = time;
   this->SetTermios2();
 }
-
 
 void Serial::SetMinNumberCharRead(int num) {
   this->GetTermios2();
