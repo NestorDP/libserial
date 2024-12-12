@@ -15,6 +15,11 @@ Serial::Serial() {
   terminator_ = (int) Terminator::CR;
 }
 
+Serial::Serial(std::string port) {
+  std::cout << "Created Serial object" << std::endl;
+  terminator_ = (int) Terminator::CR;
+  this->OpenPort(port);
+}
 
 Serial::~Serial() {
   close(fd_serial_port_);

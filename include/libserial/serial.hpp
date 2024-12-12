@@ -32,13 +32,18 @@
  */
 
 namespace serial {
-  
+
 class Serial {
  public:
   /**
    * @brief Constructor of the serial class
    */
   Serial();
+
+  /**
+   * @brief Constructor of the serial class
+   */
+  Serial(std::string port);
 
   /**
    * @brief Destroyer of the serial class
