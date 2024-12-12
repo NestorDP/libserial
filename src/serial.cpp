@@ -8,19 +8,20 @@
 
 #include "libserial/serial.hpp"
 
-
-serial::Serial::Serial() {
+namespace serial {
+  
+Serial::Serial() {
   std::cout << "Created Serial object" << std::endl;
-  terminator_ = (int) serial::Terminator::CR;
+  terminator_ = (int) Terminator::CR;
 }
 
 
-serial::Serial::~Serial() {
+Serial::~Serial() {
   close(fd_serial_port_);
 }
 
 
-void serial::Serial::OpenPort(std::string port) {
+void Serial::OpenPort(std::string port) {
   fd_serial_port_ = open(port.c_str(), O_RDWR | O_NOCTTY | O_NDELAY | O_NONBLOCK);
   if (fd_serial_port_ == -1) {
     printf("Error opening port %s: %s", port.data(), strerror(errno));
@@ -31,7 +32,7 @@ void serial::Serial::OpenPort(std::string port) {
 }
 
 
-void serial::Serial::SendMsg(std::string *msg_ptr) {
+void Serial::SendMsg(std::string *msg_ptr) {
   error_ = write(fd_serial_port_ , msg_ptr->c_str(), msg_ptr->length());
   std::cout << msg_ptr->data() << std::endl;
   if (error_ < 0) {
@@ -44,7 +45,7 @@ void serial::Serial::SendMsg(std::string *msg_ptr) {
 }
 
 
-void serial::Serial::ReceiveMsg(std::string* msg_ptr) {
+void Serial::ReceiveMsg(std::string* msg_ptr) {
   char *read_buf =
                 reinterpret_cast<char *>(malloc(kLengthBuffer_*sizeof(char)));
   memset(read_buf, '\0', kLengthBuffer_);
@@ -54,7 +55,7 @@ void serial::Serial::ReceiveMsg(std::string* msg_ptr) {
 }
 
 
-void serial::Serial::GetTermios2() {
+void Serial::GetTermios2() {
   error_ = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error_ < 0) {
     printf("Error get Termios2: %s", strerror(errno));
@@ -62,7 +63,7 @@ void serial::Serial::GetTermios2() {
 }
 
 
-void serial::Serial::SetTermios2() {
+void Serial::SetTermios2() {
   error_ = ioctl(fd_serial_port_, TCSETS2, &options_);
   if (error_ < 0) {
     printf("Error set Termios2: %s", strerror(errno));
@@ -70,23 +71,23 @@ void serial::Serial::SetTermios2() {
 }
 
 
-void serial::Serial::SetNumberBits(NumBits num_bits) {
+void Serial::SetNumberBits(NumBits num_bits) {
   this->GetTermios2();
 
   // Clear bits
   options_.c_cflag &= ~CSIZE;
 
   switch (num_bits) {
-    case NumBits::Five:
+    case NumBits::FIVE:
       options_.c_cflag |= CS5;
       break;
-    case NumBits::Six:
+    case NumBits::SIX:
       options_.c_cflag |= CS6;
       break;
-    case NumBits::Seven:
+    case NumBits::SEVEN:
       options_.c_cflag |= CS7;
       break;
-    case NumBits::Eight:
+    case NumBits::EIGHT:
       options_.c_cflag |= CS8;
       break;
     default:
@@ -97,13 +98,13 @@ void serial::Serial::SetNumberBits(NumBits num_bits) {
 }
 
 
-void serial::Serial::SetParity(Parity parity) {
+void Serial::SetParity(Parity parity) {
   this->GetTermios2();
   switch (parity) {
-    case Parity::Disable:
+    case Parity::DISABLE:
       options_.c_cflag &= ~PARENB;
       break;
-    case Parity::Enable:
+    case Parity::ENABLE:
       options_.c_cflag |= PARENB;
       break;
     default:
@@ -114,13 +115,13 @@ void serial::Serial::SetParity(Parity parity) {
 }
 
 
-void serial::Serial::SetTwoStopBits(StopBits stop_bits) {
+void Serial::SetTwoStopBits(StopBits stop_bits) {
   this->GetTermios2();
   switch (stop_bits) {
-  case StopBits::Disable:
+  case StopBits::DISABLE:
     options_.c_cflag &= ~CSTOP;
     break;
-  case StopBits::Enable:
+  case StopBits::ENABLE:
     options_.c_cflag |= CSTOP;
   default:
     options_.c_cflag &= ~CSTOP;
@@ -130,7 +131,7 @@ void serial::Serial::SetTwoStopBits(StopBits stop_bits) {
 }
 
 
-void serial::Serial::SetFlowControl(FlowControl flow_control) {
+void Serial::SetFlowControl(FlowControl flow_control) {
   this->GetTermios2();
   switch (flow_control) {
   case FlowControl::Software:
@@ -142,16 +143,16 @@ void serial::Serial::SetFlowControl(FlowControl flow_control) {
   options_.c_cflag &= ~CSTOPB; // Clear stop field, only one stop bit used in communication (most common)
   options_.c_cflag &= ~CSIZE; // Clear all bits that set the data size 
   options_.c_cflag |= CS8; // 8 bits per byte (most common)
-  options_.c_cflag &= ~CRTSCTS; // Disable RTS/CTS hardware flow control (most common)
+  options_.c_cflag &= ~CRTSCTS; // DISABLE RTS/CTS hardware flow control (most common)
   options_.c_cflag |= CREAD | CLOCAL; // Turn on READ & ignore ctrl lines (CLOCAL = 1)
 
   options_.c_lflag &= ~ICANON;
-  options_.c_lflag &= ~ECHO; // Disable echo
-  options_.c_lflag &= ~ECHOE; // Disable erasure
-  options_.c_lflag &= ~ECHONL; // Disable new-line echo
-  options_.c_lflag &= ~ISIG; // Disable interpretation of INTR, QUIT and SUSP
+  options_.c_lflag &= ~ECHO; // DISABLE echo
+  options_.c_lflag &= ~ECHOE; // DISABLE erasure
+  options_.c_lflag &= ~ECHONL; // DISABLE new-line echo
+  options_.c_lflag &= ~ISIG; // DISABLE interpretation of INTR, QUIT and SUSP
   options_.c_iflag &= ~(IXON | IXOFF | IXANY); // Turn off s/w flow ctrl
-  options_.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+  options_.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // DISABLE any special handling of received bytes
 
   options_.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
   options_.c_oflag &= ~ONLCR; // Prevent conversion of newline to carriage return/line feed
@@ -175,15 +176,15 @@ void serial::Serial::SetFlowControl(FlowControl flow_control) {
 }
 
 
-void serial::Serial::SetCanonicalMode(CanonicalMode canonical_mode){
+void Serial::SetCanonicalMode(CanonicalMode canonical_mode){
   this->GetTermios2();
   switch (canonical_mode) {
-  case CanonicalMode::Enable:
+  case CanonicalMode::ENABLE:
     options_.c_lflag |=  (ICANON);
     // options_.c_lflag &= ~(ECHOE | ECHO | ECHONL);
     options_.c_cc[VEOF] = '\n';
     break;
-  case CanonicalMode::Disable:
+  case CanonicalMode::DISABLE:
     options_.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | ECHONL);
     break;
   }
@@ -191,20 +192,21 @@ void serial::Serial::SetCanonicalMode(CanonicalMode canonical_mode){
 }
 
 
-void serial::Serial::SetTerminator(Terminator term) {
+void Serial::SetTerminator(Terminator term) {
   terminator_ = (int)term;
 }
 
 
-void serial::Serial::SetTimeOut(int time){
+void Serial::SetTimeOut(int time){
   this->GetTermios2();
   options_.c_cc[VTIME] = time;
   this->SetTermios2();
 }
 
 
-void serial::Serial::SetMinNumberCharRead(int num) {
+void Serial::SetMinNumberCharRead(int num) {
   this->GetTermios2();
   options_.c_cc[VMIN] = num;
   this->SetTermios2();
 }
+}  // namespace serial

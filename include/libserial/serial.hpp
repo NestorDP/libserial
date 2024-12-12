@@ -1,4 +1,4 @@
-//  @ Copyright 2022 Nestor Neto
+//  @ Copyright 2022-2024 Nestor Neto
 
 /**
  * @mainpage Serial Interface Library
@@ -23,51 +23,16 @@
 #include <memory>
 #include <string>
 
+#include "libserial/serial_types.hpp"
+
 /**
- * @brief Ethernet Interface Library SERIAL namespace
+ * @brief Serial Interface Library SERIAL namespace
  * @author Nestor Pereira Neto
  * 
  */
 
 namespace serial {
-  /**
-   * @brief Enum class
-   */
-  enum class NumBits {
-    Five,
-    Six,
-    Seven,
-    Eight,
-  };
-
-  /**
-   * @brief Enum class
-   */
-  enum class Parity {
-    Enable,
-    Disable,
-  };
-
-  enum class StopBits {
-    Enable,
-    Disable,
-  };
-
-  enum class FlowControl {
-    Hardware,
-    Software,
-  };
-
-  enum class CanonicalMode {
-    Enable,
-    Disable,
-  };
-
-  enum class Terminator {
-    EOT = 4,
-    CR  = 13,
-  };
-
+  
 class Serial {
  public:
   /**
