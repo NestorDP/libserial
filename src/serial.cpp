@@ -62,6 +62,23 @@ std::string Serial::read(size_t max_length) {
   return std::string(buffer.begin(), buffer.begin() + bytes_read);
 }
 
+int Serial::getAvailableData() const {
+  int bytes_available;
+  if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0){
+    throw SerialException("Error getting available data: " + std::string(strerror(errno)));
+  }
+  return bytes_available;
+}
+
+void Serial::setBaudRate(int baud_rate) {
+  this->GetTermios2();
+  options_.c_cflag &= ~CBAUD;
+  options_.c_cflag |= BOTHER;
+  options_.c_ispeed = baud_rate;
+  options_.c_ospeed = baud_rate;
+  this->SetTermios2();
+}
+
 void Serial::GetTermios2() {
   ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error < 0) {

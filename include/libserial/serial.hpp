@@ -53,9 +53,9 @@ public:
 
   std::string read(size_t max_length);
 
-  int availableData(int fd);
-
   void setBaudRate(int baud_rate);
+
+  int getAvailableData() const;
 
   // void setNumberBits(NumBits num_bits);
 
