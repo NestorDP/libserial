@@ -22,6 +22,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "libserial/serial_exception.hpp"
 #include "libserial/serial_types.hpp"
@@ -35,104 +36,44 @@
 namespace serial {
 
 class Serial {
- public:
-  /**
-   * @brief Constructor of the serial class
-   */
+public:
   Serial();
 
-  /**
-   * @brief Constructor of the serial class
-   */
   Serial(std::string port);
-
-  /**
-   * @brief Destroyer of the serial class
-   * 
-   */
+  
   ~Serial();
+  
+  void open(std::string port);
 
-    /**
-   * @brief Configure the number of bits per byte. 
-   * 
-   * @param int numBits
-   * @return void
-   */
+  void close();
+
+  void write(std::string& data);
+
+  void write(const void* data, size_t length);
+
+  std::string read(size_t max_length);
+
+  int availableData(int fd);
+
+  void setBaudRate(int baud_rate);
+
+  // void setNumberBits(NumBits num_bits);
+
+  // void setParity(Parity parity);
+
+  // void setStopBits(StopBits stop_bits);
+
+  // void setTimeOut(int time);
+  
+
+private:
   void GetTermios2();
 
-  /**
-   * @brief Configure the number of bits per byte. 
-   * 
-   * @param int numBits
-   * @return void
-   */
   void SetTermios2();
-  
-  /**
-   * @brief Method to open the serial communication
-   * 
-   */
-  void OpenPort(std::string port);
 
-  /**
-   * @brief Send string over serial port
-   * 
-   * @param std::shared_ptr<std::string> msg_ptr
-   */
-  void SendMsg(std::string *msg_ptr);
-
-  /**
-   * @brief Receive string over serial port
-   * 
-   * @param N/D
-   * @return void 
-   */
-  void ReceiveMsg(std::string* msg_ptr);
-
-  /**
-   * @brief Configure the number of bits per byte. 
-   * 
-   * @param  num_bits
-   * @return void
-   */
-  void SetNumberBits(NumBits mum_bits);
-
-    /**
-   * @brief Configure the parity. 
-   * 
-   * @param int numBits
-   * @return void
-   */
-  void SetParity(Parity parity);
-
-  void SetTwoStopBits(StopBits stop_bits);
-
-  void SetFlowControl(FlowControl flow_control);
-
-  void SetCanonicalMode(CanonicalMode canonical_mode);
-
-  void SetTerminator(Terminator term);
-
-  void SetTimeOut(int time);
-
-  void SetMinNumberCharRead(int num);
-
-
- private:
-  /** Termios struct needed to access serial communication
-   *  configuration parameters */
   struct termios2 options_;
 
-  /** File descriptor for the port */
-  int fd_serial_port_;
-
-  /** Length of buffer */
-  int kLengthBuffer_ = 64;
-
-  /**  */
-  int error_;
-
-  int terminator_ = 13;
+  int fd_serial_port_;  
 };
 
 }  // namespace serial
