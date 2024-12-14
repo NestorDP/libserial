@@ -62,6 +62,26 @@ std::string Serial::read(size_t max_length) {
   return std::string(buffer.begin(), buffer.begin() + bytes_read);
 }
 
+std::string Serial::readUntil(char terminator) {
+  std::vector<char> buffer(1);
+  std::string data;
+
+  while (buffer[0] != terminator) {
+    ssize_t bytes_read = ::read(fd_serial_port_, buffer.data(), 1);
+    if (bytes_read < 0) {
+      throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+    }
+    data.push_back(buffer[0]);
+  }
+  return data;
+}
+
+void Serial::flushInputBuffer() {
+  if (ioctl(fd_serial_port_, TCFLSH, TCIFLUSH) != 0) {
+    throw SerialException("Error flushing input buffer: " + std::string(strerror(errno)));
+  }
+}
+
 int Serial::getAvailableData() const {
   int bytes_available;
   if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0){

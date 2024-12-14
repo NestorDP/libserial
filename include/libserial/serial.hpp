@@ -53,6 +53,10 @@ public:
 
   std::string read(size_t max_length);
 
+  std::string readUntil(char terminator);
+
+  void flushInputBuffer();
+
   void setBaudRate(int baud_rate);
 
   int getAvailableData() const;
