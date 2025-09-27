@@ -85,6 +85,8 @@ dkms.conf
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+.venv/
+
 # Local History for Visual Studio Code
 .history/
 
@@ -124,5 +126,10 @@ cmake-build-*/
 # Generated pkg-config files
 *.pc
 
+# Documentation build directories
 doc/html/
 doc/latex/
+docs/_build/
+docs/html/
+build/doxygen/
+build/docs/
