@@ -28,7 +28,7 @@
  * 
  */
 
-namespace serial {
+namespace libserial {
 
 struct DeviceStruct {
   std::string name;

@@ -4,7 +4,7 @@
 #include <exception>
 #include <string>
 
-namespace serial {
+namespace libserial {
 class SerialException : public std::exception {
  public:
   explicit SerialException(const std::string& message) : message_(message) {}

@@ -8,7 +8,7 @@
 
 #include "libserial/serial.hpp"
 
-namespace serial {
+namespace libserial {
   
 Serial::Serial() {
   std::cout << "Created Serial object" << std::endl;
@@ -41,10 +41,12 @@ void Serial::close() {
   }
 }
 
-void Serial::write(std::string& data) {
-  data.push_back('\r');
+void Serial::write(std::shared_ptr<std::string> data) {
+  if (!data) {
+    throw SerialException("Null pointer passed to write function");
+  }
 
-  ssize_t bytes_written = ::write(fd_serial_port_, data.c_str(), data.size());
+  ssize_t bytes_written = ::write(fd_serial_port_, data->c_str(), data->size());
 
   if (bytes_written < 0) {
     throw SerialException("Error writing to serial port: " + std::string(strerror(errno)));

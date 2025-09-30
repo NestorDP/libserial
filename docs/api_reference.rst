@@ -18,37 +18,8 @@ Exceptions
 .. doxygenclass:: libserial::SerialException
    :members:
 
-.. doxygenclass:: libserial::PortNotFoundException
+Data Structures
+---------------
+
+.. doxygenstruct:: libserial::DeviceStruct
    :members:
-
-.. doxygenclass:: libserial::PermissionDeniedException
-   :members:
-
-.. doxygenclass:: libserial::TimeoutException
-   :members:
-
-.. doxygenclass:: libserial::IOException
-   :members:
-
-Enumerations
-------------
-
-.. doxygenenum:: libserial::BaudRate
-
-.. doxygenenum:: libserial::DataBits
-
-.. doxygenenum:: libserial::Parity
-
-.. doxygenenum:: libserial::StopBits
-
-.. doxygenenum:: libserial::FlowControl
-
-Functions
----------
-
-.. doxygenfunction:: libserial::getAvailablePorts
-
-Type Definitions
-----------------
-
-.. doxygentypedef:: libserial::PortList

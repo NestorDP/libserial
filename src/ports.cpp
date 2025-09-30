@@ -8,15 +8,17 @@
 
 #include "libserial/ports.hpp"
 
-serial::Ports::Ports() {
+namespace libserial {
+
+Ports::Ports() {
   
 }
 
-serial::Ports::~Ports() { 
+Ports::~Ports() { 
 
 }
 
-void serial::Ports::list_ports() {
+void Ports::list_ports() {
   FILE *fp_id;
   //FILE *fp_path;
   char ls_output[100];
@@ -83,5 +85,5 @@ void serial::Ports::list_ports() {
   //   std::cout << "Device port: " << i.port<< std::endl;
   //   std::cout << "Device path: " << i.path<< std::endl;
   // }
-
+}
 }
