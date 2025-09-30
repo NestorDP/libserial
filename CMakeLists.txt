@@ -23,6 +23,12 @@ file(GLOB_RECURSE SOURCES "src/*.cpp")
 # Create shared library
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
+# Set include directories for the library
+target_include_directories(${PROJECT_NAME} PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>
+)
+
 # Set library properties
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VERSION ${PROJECT_VERSION}
@@ -116,6 +122,14 @@ endif()
 
 # Testing configuration
 option(BUILD_TESTING "Build tests" OFF)
+option(BUILD_COVERAGE "Build with code coverage support" OFF)
+
+# Coverage configuration
+if(BUILD_COVERAGE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --coverage")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} --coverage")
+endif()
 
 if(BUILD_TESTING)
     enable_testing()
@@ -126,6 +140,10 @@ if(BUILD_TESTING)
         test/test_serial_pty.cpp
     )
     
+    target_include_directories(serial_tests PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    )
+    
     target_link_libraries(serial_tests PRIVATE
         ${PROJECT_NAME}
         GTest::gtest
@@ -134,4 +152,61 @@ if(BUILD_TESTING)
     )
 
     add_test(NAME SerialTests COMMAND serial_tests)
+    
+    # Coverage targets (only if BUILD_COVERAGE is enabled)
+    if(BUILD_COVERAGE)
+        # Find required tools
+        find_program(LCOV_PATH lcov)
+        find_program(GENHTML_PATH genhtml)
+        
+        if(NOT LCOV_PATH OR NOT GENHTML_PATH)
+            message(WARNING "lcov or genhtml not found. Coverage report generation disabled.")
+        else()
+            # Setup target to clean coverage data
+            add_custom_target(coverage-clean
+                COMMAND ${LCOV_PATH} --directory . --zerocounters
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                COMMENT "Resetting code coverage counters to zero"
+            )
+            
+            # Setup target to run tests and generate coverage data
+            add_custom_target(coverage-run
+                COMMAND ${CMAKE_CTEST_COMMAND} --verbose
+                DEPENDS serial_tests
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                COMMENT "Running tests for coverage analysis"
+            )
+            
+            # Generate coverage information
+            add_custom_target(coverage-capture
+                COMMAND ${LCOV_PATH} --directory . --capture --output-file coverage.info --ignore-errors mismatch,gcov
+                COMMAND ${LCOV_PATH} --remove coverage.info '/usr/*' '*/test/*' --output-file coverage.info.cleaned --ignore-errors unused
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                DEPENDS coverage-run
+                COMMENT "Capturing coverage data"
+            )
+            
+            # Generate HTML coverage report
+            add_custom_target(coverage-html
+                COMMAND ${GENHTML_PATH} coverage.info.cleaned --output-directory coverage_html
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                DEPENDS coverage-capture
+                COMMENT "Generating HTML coverage report"
+            )
+            
+            # Combined coverage target
+            add_custom_target(coverage
+                DEPENDS coverage-clean coverage-html
+                COMMENT "Generate complete coverage report"
+            )
+            
+            # Show coverage summary
+            add_custom_target(coverage-summary
+                COMMAND ${LCOV_PATH} --summary coverage.info.cleaned
+                WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                DEPENDS coverage-capture
+                COMMENT "Show coverage summary"
+            )
+        endif()
+    endif()
 endif()
