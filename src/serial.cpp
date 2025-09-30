@@ -10,7 +10,7 @@
 
 namespace libserial {
   
-Serial::Serial() {
+Serial::Serial() : fd_serial_port_(-1) {
   std::cout << "Created Serial object" << std::endl;
 }
 
@@ -35,9 +35,12 @@ void Serial::open(std::string port) {
 }
 
 void Serial::close() {
-  ssize_t error = ::close(fd_serial_port_);
-  if (error < 0) {
-    throw SerialException("Error closing port: " + std::string(strerror(errno)));
+  if (fd_serial_port_ != -1) {
+    ssize_t error = ::close(fd_serial_port_);
+    if (error < 0) {
+      throw SerialException("Error closing port: " + std::string(strerror(errno)));
+    }
+    fd_serial_port_ = -1;
   }
 }
 

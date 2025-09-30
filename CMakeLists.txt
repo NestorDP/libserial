@@ -113,3 +113,25 @@ if(BUILD_DOCUMENTATION)
         OPTIONAL
     )
 endif()
+
+# Testing configuration
+option(BUILD_TESTING "Build tests" OFF)
+
+if(BUILD_TESTING)
+    enable_testing()
+    find_package(GTest REQUIRED)
+
+    add_executable(serial_tests
+        test/test_serial_simple.cpp
+        test/test_serial_pty.cpp
+    )
+    
+    target_link_libraries(serial_tests PRIVATE
+        ${PROJECT_NAME}
+        GTest::gtest
+        GTest::gtest_main
+        pthread
+    )
+
+    add_test(NAME SerialTests COMMAND serial_tests)
+endif()

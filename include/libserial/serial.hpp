@@ -40,7 +40,7 @@ namespace libserial {
  * 
  * The Serial class provides a high-level interface for serial port operations
  * on Linux systems. It encapsulates low-level POSIX system calls and provides
- * exception-based error handling for robust serial communication.
+ * exception-based error handling for serial communication.
  * 
  * @author Nestor Pereira Neto
  * @version 1.0.0
