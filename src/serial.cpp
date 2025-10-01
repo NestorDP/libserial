@@ -10,12 +10,7 @@
 
 namespace libserial {
 
-Serial::Serial() : fd_serial_port_(-1) {
-  std::cout << "Created Serial object" << std::endl;
-}
-
 Serial::Serial(std::string port) {
-  std::cout << "Created Serial object" << std::endl;
   this->open(port);
   this->setBaudRate(BaudRate::BAUD_RATE_9600);
 }

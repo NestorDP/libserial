@@ -54,7 +54,7 @@ public:
    * Use open() method to establish connection.
    * Initializes with default baud rate of 9600.
    */
-  Serial();
+  Serial() = default;
   Serial(const Serial&) = delete;
   Serial& operator=(const Serial&) = delete;
 
@@ -237,7 +237,7 @@ private:
    * The low-level file descriptor used for all read/write operations
    * on the serial port. Set to -1 when no port is open.
    */
-  int fd_serial_port_;  
+  int fd_serial_port_{-1};
 };
 
 }  // namespace serial
