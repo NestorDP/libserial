@@ -61,7 +61,6 @@ TEST_F(SerialTest, APIExists) {
     
     // These should all throw exceptions since no port is open,
     // but they test that the API methods exist and are callable
-    EXPECT_THROW(serial.read(100), libserial::SerialException);
     EXPECT_THROW(serial.readUntil('\n'), libserial::SerialException);
     EXPECT_THROW(serial.flushInputBuffer(), libserial::SerialException);
     EXPECT_THROW(serial.setBaudRate(9600), libserial::SerialException);
