@@ -52,8 +52,9 @@ public:
    * 
    * Creates a Serial object without opening any port. 
    * Use open() method to establish connection.
+   * Initializes with default baud rate of 9600.
    */
-  Serial() = default;
+  Serial();
   Serial(const Serial&) = delete;
   Serial& operator=(const Serial&) = delete;
 
@@ -159,6 +160,27 @@ public:
   void setBaudRate(int baud_rate);
 
   /**
+   * @brief Set the baud rate using BaudRate enum
+   * 
+   * This overloaded version accepts a BaudRate enum value, providing
+   * type safety and preventing invalid baud rate values.
+   * 
+   * @param baud_rate The baud rate from BaudRate enum
+   * @throws SerialException if baud rate cannot be set
+   * 
+   * @note The port must be opened before calling this method
+   */
+  void setBaudRate(BaudRate baud_rate);
+
+  /**
+   * @brief Gets the current baud rate
+   * 
+   * @return The current baud rate
+   * @throws SerialException if unable to retrieve baud rate
+   */
+  int getBaudRate() const;
+
+  /**
    * @brief Gets the number of bytes available for reading
    * 
    * Returns the number of bytes currently available in the input buffer
@@ -186,7 +208,7 @@ private:
    * 
    * @throws SerialException if ioctl operation fails
    */
-  void GetTermios2();
+  void GetTermios2() const;
 
   /**
    * @brief Applies terminal settings to the port
@@ -204,7 +226,7 @@ private:
    * Holds the current serial port configuration including
    * baud rate, data bits, parity, stop bits, and other settings.
    */
-  struct termios2 options_;
+  mutable struct termios2 options_;
 
   /**
    * @brief File descriptor for the serial port

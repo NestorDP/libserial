@@ -18,23 +18,18 @@ protected:
     }
 };
 
-// Test Serial object construction
 TEST_F(SerialTest, DefaultConstructor) {
-    // This should not throw
     EXPECT_NO_THROW({
         libserial::Serial serial;
     });
 }
 
-// Test Serial object construction with port
 TEST_F(SerialTest, ConstructorWithInvalidPort) {
-    // This will likely throw since "/dev/nonexistent" isn't a serial port
     EXPECT_THROW({
         libserial::Serial serial("/dev/nonexistent");
     }, libserial::SerialException);
 }
 
-// Test write function with shared_ptr
 TEST_F(SerialTest, WriteWithSharedPtr) {
     libserial::Serial serial;
     
@@ -47,7 +42,6 @@ TEST_F(SerialTest, WriteWithSharedPtr) {
     }, libserial::SerialException);
 }
 
-// Test write function with null pointer
 TEST_F(SerialTest, WriteWithNullPtr) {
     libserial::Serial serial;
     
@@ -59,7 +53,6 @@ TEST_F(SerialTest, WriteWithNullPtr) {
     }, libserial::SerialException);
 }
 
-// Test basic API methods exist (without actual hardware)
 TEST_F(SerialTest, APIExists) {
     libserial::Serial serial;
     

@@ -59,7 +59,40 @@ protected:
     }
 };
 
-// Test basic communication with proper timeout handling
+TEST_F(WorkingPseudoTerminalTest, OpenClosePort) {
+    libserial::Serial serial_port;
+    
+    // Test opening the port
+    EXPECT_NO_THROW({
+        serial_port.open(slave_port);
+    });
+    
+    // Test closing the port
+    EXPECT_NO_THROW({
+        serial_port.close();
+    });
+}
+
+TEST_F(WorkingPseudoTerminalTest, GetValidBaudRate) {
+    libserial::Serial serial_port;
+    
+    serial_port.open(slave_port);
+
+    // Set a valid baud rate
+    EXPECT_NO_THROW({
+        serial_port.setBaudRate(9600);
+    });
+    
+    // Get the baud rate and verify
+    int baud_rate = 0;
+    EXPECT_NO_THROW({
+        baud_rate = serial_port.getBaudRate();
+    });
+    EXPECT_EQ(baud_rate, 9600);
+
+    serial_port.close();
+}
+
 TEST_F(WorkingPseudoTerminalTest, SafeCommunication) {
     libserial::Serial serial_port;
     
@@ -106,7 +139,6 @@ TEST_F(WorkingPseudoTerminalTest, SafeCommunication) {
     EXPECT_GT(bytes_written, 0);  // At least writing worked
 }
 
-// Test write functionality
 TEST_F(WorkingPseudoTerminalTest, WriteTest) {
     libserial::Serial serial_port;
     

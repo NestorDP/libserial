@@ -9,7 +9,7 @@
 #include "libserial/serial.hpp"
 
 namespace libserial {
-  
+
 Serial::Serial() : fd_serial_port_(-1) {
   std::cout << "Created Serial object" << std::endl;
 }
@@ -17,6 +17,7 @@ Serial::Serial() : fd_serial_port_(-1) {
 Serial::Serial(std::string port) {
   std::cout << "Created Serial object" << std::endl;
   this->open(port);
+  this->setBaudRate(BaudRate::BAUD_RATE_9600);
 }
 
 Serial::~Serial() {
@@ -104,7 +105,16 @@ void Serial::setBaudRate(int baud_rate) {
   this->SetTermios2();
 }
 
-void Serial::GetTermios2() {
+void Serial::setBaudRate(BaudRate baud_rate) {
+  setBaudRate(static_cast<int>(baud_rate));
+}
+
+int Serial::getBaudRate() const {
+  this->GetTermios2();
+  return (static_cast<int>(options_.c_ispeed));
+}
+
+void Serial::GetTermios2() const {
   ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error < 0) {
     throw SerialException("Error get Termios2: " + std::string(strerror(errno)));

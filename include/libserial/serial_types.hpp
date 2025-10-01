@@ -1,7 +1,7 @@
 #ifndef SERIAL_TYPES_HPP
 #define SERIAL_TYPES_HPP
 
-namespace serial {
+namespace libserial {
 
   enum class Parity {
     ENABLE,
@@ -49,6 +49,6 @@ namespace serial {
     BAUD_RATE_230400 = 230400
   };
 
-}  // namespace serial
+}  // namespace libserial
 
 #endif // SERIAL_TYPES_HPP
