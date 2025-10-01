@@ -19,9 +19,11 @@
 #include <asm/termbits.h>
 #include <sys/ioctl.h>
 
+#include <chrono>
 #include <iostream>
 #include <memory>
 #include <string>
+#include <thread>
 #include <vector>
 
 #include "libserial/serial_exception.hpp"
@@ -137,7 +139,7 @@ public:
    * @warning This method reads one byte at a time and may be slower
    *          for large amounts of data
    */
-  std::string readUntil(char terminator);
+  size_t readUntil(std::shared_ptr<std::string> buffer, char terminator);
 
   /**
    * @brief Flushes the input buffer
@@ -194,8 +196,27 @@ public:
    */
   int getAvailableData() const;
 
+  /**
+   * @brief Sets the read timeout in milliseconds
+   * 
+   * Configures the maximum time to wait for read operations before
+   * timing out. A value of 0 means no timeout (blocking).
+   * 
+   * @param timeout Timeout in milliseconds
+   */
+  void setReadTimeout(unsigned int timeout);
+
+  /**
+   * @brief Sets the write timeout in milliseconds
+   * 
+   * Configures the maximum time to wait for write operations before
+   * timing out. A value of 0 means no timeout (blocking).
+   * 
+   * @param timeout Timeout in milliseconds
+   */
+  void setWriteTimeout(unsigned int timeout);
+
   // Future planned methods (not yet implemented):
-  
   // void setNumberBits(NumBits num_bits);
   // void setParity(Parity parity);
   // void setStopBits(StopBits stop_bits);
@@ -211,7 +232,7 @@ private:
    * 
    * @throws SerialException if ioctl operation fails
    */
-  void GetTermios2() const;
+  void getTermios2() const;
 
   /**
    * @brief Applies terminal settings to the port
@@ -221,7 +242,7 @@ private:
    * 
    * @throws SerialException if ioctl operation fails
    */
-  void SetTermios2();
+  void setTermios2();
 
   /**
    * @brief Terminal configuration structure
@@ -238,8 +259,24 @@ private:
    * on the serial port. Set to -1 when no port is open.
    */
   int fd_serial_port_{-1};
+
+  /**
+   * @brief Read timeout in milliseconds
+   * 
+   * Specifies the maximum time to wait for read operations
+   * before timing out. Default is 1000ms.
+   */
+  unsigned int read_timeout_{1000};  ///< Read timeout in milliseconds (default 1000ms)
+
+  /**
+   * @brief Write timeout in milliseconds
+   * 
+   * Specifies the maximum time to wait for write operations
+   * before timing out. Default is 1000ms.
+   */
+  unsigned int write_timeout_{1000}; ///< Write timeout in milliseconds (default 1000ms)
 };
 
-}  // namespace serial
+}  // namespace libserial
 
 #endif  // LIBSERIAL_SERIAL_HPP_

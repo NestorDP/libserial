@@ -61,7 +61,6 @@ TEST_F(SerialTest, APIExists) {
     
     // These should all throw exceptions since no port is open,
     // but they test that the API methods exist and are callable
-    EXPECT_THROW(serial.readUntil('\n'), libserial::SerialException);
     EXPECT_THROW(serial.flushInputBuffer(), libserial::SerialException);
     EXPECT_THROW(serial.setBaudRate(9600), libserial::SerialException);
     EXPECT_THROW(serial.getAvailableData(), libserial::SerialException);
@@ -69,6 +68,7 @@ TEST_F(SerialTest, APIExists) {
     // Test new shared pointer read API
     auto buffer = std::make_shared<std::string>();
     EXPECT_THROW(serial.read(buffer, 100), libserial::SerialException);
+    EXPECT_THROW(serial.readUntil(buffer, '\n'), libserial::SerialException);
 }
 
 // Test the new shared pointer read function with null pointer

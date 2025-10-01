@@ -50,8 +50,6 @@ protected:
             FAIL() << "Failed to open slave pseudo-terminal";
             return;
         }
-        
-        std::cout << "Created pseudo-terminal pair: " << slave_port << std::endl;
     }
 
     void TearDown() override {
@@ -153,19 +151,55 @@ TEST_F(WorkingPseudoTerminalTest, ReadWithValidSharedPtr) {
     EXPECT_EQ(*read_buffer, test_message);
 }
 
-TEST_F(WorkingPseudoTerminalTest, ReadWithNullSharedPtr) {
+TEST_F(WorkingPseudoTerminalTest, ReadUntil) {
     libserial::Serial serial_port;
     
     serial_port.open(slave_port);
     serial_port.setBaudRate(9600);
-  
-    // Test null pointer error handling
-    std::shared_ptr<std::string> null_buffer;
-    EXPECT_THROW({
-        serial_port.read(null_buffer, 10);
-    }, libserial::SerialException);
+
+    const std::string test_message = "Read Until! Test!\n";
+
+    ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+    ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+     
+    // Give time for data to propagate
+    fsync(master_fd);
+    usleep(100000);  // 100ms delay
+ 
+    // Test reading with shared pointer - only read what's available
+    auto read_buffer = std::make_shared<std::string>();
+    size_t bytes_read = 0;
+    
+    EXPECT_NO_THROW({
+        bytes_read = serial_port.readUntil(read_buffer, '!');
+    });
+
+    EXPECT_EQ(*read_buffer, "Read Until!");
 }
 
+TEST_F(WorkingPseudoTerminalTest, ReadUntilTimeout) {
+    libserial::Serial serial_port;
+    
+    serial_port.open(slave_port);
+    serial_port.setBaudRate(9600);
+
+    const std::string test_message = "Read Until Test";
+
+    ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+    ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+     
+    // Give time for data to propagate
+    fsync(master_fd);
+    usleep(100000);  // 100ms delay
+ 
+    // Test reading with shared pointer - only read what's available
+    auto read_buffer = std::make_shared<std::string>();
+    size_t bytes_read = 0;
+    
+    EXPECT_THROW({
+        bytes_read = serial_port.readUntil(read_buffer, '!');
+    }, libserial::SerialException);
+}
 
 
 

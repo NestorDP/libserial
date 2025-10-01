@@ -26,7 +26,6 @@ void Serial::open(std::string port) {
     throw SerialException("Error opening port " + port + ": " + strerror(errno));
   } else {
     fcntl(fd_serial_port_, F_SETFL, 0);
-    std::cout << "Open port"  << port << std::endl;
   }
 }
 
@@ -72,18 +71,65 @@ size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
   return static_cast<size_t>(bytes_read);
 }
 
-std::string Serial::readUntil(char terminator) {
-  std::vector<char> buffer(1);
-  std::string data;
-
-  while (buffer[0] != terminator) {
-    ssize_t bytes_read = ::read(fd_serial_port_, buffer.data(), 1);
-    if (bytes_read < 0) {
-      throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
-    }
-    data.push_back(buffer[0]);
+size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
+  if (!buffer) {
+    throw SerialException("Null pointer passed to readUntil function");
   }
-  return data;
+
+  buffer->clear();
+  char temp_char = '\0';
+  
+  auto start_time = std::chrono::steady_clock::now();
+  
+  while (temp_char != terminator) {
+    // Check timeout if enabled (0 means no timeout)
+    if (read_timeout_ > 0) {
+      auto current_time = std::chrono::steady_clock::now();
+      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+
+      if (elapsed >= static_cast<long>(read_timeout_)) {
+        throw SerialException("Read timeout exceeded while waiting for terminator");
+      }
+      
+      // Use select() to check if data is available with remaining timeout
+      fd_set read_fds;
+      FD_ZERO(&read_fds);
+      FD_SET(fd_serial_port_, &read_fds);
+      
+      struct timeval timeout;
+      long remaining_timeout = read_timeout_ - elapsed;
+      timeout.tv_sec = remaining_timeout / 1000;
+      timeout.tv_usec = (remaining_timeout % 1000) * 1000;
+      
+      int select_result = select(fd_serial_port_ + 1, &read_fds, nullptr, nullptr, &timeout);
+      
+      if (select_result < 0) {
+        throw SerialException("Error in select(): " + std::string(strerror(errno)));
+      } else if (select_result == 0) {
+        throw SerialException("Read timeout exceeded while waiting for data");
+      }
+    }
+    
+    // Data is available, perform the read
+    ssize_t bytes_read = ::read(fd_serial_port_, &temp_char, 1);
+    
+    if (bytes_read < 0) {
+      if (errno == EAGAIN || errno == EWOULDBLOCK) {
+        // Non-blocking read, no data available right now
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        continue;
+      }
+      throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+    } else if (bytes_read == 0) {
+      // End of file or connection closed
+      throw SerialException("Connection closed while reading");
+    }
+    
+    // Add the character to buffer (including terminator)
+    buffer->push_back(temp_char);
+  }
+  
+  return buffer->size();
 }
 
 void Serial::flushInputBuffer() {
@@ -101,12 +147,12 @@ int Serial::getAvailableData() const {
 }
 
 void Serial::setBaudRate(int baud_rate) {
-  this->GetTermios2();
+  this->getTermios2();
   options_.c_cflag &= ~CBAUD;
   options_.c_cflag |= BOTHER;
   options_.c_ispeed = baud_rate;
   options_.c_ospeed = baud_rate;
-  this->SetTermios2();
+  this->setTermios2();
 }
 
 void Serial::setBaudRate(BaudRate baud_rate) {
@@ -114,26 +160,34 @@ void Serial::setBaudRate(BaudRate baud_rate) {
 }
 
 int Serial::getBaudRate() const {
-  this->GetTermios2();
+  this->getTermios2();
   return (static_cast<int>(options_.c_ispeed));
 }
 
-void Serial::GetTermios2() const {
+void Serial::getTermios2() const {
   ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
   if (error < 0) {
     throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
   }
 }
 
-void Serial::SetTermios2() {
+void Serial::setTermios2() {
   ssize_t error = ioctl(fd_serial_port_, TCSETS2, &options_);
   if (error < 0) {
     throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
   }
 }
 
+void Serial::setReadTimeout(unsigned int timeout) {
+  read_timeout_ = timeout;
+}
+
+void Serial::setWriteTimeout(unsigned int timeout) {
+  write_timeout_ = timeout;
+}
+
 // void Serial::SetNumberBits(NumBits num_bits) {
-//   this->GetTermios2();
+//   this->getTermios2();
 
 //   // Clear bits
 //   options_.c_cflag &= ~CSIZE;
@@ -155,11 +209,11 @@ void Serial::SetTermios2() {
 //       options_.c_cflag |= CS8;
 //       break;
 //   }
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 
 // void Serial::SetParity(Parity parity) {
-//   this->GetTermios2();
+//   this->getTermios2();
 //   switch (parity) {
 //     case Parity::DISABLE:
 //       options_.c_cflag &= ~PARENB;
@@ -171,11 +225,11 @@ void Serial::SetTermios2() {
 //       options_.c_cflag &= ~PARENB;
 //       break;
 //   }
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 
 // void Serial::SetTwoStopBits(StopBits stop_bits) {
-//   this->GetTermios2();
+//   this->getTermios2();
 //   switch (stop_bits) {
 //   case StopBits::DISABLE:
 //     options_.c_cflag &= ~CSTOP;
@@ -186,11 +240,11 @@ void Serial::SetTermios2() {
 //     options_.c_cflag &= ~CSTOP;
 //     break;
 //   }
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 
 // void Serial::SetFlowControl(FlowControl flow_control) {
-//   this->GetTermios2();
+//   this->getTermios2();
 //   switch (flow_control) {
 //   case FlowControl::Software:
 //     // options_.c_cflag &= ~CRTSCTS;
@@ -228,11 +282,11 @@ void Serial::SetTermios2() {
 //     options_.c_cflag &= ~CRTSCTS;
 //     break;
 //   }
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 
 // void Serial::SetCanonicalMode(CanonicalMode canonical_mode){
-//   this->GetTermios2();
+//   this->getTermios2();
 //   switch (canonical_mode) {
 //   case CanonicalMode::ENABLE:
 //     options_.c_lflag |=  (ICANON);
@@ -243,7 +297,7 @@ void Serial::SetTermios2() {
 //     options_.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | ECHONL);
 //     break;
 //   }
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 
 // void Serial::SetTerminator(Terminator term) {
@@ -251,14 +305,14 @@ void Serial::SetTermios2() {
 // }
 
 // void Serial::SetTimeOut(int time){
-//   this->GetTermios2();
+//   this->getTermios2();
 //   options_.c_cc[VTIME] = time;
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 
 // void Serial::SetMinNumberCharRead(int num) {
-//   this->GetTermios2();
+//   this->getTermios2();
 //   options_.c_cc[VMIN] = num;
-//   this->SetTermios2();
+//   this->setTermios2();
 // }
 }  // namespace serial
