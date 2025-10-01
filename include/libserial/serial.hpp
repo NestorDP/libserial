@@ -28,7 +28,7 @@
 #include "libserial/serial_types.hpp"
 
 /**
- * @brief Serial Interface Library SERIAL namespace
+ * @brief Serial Interface Library libserial namespace
  * @author Nestor Pereira Neto
  * 
  */
@@ -43,24 +43,7 @@ namespace libserial {
  * exception-based error handling for serial communication.
  * 
  * @author Nestor Pereira Neto
- * @version 1.0.0
- * 
- * Example usage:
- * @code
- * try {
- *     serial::Serial port("/dev/ttyUSB0");
- *     port.setBaudRate(9600);
- *     
- *     auto message = std::make_shared<std::string>("Hello World");
- *     port.write(message);
- *     
- *     std::string response = port.read(100);
- *     std::cout << "Received: " << response << std::endl;
- *     
- * } catch (const SerialException& e) {
- *     std::cerr << "Error: " << e.what() << std::endl;
- * }
- * @endcode
+ * @version 0.0.0
  */
 class Serial {
 public:
@@ -70,7 +53,9 @@ public:
    * Creates a Serial object without opening any port. 
    * Use open() method to establish connection.
    */
-  Serial();
+  Serial() = default;
+  Serial(const Serial&) = delete;
+  Serial& operator=(const Serial&) = delete;
 
   /**
    * @brief Constructor with automatic port opening
