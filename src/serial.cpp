@@ -57,15 +57,24 @@ void Serial::write(std::shared_ptr<std::string> data) {
   }
 }
 
-std::string Serial::read(size_t max_length) {
-  std::vector<char> buffer(max_length);
+size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
+  if (!buffer) {
+    throw SerialException("Null pointer passed to read function");
+  }
 
-  ssize_t bytes_read = ::read(fd_serial_port_, buffer.data(), max_length);
+  // Resize the string to accommodate the maximum possible data
+  buffer->resize(max_length);
+
+  // Use const_cast to get non-const pointer for read operation
+  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), max_length);
   if (bytes_read < 0) {
     throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
   }
 
-  return std::string(buffer.begin(), buffer.begin() + bytes_read);
+  // Resize the string to the actual number of bytes read
+  buffer->resize(static_cast<size_t>(bytes_read));
+
+  return static_cast<size_t>(bytes_read);
 }
 
 std::string Serial::readUntil(char terminator) {

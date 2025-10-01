@@ -66,4 +66,20 @@ TEST_F(SerialTest, APIExists) {
     EXPECT_THROW(serial.flushInputBuffer(), libserial::SerialException);
     EXPECT_THROW(serial.setBaudRate(9600), libserial::SerialException);
     EXPECT_THROW(serial.getAvailableData(), libserial::SerialException);
+    
+    // Test new shared pointer read API
+    auto buffer = std::make_shared<std::string>();
+    EXPECT_THROW(serial.read(buffer, 100), libserial::SerialException);
+}
+
+// Test the new shared pointer read function with null pointer
+TEST_F(SerialTest, ReadWithNullSharedPtr) {
+    libserial::Serial serial;
+    
+    // Test that read function handles null shared pointer
+    std::shared_ptr<std::string> null_buffer;
+    
+    EXPECT_THROW({
+        serial.read(null_buffer, 100);
+    }, libserial::SerialException);
 }

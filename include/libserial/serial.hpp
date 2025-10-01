@@ -108,18 +108,21 @@ public:
   void write(std::shared_ptr<std::string> data);
 
   /**
-   * @brief Reads data from the serial port
+   * @brief Reads data from serial port into a shared pointer buffer
    * 
-   * Attempts to read up to max_length bytes from the serial port.
-   * This is a blocking operation that will wait for data to arrive.
+   * Reads up to max_length bytes from the serial port and stores them
+   * in the provided shared string buffer. This version provides better
+   * memory management and avoids unnecessary string copies.
    * 
+   * @param buffer Shared pointer to string where data will be stored
    * @param max_length Maximum number of bytes to read
-   * @return String containing the read data
+   * @return Number of bytes actually read
    * @throws SerialException if read operation fails
+   * @throws SerialException if buffer is null
    * 
-   * @note The actual number of bytes read may be less than max_length
+   * @note The buffer will be resized to contain exactly the read data
    */
-  std::string read(size_t max_length);
+  size_t read(std::shared_ptr<std::string> buffer, size_t max_length);
 
   /**
    * @brief Reads data until a specific terminator character is found
