@@ -123,6 +123,7 @@ endif()
 # Testing configuration
 option(BUILD_TESTING "Build tests" OFF)
 option(BUILD_COVERAGE "Build with code coverage support" OFF)
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 # Coverage configuration
 if(BUILD_COVERAGE)
@@ -209,4 +210,38 @@ if(BUILD_TESTING)
             )
         endif()
     endif()
+endif()
+
+# Examples configuration
+if(BUILD_EXAMPLES)
+    # Find socat for examples (optional)
+    find_program(SOCAT_EXECUTABLE socat)
+    if(SOCAT_EXECUTABLE)
+        message(STATUS "Found socat: ${SOCAT_EXECUTABLE} - examples will work fully")
+    else()
+        message(WARNING "socat not found - examples may require manual setup")
+    endif()
+    
+    # Create examples directory in build
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/examples)
+    
+    # Basic communication example
+    add_executable(basic_communication examples/basic_communication.cpp)
+    target_link_libraries(basic_communication PRIVATE ${PROJECT_NAME})
+    target_include_directories(basic_communication PRIVATE include)
+    
+    # Baud rate testing example
+    add_executable(baud_rate_testing examples/baud_rate_testing.cpp)
+    target_link_libraries(baud_rate_testing PRIVATE ${PROJECT_NAME})
+    target_include_directories(baud_rate_testing PRIVATE include)
+    
+    # Set output directory for examples
+    set_target_properties(basic_communication baud_rate_testing PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples
+    )
+    
+    # Create examples target for building all examples
+    add_custom_target(examples DEPENDS basic_communication baud_rate_testing)
+    
+    message(STATUS "Examples will be built - use 'make examples' to build them")
 endif()
