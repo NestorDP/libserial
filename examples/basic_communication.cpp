@@ -46,8 +46,9 @@ int main(int argc, char* argv[]) {
         std::cout << "Available data: " << available << " bytes" << std::endl;
         
         if (available > 0) {
-            std::string response = serial.read(available);
-            std::cout << "Received: '" << response << "'" << std::endl;
+            auto buffer = std::make_shared<std::string>();
+            size_t bytes_read = serial.read(buffer, available);
+            std::cout << "Received (" << bytes_read << " bytes): '" << *buffer << "'" << std::endl;
         } else {
             std::cout << "No response received." << std::endl;
             std::cout << "You can send data to the other end of the virtual port." << std::endl;
@@ -74,8 +75,9 @@ int main(int argc, char* argv[]) {
             available = serial.getAvailableData();
             
             if (available > 0) {
-                std::string response = serial.read(available);
-                std::cout << "Received: '" << response << "'" << std::endl;
+                auto buffer = std::make_shared<std::string>();
+                size_t bytes_read = serial.read(buffer, available);
+                std::cout << "Received (" << bytes_read << " bytes): '" << *buffer << "'" << std::endl;
             }
         }
         
