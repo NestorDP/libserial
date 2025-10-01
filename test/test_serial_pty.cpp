@@ -123,45 +123,92 @@ TEST_F(WorkingPseudoTerminalTest, GetAvailableData) {
     EXPECT_EQ(available, bytes_written);
 }
 
-TEST_F(WorkingPseudoTerminalTest, SafeCommunication) {
+TEST_F(WorkingPseudoTerminalTest, ReadWithValidSharedPtr) {
     libserial::Serial serial_port;
-
+    
     serial_port.open(slave_port);
     serial_port.setBaudRate(9600);
-    std::cout << "Successfully opened serial port: " << slave_port << std::endl;
-
-    const std::string test_message = "Hello World!";
+        
+    const std::string test_message = "Smart Pointer Test!\n";
     
-    // Write data directly to the master end
     ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
     ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
-    std::cout << "Wrote " << bytes_written << " bytes to master" << std::endl;
-    
+     
     // Give time for data to propagate
+    fsync(master_fd);
     usleep(100000);  // 100ms delay
     
-    // Check available data first
-    std::string received_data;
-    try {
-        int available = serial_port.getAvailableData();
-        std::cout << "Available data: " << available << " bytes" << std::endl;
-        
-        if (available > 0) {
-            // Read only what's available to avoid blocking
-            received_data = serial_port.read(available);
-            std::cout << "Successfully read: '" << received_data << "'" << std::endl;
-        } else {
-            std::cout << "No data available for reading" << std::endl;
-        }
-        
-    } catch (const libserial::SerialException& e) {
-        // Don't fail the test, just report the issue
-        std::cout << "Read error (expected): " << e.what() << std::endl;
-    }
+    // Check that data is available before attempting to read
+    int available = serial_port.getAvailableData();
+
+    // Test reading with shared pointer - only read what's available
+    auto read_buffer = std::make_shared<std::string>();
+    size_t bytes_read = 0;
     
-    // Verify basic functionality worked
-    EXPECT_GT(bytes_written, 0);  // At least writing worked
+    EXPECT_NO_THROW({
+        bytes_read = serial_port.read(read_buffer, available);
+    });
+
+    EXPECT_EQ(bytes_read, test_message.length());
+    EXPECT_EQ(*read_buffer, test_message);
 }
+
+TEST_F(WorkingPseudoTerminalTest, ReadWithNullSharedPtr) {
+    libserial::Serial serial_port;
+    
+    serial_port.open(slave_port);
+    serial_port.setBaudRate(9600);
+  
+    // Test null pointer error handling
+    std::shared_ptr<std::string> null_buffer;
+    EXPECT_THROW({
+        serial_port.read(null_buffer, 10);
+    }, libserial::SerialException);
+}
+
+
+
+
+
+// TEST_F(WorkingPseudoTerminalTest, SafeCommunication) {
+//     libserial::Serial serial_port;
+
+//     serial_port.open(slave_port);
+//     serial_port.setBaudRate(9600);
+//     std::cout << "Successfully opened serial port: " << slave_port << std::endl;
+
+//     const std::string test_message = "Hello World!";
+    
+//     // Write data directly to the master end
+//     ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+//     ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+//     std::cout << "Wrote " << bytes_written << " bytes to master" << std::endl;
+    
+//     // Give time for data to propagate
+//     usleep(100000);  // 100ms delay
+    
+//     // Check available data first
+//     std::string received_data;
+//     try {
+//         int available = serial_port.getAvailableData();
+//         std::cout << "Available data: " << available << " bytes" << std::endl;
+        
+//         if (available > 0) {
+//             // Read only what's available to avoid blocking
+//             received_data = serial_port.read(available);
+//             std::cout << "Successfully read: '" << received_data << "'" << std::endl;
+//         } else {
+//             std::cout << "No data available for reading" << std::endl;
+//         }
+        
+//     } catch (const libserial::SerialException& e) {
+//         // Don't fail the test, just report the issue
+//         std::cout << "Read error (expected): " << e.what() << std::endl;
+//     }
+    
+//     // Verify basic functionality worked
+//     EXPECT_GT(bytes_written, 0);  // At least writing worked
+// }
 
 TEST_F(WorkingPseudoTerminalTest, WriteTest) {
     libserial::Serial serial_port;
