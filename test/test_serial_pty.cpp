@@ -9,6 +9,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/ioctl.h>
 
 #include "libserial/serial.hpp"
 #include "libserial/serial_exception.hpp"
@@ -73,7 +74,7 @@ TEST_F(WorkingPseudoTerminalTest, OpenClosePort) {
     });
 }
 
-TEST_F(WorkingPseudoTerminalTest, GetValidBaudRate) {
+TEST_F(WorkingPseudoTerminalTest, GetBaudRate) {
     libserial::Serial serial_port;
     
     serial_port.open(slave_port);
@@ -84,7 +85,7 @@ TEST_F(WorkingPseudoTerminalTest, GetValidBaudRate) {
     });
     
     // Get the baud rate and verify
-    int baud_rate = 0;
+    int baud_rate{0};
     EXPECT_NO_THROW({
         baud_rate = serial_port.getBaudRate();
     });
@@ -93,20 +94,43 @@ TEST_F(WorkingPseudoTerminalTest, GetValidBaudRate) {
     serial_port.close();
 }
 
+TEST_F(WorkingPseudoTerminalTest, GetAvailableData) {
+    libserial::Serial serial_port;
+
+    serial_port.open(slave_port);
+    serial_port.setBaudRate(9600);
+
+    // First check that no data is available initially
+    int initial_available{0};
+    EXPECT_NO_THROW({
+        initial_available = serial_port.getAvailableData();
+    });
+    EXPECT_EQ(initial_available, 0);
+
+    const std::string test_message = "Hello World!\n";    
+    ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+    ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+    // Force flush and give more time for data to propagate
+    fsync(master_fd);
+    usleep(100000);  // 100ms delay
+
+    // Now check available data again - should match what we wrote
+    int available{0};
+    EXPECT_NO_THROW({
+        available = serial_port.getAvailableData();
+    });
+    EXPECT_EQ(available, bytes_written);
+}
+
 TEST_F(WorkingPseudoTerminalTest, SafeCommunication) {
     libserial::Serial serial_port;
-    
-    // Test opening the port
-    try {
-        serial_port.open(slave_port);
-        serial_port.setBaudRate(9600);
-        std::cout << "Successfully opened serial port: " << slave_port << std::endl;
-    } catch (const libserial::SerialException& e) {
-        FAIL() << "Failed to open serial port: " << e.what();
-    }
-    
-    // Test data to send
-    const std::string test_message = "Hello!";
+
+    serial_port.open(slave_port);
+    serial_port.setBaudRate(9600);
+    std::cout << "Successfully opened serial port: " << slave_port << std::endl;
+
+    const std::string test_message = "Hello World!";
     
     // Write data directly to the master end
     ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
