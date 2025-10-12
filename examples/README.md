@@ -11,9 +11,6 @@ sudo apt-get install socat
 
 # CentOS/RHEL/Fedora
 sudo yum install socat    # or dnf install socat
-
-# macOS
-brew install socat
 ```
 
 ## Examples
