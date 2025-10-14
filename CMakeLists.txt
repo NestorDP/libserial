@@ -285,8 +285,8 @@ endif()
 
 if(UNCRUSTIFY_EXECUTABLE)
   add_custom_target(uncrustify
-    COMMAND ${CMAKE_COMMAND} -E echo "Running uncrustify (check-only) ..."
-    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/tools/run_uncrustify.sh
+    COMMAND ${CMAKE_COMMAND} -E echo "Running uncrustify - check-only..."
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/tools/run_uncrustify_check.sh
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Running uncrustify"
   )
