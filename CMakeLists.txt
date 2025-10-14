@@ -4,8 +4,9 @@ cmake_minimum_required(VERSION 3.10)
 project(libserial VERSION 1.0.0 LANGUAGES CXX)
 
 # Set C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Compiler flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -234,14 +235,19 @@ if(BUILD_EXAMPLES)
     add_executable(baud_rate_testing examples/baud_rate_testing.cpp)
     target_link_libraries(baud_rate_testing PRIVATE ${PROJECT_NAME})
     target_include_directories(baud_rate_testing PRIVATE include)
+
+    # List ports example
+    add_executable(list_ports examples/list_ports.cpp)
+    target_link_libraries(list_ports PRIVATE ${PROJECT_NAME})
+    target_include_directories(list_ports PRIVATE include)
     
     # Set output directory for examples
-    set_target_properties(basic_communication baud_rate_testing PROPERTIES
+    set_target_properties(basic_communication baud_rate_testing list_ports PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples
     )
     
     # Create examples target for building all examples
-    add_custom_target(examples DEPENDS basic_communication baud_rate_testing)
+    add_custom_target(examples DEPENDS basic_communication baud_rate_testing list_ports)
     
     message(STATUS "Examples will be built - use 'make examples' to build them")
 endif()

@@ -21,6 +21,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <optional>
+
+#include "libserial/serial_exception.hpp"
+#include "libserial/serial_types.hpp"
 
 /**
  * @brief Ethernet Interface Library SERIAL namespace
@@ -30,12 +35,6 @@
 
 namespace libserial {
 
-struct DeviceStruct {
-  std::string name;
-  std::string port;
-  std::string path;
-  int id;
-};
 
 
 class Ports {
@@ -44,13 +43,13 @@ public:
  * @brief Constructor of the Ports class
  *
  */
-Ports();
+Ports() = default;
 
 /**
  * @brief Destroyer of the Ports class
  *
  */
-~Ports();
+~Ports() = default;
 
 /**
  * @brief Receive string over serial port
@@ -58,13 +57,20 @@ Ports();
  * @param N/D
  * @return std::string
  */
-void list_ports() const;
+uint16_t scanPorts();
 
+
+void getDeviceList(std::vector<DeviceStruct> & list) const;
+
+std::optional<std::string> findPortPath(uint16_t id) const;
+
+std::optional<std::string> findBusPath(uint16_t id) const;
+
+std::optional<std::string> findName(uint16_t id) const;
 
 private:
 std::vector<DeviceStruct> device_list_;
 };
-
 }  // namespace libserial
 
 #endif  // INCLUDE_LIBSERIAL_PORTS_HPP_

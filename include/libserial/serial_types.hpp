@@ -13,6 +13,7 @@
 #ifndef INCLUDE_LIBSERIAL_SERIAL_TYPES_HPP_
 #define INCLUDE_LIBSERIAL_SERIAL_TYPES_HPP_
 
+#include <string>
 /**
  * @namespace libserial
  * @brief Main namespace for the LibSerial library
@@ -21,6 +22,13 @@
  * communication functionality.
  */
 namespace libserial {
+
+struct DeviceStruct {
+  std::string name;
+  std::string port_path;
+  std::string bus_path;
+  uint16_t id;
+};
 
 /**
  * @enum Parity

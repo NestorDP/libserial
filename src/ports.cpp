@@ -7,79 +7,102 @@
  */
 #include <cstdio>
 #include <string>
+#include <dirent.h>
+#include <limits.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <iostream>
+#include <utility>
+
 #include "libserial/ports.hpp"
 
 namespace libserial {
 
-Ports::Ports() {
+uint16_t Ports::scanPorts() {
+  device_list_.clear();
+
+  // Directory where udev creates symlinks for serial devices by ID
+  // this directory may not exist if no serial devices are connected
+  const char* by_id_dir = "/dev/serial/by-id";
+  DIR* dir = opendir(by_id_dir);
+  if (!dir) {
+    std::cout << "No serial devices directory: " << by_id_dir << "\n";
+    return -1;
+  }
+
+  // The POSIX directory-entry structure used by readdir() to describe files
+  // inside a directory.
+  struct dirent* entry;
+  uint16_t id_counter = 0;
+
+
+  while ((entry = readdir(dir)) != nullptr) {
+    // Skip . and .. entries
+    if (entry->d_name[0] == '.') continue;
+
+    std::string device_name(entry->d_name);
+    std::string symlink_path = std::string(by_id_dir) + "/" + device_name;
+
+    // Store the relative path the symlink points to
+    char target[PATH_MAX] = {0};
+
+    // Resolve the symlink to get the actual device path relative to /dev
+    // from the /dev/serial/by-id/ directory (e.g., ../../ttyUSB0)
+    ssize_t len = readlink(symlink_path.c_str(), target, sizeof(target) - 1);
+    target[len] = '\0';
+
+    // Resolve the relative path to an absolute path
+    const char* bname = strrchr(target, '/');
+    bname++;
+
+    // Construct the full /dev/ttyXXX path
+    auto resolved = std::string("/dev/") + std::string(bname);
+
+    // Add to device list
+    DeviceStruct dev;
+    dev.id = id_counter++;
+    dev.name = device_name;
+    dev.bus_path = resolved;
+    dev.port_path = resolved;
+
+    // Update the device list
+    device_list_.push_back(std::move(dev));
+  }
+
+  closedir(dir);
+
+  return (id_counter - 1);
 }
 
-Ports::~Ports() {
+void Ports::getDeviceList(std::vector<DeviceStruct> & list) const {
+  list = device_list_;
 }
 
-void Ports::list_ports() const {
-  // Note: ports listing implementation is platform-specific and was
-  // left as a placeholder. Remove unused variables reported by static
-  // analysis. Implement actual device enumeration when needed.
-  (void)device_list_;  // suppress unused member warning until implemented
-
-  // std::cout << "xxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
-
-  // if (feof(fp_id)) {
-  //   fscanf(fp_id, "%s", ls_output);
-  //   std::cout << "1111111111111111111111111   " << std::endl;
-  // }
-
-
-  // std::cout << std::endl;
-
-  // // Get device name
-  // if (strcmp (ls_output, "total") == 0) {
-  //   std::cout << "222222222222222222222" << std::endl;
-  //   //fscanf(fp_id, "%s", ls_output);
-  //   //fscanf(fp_id, "%s", ls_output);
-  //   serial::device.id = 1;
-  //   do {
-  //     for (int i = 0; i < 8; i++) {
-  //       //fscanf(fp_id, "%s", ls_output);
-  //     }
-  //     serial::device.name = ls_output;
-
-  //     // Get port name
-  //     //fscanf(fp_id, "%s", ls_output);
-  //     //fscanf(fp_id, "%s", ls_output);
-  //     serial::device.port = ls_output;
-  //     serial::device.port.replace(0, 5, dev);
-
-  //     // Get device path
-  //     //fscanf(fp_path, "%s", ls_output);
-  //     serial::device.path = ls_output;
-
-  //     device_list_.push_back(serial::device);
-
-  //     //fscanf(fp_id, "%s", ls_output);
-  //     serial::device.id++;
-
-  //   } while (strcmp (serial::device.path.c_str(), ls_output));
-  //   // fclose(fp_id);
-  //   //fclose(fp_path);
-  // }
-  // else {
-  //   // std::cout << "33333333333333333333333333" << std::endl;
-  //   // serial::device.path = "NaN";
-  //   // serial::device.name = "NaN";
-  //   // serial::device.port = "NaN";
-  //   // fclose(fp_id);
-  //   //fclose(fp_path);
-  // }
-
-  // std::cout << "Number of devices: " << device_list_.size() << std::endl;
-
-  // for (auto i : device_list_ ) {
-  //   std::cout << "Device ID: " << i.id<< std::endl;
-  //   std::cout << "Device name: " << i.name<< std::endl;
-  //   std::cout << "Device port: " << i.port<< std::endl;
-  //   std::cout << "Device path: " << i.path<< std::endl;
-  // }
+std::optional<std::string> Ports::findPortPath(uint16_t id) const {
+  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
+                         [id](const DeviceStruct& dev){
+      return dev.id == id;
+    });
+  if (it == device_list_.cend()) return std::nullopt;
+  return it->port_path;
 }
+
+std::optional<std::string> Ports::findBusPath(uint16_t id) const {
+  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
+                         [id](const DeviceStruct& dev){
+      return dev.id == id;
+    });
+  if (it == device_list_.cend()) return std::nullopt;
+  return it->bus_path;
+}
+
+std::optional<std::string> Ports::findName(uint16_t id) const {
+  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
+                         [id](const DeviceStruct& dev){
+      return dev.id == id;
+    });
+  if (it == device_list_.cend()) return std::nullopt;
+  return it->name;
+}
+
 }  // namespace libserial
