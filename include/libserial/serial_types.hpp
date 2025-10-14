@@ -13,6 +13,7 @@
 #ifndef INCLUDE_LIBSERIAL_SERIAL_TYPES_HPP_
 #define INCLUDE_LIBSERIAL_SERIAL_TYPES_HPP_
 
+#include <string>
 /**
  * @namespace libserial
  * @brief Main namespace for the LibSerial library

@@ -13,10 +13,10 @@ int main() {
     std::cout << "Number of devices found: " << num_ports + 1 << std::endl;
 
     for (uint16_t i = 0; i <= num_ports; ++i) {
-        auto name = ports.getName(i);
-        auto port_path = ports.getPortPath(i);
-        auto bus_path = ports.getBusPath(i);
-        std::cout << "  [" << i << "] " << name << " -> " << port_path << " (bus: " << bus_path << ")\n";
+        auto name = ports.findName(i);
+        auto port_path = ports.findPortPath(i);
+        auto bus_path = ports.findBusPath(i);
+        std::cout << "  [" << i << "] " << name.value_or("unknown") << " -> " << port_path.value_or("unknown") << " (bus: " << bus_path.value_or("unknown") << ")\n";
     }
 
     return 0;

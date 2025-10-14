@@ -21,6 +21,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <optional>
 
 #include "libserial/serial_exception.hpp"
 #include "libserial/serial_types.hpp"
@@ -60,11 +62,11 @@ uint16_t scanPorts();
 
 void getDeviceList(std::vector<DeviceStruct> & list) const;
 
-std::string getPortPath(uint16_t id) const;
+std::optional<std::string> findPortPath(uint16_t id) const;
 
-std::string getBusPath(uint16_t id) const;
+std::optional<std::string> findBusPath(uint16_t id) const;
 
-std::string getName(uint16_t id) const;
+std::optional<std::string> findName(uint16_t id) const;
 
 private:
 std::vector<DeviceStruct> device_list_;

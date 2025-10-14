@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <iostream>
+#include <utility>
 
 #include "libserial/ports.hpp"
 
@@ -42,7 +43,7 @@ uint16_t Ports::scanPorts() {
     std::string device_name(entry->d_name);
     std::string symlink_path = std::string(by_id_dir) + "/" + device_name;
 
-    // Store the relative path the symlink points to 
+    // Store the relative path the symlink points to
     char target[PATH_MAX] = {0};
 
     // Resolve the symlink to get the actual device path relative to /dev
@@ -56,7 +57,7 @@ uint16_t Ports::scanPorts() {
 
     // Construct the full /dev/ttyXXX path
     auto resolved = std::string("/dev/") + std::string(bname);
-    
+
     // Add to device list
     DeviceStruct dev;
     dev.id = id_counter++;
@@ -77,31 +78,31 @@ void Ports::getDeviceList(std::vector<DeviceStruct> & list) const {
   list = device_list_;
 }
 
-std::string Ports::getPortPath(uint16_t id) const {
-  for (const auto& dev : device_list_) {
-    if (dev.id == id) {
-      return dev.port_path;
-    }
-  }
-  return "";
+std::optional<std::string> Ports::findPortPath(uint16_t id) const {
+  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
+                         [id](const DeviceStruct& dev){
+      return dev.id == id;
+    });
+  if (it == device_list_.cend()) return std::nullopt;
+  return it->port_path;
 }
 
-std::string Ports::getBusPath(uint16_t id) const {
-  for (const auto& dev : device_list_) {
-    if (dev.id == id) {
-      return dev.bus_path;
-    }
-  }
-  return "";
+std::optional<std::string> Ports::findBusPath(uint16_t id) const {
+  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
+                         [id](const DeviceStruct& dev){
+      return dev.id == id;
+    });
+  if (it == device_list_.cend()) return std::nullopt;
+  return it->bus_path;
 }
 
-std::string Ports::getName(uint16_t id) const {
-  for (const auto& dev : device_list_) {
-    if (dev.id == id) {
-      return dev.name;
-    }
-  }
-  return "";
+std::optional<std::string> Ports::findName(uint16_t id) const {
+  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
+                         [id](const DeviceStruct& dev){
+      return dev.id == id;
+    });
+  if (it == device_list_.cend()) return std::nullopt;
+  return it->name;
 }
 
 }  // namespace libserial
