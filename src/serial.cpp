@@ -108,7 +108,8 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
       int poll_result = poll(&pfd, 1, timeout_ms);
       if (poll_result < 0) {
         throw SerialException("Error in poll(): " + std::string(strerror(errno)));
-      } else if (poll_result == 0) {
+      }
+      else if (poll_result == 0) {
         throw SerialException("Read timeout exceeded while waiting for data");
       }
     }
