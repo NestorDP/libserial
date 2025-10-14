@@ -1,0 +1,27 @@
+name: Lint
+
+on: [pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: |
+          sudo apt update
+          sudo apt install -y cppcheck uncrustify
+          python3 -m pip install cpplint
+      - name: Configure CMake
+        run: |
+          mkdir build && cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+      - name: Run cpplint
+        run: |
+          ./tools/run_cpplint.sh
+      - name: Run cppcheck
+        run: |
+          ./tools/run_cppcheck.sh
+      - name: Run uncrustify (check)
+        run: |
+          ./tools/run_uncrustify.sh
