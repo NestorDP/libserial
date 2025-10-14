@@ -4,8 +4,8 @@
  * @mainpage Serial Interface Library
  * @section intro_sec Indroduction
  * This is an interface C++ library for serial serial
- * 
- * 
+ *
+ *
  */
 #ifndef INCLUDE_LIBSERIAL_PORTS_HPP_
 #define INCLUDE_LIBSERIAL_PORTS_HPP_
@@ -25,7 +25,7 @@
 /**
  * @brief Ethernet Interface Library SERIAL namespace
  * @author Nestor Pereira Neto
- * 
+ *
  */
 
 namespace libserial {
@@ -39,30 +39,30 @@ struct DeviceStruct {
 
 
 class Ports {
- public:
-  /**
-   * @brief Constructor of the Ports class
-   * 
-   */
-  Ports();
+public:
+/**
+ * @brief Constructor of the Ports class
+ *
+ */
+Ports();
 
-  /**
-   * @brief Destroyer of the Ports class
-   * 
-   */
-  ~Ports();
+/**
+ * @brief Destroyer of the Ports class
+ *
+ */
+~Ports();
 
-  /**
-   * @brief Receive string over serial port
-   * 
-   * @param N/D
-   * @return std::string 
-   */
-  void list_ports();
+/**
+ * @brief Receive string over serial port
+ *
+ * @param N/D
+ * @return std::string
+ */
+void list_ports();
 
 
- private:
-  std::vector<DeviceStruct> device_list_;
+private:
+std::vector<DeviceStruct> device_list_;
 };
 
 }  // namespace libserial

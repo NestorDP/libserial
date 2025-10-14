@@ -1,7 +1,7 @@
 // @ Copyright 2020-2025 Nestor Neto
 
 /**
- * 
+ *
  *
  * \file serial.cpp
  */
@@ -11,18 +11,17 @@
 
 namespace libserial {
 
-Ports::Ports() {}
+Ports::Ports() {
+}
 
-Ports::~Ports() {}
+Ports::~Ports() {
+}
 
 void Ports::list_ports() {
-  FILE *fp_id;
-  // FILE *fp_path;
-  char ls_output[100];
-  std::string dev = "/dev";
-
-  fp_id = popen("ls -l /dev/serial/by-id", "r");
-  // fp_path = popen("ls /dev/serial/by-path","r");
+  // Note: ports listing implementation is platform-specific and was
+  // left as a placeholder. Remove unused variables reported by static
+  // analysis. Implement actual device enumeration when needed.
+  (void)device_list_;  // suppress unused member warning until implemented
 
   // std::cout << "xxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 

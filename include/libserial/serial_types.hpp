@@ -4,7 +4,7 @@
  * @file serial_types.hpp
  * @brief Type definitions and enumerations for serial port configuration
  * @author Ntor Neto
- * 
+ *
  * This file contains type-safe enum classes used for configuring various
  * aspects of serial port communication including parity, stop bits, flow control,
  * canonical mode, terminators, and baud rates.
@@ -16,7 +16,7 @@
 /**
  * @namespace libserial
  * @brief Main namespace for the LibSerial library
- * 
+ *
  * Contains all classes, functions, and type definitions for serial port
  * communication functionality.
  */
@@ -25,11 +25,11 @@ namespace libserial {
 /**
  * @enum Parity
  * @brief Enumeration for serial port parity configuration
- * 
+ *
  * Parity is an error-checking mechanism where an extra bit is added to each
  * byte of data to detect transmission errors. The parity bit makes the total
  * number of 1 bits in the byte either even (even parity) or odd (odd parity).
- * 
+ *
  * @note This enum currently provides basic enable/disable functionality.
  *       Future versions may include specific parity types (EVEN, ODD, MARK, SPACE).
  */
@@ -41,11 +41,11 @@ enum class Parity {
 /**
  * @enum StopBits
  * @brief Enumeration for serial port stop bits configuration
- * 
+ *
  * Stop bits are used to signal the end of a data frame in asynchronous
  * serial communication. Common configurations include 1 stop bit (standard)
  * or 2 stop bits (for slower or noisy communication).
- * 
+ *
  * @note This enum currently provides basic enable/disable functionality.
  *       Future versions may include specific stop bit counts (ONE, TWO).
  */
@@ -57,7 +57,7 @@ enum class StopBits {
 /**
  * @enum FlowControl
  * @brief Enumeration for serial port flow control configuration
- * 
+ *
  * Flow control is used to prevent data loss when the receiver cannot keep up
  * with the sender's transmission rate. It provides mechanisms to pause and
  * resume data transmission.
@@ -70,7 +70,7 @@ enum class FlowControl {
 /**
  * @enum CanonicalMode
  * @brief Enumeration for terminal canonical mode configuration
- * 
+ *
  * Canonical mode (also known as "cooked mode") controls how input is processed
  * by the terminal driver. In canonical mode, input is line-buffered and
  * processed for special characters (backspace, delete, etc.). In non-canonical
@@ -84,7 +84,7 @@ enum class CanonicalMode {
 /**
  * @enum Terminator
  * @brief Enumeration for data transmission terminator characters
- * 
+ *
  * Terminator characters are used to mark the end of data frames or messages
  * in serial communication protocols. These characters help the receiver
  * identify message boundaries in continuous data streams.
@@ -97,22 +97,22 @@ enum class Terminator {
 /**
  * @enum BaudRate
  * @brief Enumeration for serial port baud rate (bits per second) configuration
- * 
+ *
  * Baud rate defines the speed of data transmission in bits per second (bps).
  * This enum class provides type-safe access to standard baud rates commonly
  * used in serial communication. Higher baud rates allow faster data transfer
  * but may be more susceptible to transmission errors over long distances or
  * in noisy environments.
- * 
+ *
  * @note The underlying integer values represent the actual baud rate in bps.
  *       These values can be used with system calls that require integer
  *       baud rate parameters through static_cast<int>().
- * 
+ *
  * @example
  * @code
  * // Type-safe baud rate setting
  * serial.setBaudRate(BaudRate::BAUD_RATE_115200);
- * 
+ *
  * // Convert to integer if needed for system calls
  * int baud_int = static_cast<int>(BaudRate::BAUD_RATE_9600);
  * @endcode

@@ -25,7 +25,8 @@ void Serial::open(const std::string& port) {
 
   if (fd_serial_port_ == -1) {
     throw SerialException("Error opening port " + port + ": " + strerror(errno));
-  } else {
+  }
+  else {
     fcntl(fd_serial_port_, F_SETFL, 0);
   }
 }
@@ -86,7 +87,8 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
     // Check timeout if enabled (0 means no timeout)
     if (read_timeout_ > 0) {
       auto current_time = std::chrono::steady_clock::now();
-      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time - start_time).count();
+      auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time -
+                                                                           start_time).count();
 
       if (elapsed >= static_cast<int64_t>(read_timeout_)) {
         throw SerialException("Read timeout exceeded while waiting for terminator");
@@ -106,7 +108,8 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
 
       if (select_result < 0) {
         throw SerialException("Error in select(): " + std::string(strerror(errno)));
-      } else if (select_result == 0) {
+      }
+      else if (select_result == 0) {
         throw SerialException("Read timeout exceeded while waiting for data");
       }
     }
@@ -121,7 +124,8 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
         continue;
       }
       throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
-    } else if (bytes_read == 0) {
+    }
+    else if (bytes_read == 0) {
       // End of file or connection closed
       throw SerialException("Connection closed while reading");
     }
