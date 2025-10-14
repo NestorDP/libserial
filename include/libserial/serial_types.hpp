@@ -22,6 +22,13 @@
  */
 namespace libserial {
 
+struct DeviceStruct {
+  std::string name;
+  std::string port_path;
+  std::string bus_path;
+  uint16_t id;
+};
+
 /**
  * @enum Parity
  * @brief Enumeration for serial port parity configuration
