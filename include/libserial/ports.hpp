@@ -39,7 +39,7 @@ struct DeviceStruct {
 
 
 class Ports {
- public:
+public:
 /**
  * @brief Constructor of the Ports class
  *
@@ -61,7 +61,7 @@ Ports();
 void list_ports() const;
 
 
- private:
+private:
 std::vector<DeviceStruct> device_list_;
 };
 
