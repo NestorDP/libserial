@@ -1,8 +1,11 @@
+// @ Copyright 2025 Nestor Neto
+
 #include <iostream>
 #include <memory>
 #include <thread>
 #include <chrono>
 #include <vector>
+#include <string>
 
 #include "libserial/serial.hpp"
 #include "libserial/serial_exception.hpp"
@@ -11,9 +14,9 @@ void testBaudRate(libserial::Serial& serial, libserial::BaudRate baud) {
     try {
         serial.setBaudRate(baud);
         int actual = serial.getBaudRate();
-        std::cout << "  Set: " << static_cast<int>(baud) 
-                  << " -> Got: " << actual 
-                  << (actual == static_cast<int>(baud) ? " ✓" : " ✗") 
+        std::cout << "  Set: " << static_cast<int>(baud)
+                  << " -> Got: " << actual
+                  << (actual == static_cast<int>(baud) ? " ✓" : " ✗")
                   << std::endl;
     } catch (const libserial::SerialException& e) {
         std::cout << "  Failed to set " << static_cast<int>(baud) << ": " << e.what() << std::endl;
@@ -28,16 +31,15 @@ int main(int argc, char* argv[]) {
     }
 
     std::string port = argv[1];
-    
     try {
         libserial::Serial serial;
-        
+
         std::cout << "=== Baud Rate Testing Example ===" << std::endl;
         std::cout << "Opening serial port: " << port << std::endl;
         serial.open(port);
-        
+
         std::cout << "\nTesting various baud rates:" << std::endl;
-        
+
         // Test standard baud rates
         std::vector<libserial::BaudRate> baud_rates = {
             libserial::BaudRate::BAUD_RATE_1200,
@@ -50,42 +52,40 @@ int main(int argc, char* argv[]) {
             libserial::BaudRate::BAUD_RATE_115200,
             libserial::BaudRate::BAUD_RATE_230400
         };
-        
+
         for (auto baud : baud_rates) {
             testBaudRate(serial, baud);
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
-        
+
         // Test communication at different speeds
         std::cout << "\n=== Communication Test ===" << std::endl;
         std::vector<libserial::BaudRate> test_speeds = {
             libserial::BaudRate::BAUD_RATE_9600,
             libserial::BaudRate::BAUD_RATE_115200
         };
-        
+
         for (auto speed : test_speeds) {
             std::cout << "\nTesting communication at " << static_cast<int>(speed) << " baud:" << std::endl;
             serial.setBaudRate(speed);
-            
+
             // Send test message
             std::string test_msg = "Speed test at " + std::to_string(static_cast<int>(speed));
             auto message = std::make_shared<std::string>(test_msg);
-            
+
             auto start = std::chrono::high_resolution_clock::now();
             serial.write(message);
             auto end = std::chrono::high_resolution_clock::now();
-            
+
             auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
             std::cout << "  Write time: " << duration.count() << " μs" << std::endl;
             std::cout << "  Message: '" << test_msg << "'" << std::endl;
-            
+
             // Small delay between tests
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-        
         std::cout << "\n=== Test Complete ===" << std::endl;
         std::cout << "Baud rate testing finished successfully!" << std::endl;
-        
     } catch (const libserial::SerialException& e) {
         std::cerr << "Serial error: " << e.what() << std::endl;
         return 1;
@@ -93,6 +93,6 @@ int main(int argc, char* argv[]) {
         std::cerr << "Error: " << e.what() << std::endl;
         return 1;
     }
-    
+
     return 0;
 }

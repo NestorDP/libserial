@@ -1,3 +1,5 @@
+// Copyright 2020-2025 Nestor Neto
+
 #include <gtest/gtest.h>
 #include <memory>
 #include <string>
@@ -8,7 +10,7 @@
 
 // Simple unit tests that don't require actual hardware
 class SerialTest : public ::testing::Test {
-protected:
+ protected:
     void SetUp() override {
         // Test setup if needed
     }
@@ -32,10 +34,10 @@ TEST_F(SerialTest, ConstructorWithInvalidPort) {
 
 TEST_F(SerialTest, WriteWithSharedPtr) {
     libserial::Serial serial;
-    
+
     // Test that write function accepts shared_ptr
     auto message = std::make_shared<std::string>("Test message");
-    
+
     // This will throw since no port is opened, but tests the API
     EXPECT_THROW({
         serial.write(message);
@@ -44,10 +46,10 @@ TEST_F(SerialTest, WriteWithSharedPtr) {
 
 TEST_F(SerialTest, WriteWithNullPtr) {
     libserial::Serial serial;
-    
+
     // Test that write function handles null pointer
     std::shared_ptr<std::string> null_message;
-    
+
     EXPECT_THROW({
         serial.write(null_message);
     }, libserial::SerialException);
@@ -55,16 +57,16 @@ TEST_F(SerialTest, WriteWithNullPtr) {
 
 TEST_F(SerialTest, APIExists) {
     libserial::Serial serial;
-    
+
     // close() should not throw when no port is open (safe operation)
     EXPECT_NO_THROW(serial.close());
-    
+
     // These should all throw exceptions since no port is open,
     // but they test that the API methods exist and are callable
     EXPECT_THROW(serial.flushInputBuffer(), libserial::SerialException);
     EXPECT_THROW(serial.setBaudRate(9600), libserial::SerialException);
     EXPECT_THROW(serial.getAvailableData(), libserial::SerialException);
-    
+
     // Test new shared pointer read API
     auto buffer = std::make_shared<std::string>();
     EXPECT_THROW(serial.read(buffer, 100), libserial::SerialException);
@@ -74,10 +76,10 @@ TEST_F(SerialTest, APIExists) {
 // Test the new shared pointer read function with null pointer
 TEST_F(SerialTest, ReadWithNullSharedPtr) {
     libserial::Serial serial;
-    
+
     // Test that read function handles null shared pointer
     std::shared_ptr<std::string> null_buffer;
-    
+
     EXPECT_THROW({
         serial.read(null_buffer, 100);
     }, libserial::SerialException);

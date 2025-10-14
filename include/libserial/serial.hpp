@@ -1,4 +1,4 @@
-//  @ Copyright 2022-2024 Nestor Neto
+//  @ Copyright 2022-2025 Nestor Neto
 
 /**
  * @mainpage Serial Interface Library
@@ -7,8 +7,8 @@
  * 
  * 
  */
-#ifndef LIBSERIAL_SERIAL_HPP_
-#define LIBSERIAL_SERIAL_HPP_
+#ifndef INCLUDE_LIBSERIAL_SERIAL_HPP_
+#define INCLUDE_LIBSERIAL_SERIAL_HPP_
 
 #include <errno.h>
 #include <fcntl.h>
@@ -48,7 +48,7 @@ namespace libserial {
  * @version 0.0.0
  */
 class Serial {
-public:
+ public:
   /**
    * @brief Default constructor
    * 
@@ -68,8 +68,8 @@ public:
    * @param port The device path (e.g., "/dev/ttyUSB0", "/dev/ttyS0")
    * @throws SerialException if the port cannot be opened
    */
-  Serial(std::string port);
-  
+    explicit Serial(std::string port);
+
   /**
    * @brief Destructor
    * 
@@ -77,7 +77,7 @@ public:
    * proper resource cleanup.
    */
   ~Serial();
-  
+
   /**
    * @brief Opens a serial port for communication
    * 
@@ -221,9 +221,8 @@ public:
   // void setParity(Parity parity);
   // void setStopBits(StopBits stop_bits);
   // void setTimeOut(int time);
-  
 
-private:
+ private:
   /**
    * @brief Retrieves current terminal settings
    * 
@@ -274,9 +273,9 @@ private:
    * Specifies the maximum time to wait for write operations
    * before timing out. Default is 1000ms.
    */
-  unsigned int write_timeout_{1000}; ///< Write timeout in milliseconds (default 1000ms)
+  unsigned int write_timeout_{1000};  ///< Write timeout in milliseconds (default 1000ms)
 };
 
 }  // namespace libserial
 
-#endif  // LIBSERIAL_SERIAL_HPP_
+#endif  // INCLUDE_LIBSERIAL_SERIAL_HPP_

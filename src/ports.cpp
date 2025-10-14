@@ -1,32 +1,29 @@
-// @ Copyright 2020
+// @ Copyright 2020-2025 Nestor Neto
 
 /**
  * 
  *
  * \file serial.cpp
  */
-
+#include <cstdio>
+#include <string>
 #include "libserial/ports.hpp"
 
 namespace libserial {
 
-Ports::Ports() {
-  
-}
+Ports::Ports() {}
 
-Ports::~Ports() { 
-
-}
+Ports::~Ports() {}
 
 void Ports::list_ports() {
   FILE *fp_id;
-  //FILE *fp_path;
+  // FILE *fp_path;
   char ls_output[100];
   std::string dev = "/dev";
 
-  fp_id = popen("ls -l /dev/serial/by-id","r"); 
-  //fp_path = popen("ls /dev/serial/by-path","r"); 
-  
+  fp_id = popen("ls -l /dev/serial/by-id", "r");
+  // fp_path = popen("ls /dev/serial/by-path","r");
+
   // std::cout << "xxxxxxxxxxxxxxxxxxxxxxxx" << std::endl;
 
   // if (feof(fp_id)) {
@@ -75,7 +72,7 @@ void Ports::list_ports() {
   //   // serial::device.port = "NaN";
   //   // fclose(fp_id);
   //   //fclose(fp_path);
-  // }  
+  // }
 
   // std::cout << "Number of devices: " << device_list_.size() << std::endl;
 
@@ -86,4 +83,4 @@ void Ports::list_ports() {
   //   std::cout << "Device path: " << i.path<< std::endl;
   // }
 }
-}
+}  // namespace libserial

@@ -7,8 +7,8 @@
  * 
  * 
  */
-#ifndef LIBSERIAL_PORTS_HPP_
-#define LIBSERIAL_PORTS_HPP_
+#ifndef INCLUDE_LIBSERIAL_PORTS_HPP_
+#define INCLUDE_LIBSERIAL_PORTS_HPP_
 
 #include <errno.h>
 #include <fcntl.h>
@@ -62,9 +62,9 @@ class Ports {
 
 
  private:
-  std::vector<DeviceStruct> device_list_ ;
+  std::vector<DeviceStruct> device_list_;
 };
 
-}  // namespace serial
+}  // namespace libserial
 
-#endif  // LIBSERIAL_PORTS_HPP_
+#endif  // INCLUDE_LIBSERIAL_PORTS_HPP_
