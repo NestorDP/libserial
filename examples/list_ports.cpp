@@ -1,3 +1,5 @@
+// @ Copyright 2025 Nestor Neto
+//
 // Example: list serial ports using Ports class
 
 #include <iostream>
