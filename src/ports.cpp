@@ -17,7 +17,7 @@ Ports::Ports() {
 Ports::~Ports() {
 }
 
-void Ports::list_ports() {
+void Ports::list_ports() const {
   // Note: ports listing implementation is platform-specific and was
   // left as a placeholder. Remove unused variables reported by static
   // analysis. Implement actual device enumeration when needed.

@@ -48,7 +48,7 @@ namespace libserial {
  * @version 0.0.0
  */
 class Serial {
-public:
+ public:
 /**
  * @brief Default constructor
  *
@@ -222,7 +222,7 @@ void setWriteTimeout(unsigned int timeout);
 // void setStopBits(StopBits stop_bits);
 // void setTimeOut(int time);
 
-private:
+ private:
 /**
  * @brief Retrieves current terminal settings
  *

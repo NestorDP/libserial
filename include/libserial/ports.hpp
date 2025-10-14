@@ -35,11 +35,11 @@ struct DeviceStruct {
   std::string port;
   std::string path;
   int id;
-} device;
+};
 
 
 class Ports {
-public:
+ public:
 /**
  * @brief Constructor of the Ports class
  *
@@ -58,10 +58,10 @@ Ports();
  * @param N/D
  * @return std::string
  */
-void list_ports();
+void list_ports() const;
 
 
-private:
+ private:
 std::vector<DeviceStruct> device_list_;
 };
 

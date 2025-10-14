@@ -159,9 +159,8 @@ TEST_F(WorkingPseudoTerminalTest, ReadUntil) {
 
     // Test reading with shared pointer - only read what's available
     auto read_buffer = std::make_shared<std::string>();
-    size_t bytes_read = 0;
 
-    EXPECT_NO_THROW({ bytes_read = serial_port.readUntil(read_buffer, '!'); });
+    EXPECT_NO_THROW({serial_port.readUntil(read_buffer, '!'); });
 
     EXPECT_EQ(*read_buffer, "Read Until!");
 }
@@ -183,9 +182,8 @@ TEST_F(WorkingPseudoTerminalTest, ReadUntilTimeout) {
 
     // Test reading with shared pointer - only read what's available
     auto read_buffer = std::make_shared<std::string>();
-    size_t bytes_read = 0;
 
-    EXPECT_THROW({ bytes_read = serial_port.readUntil(read_buffer, '!'); }, libserial::SerialException);
+    EXPECT_THROW({serial_port.readUntil(read_buffer, '!'); }, libserial::SerialException);
 }
 
 // TEST_F(WorkingPseudoTerminalTest, SafeCommunication) {
