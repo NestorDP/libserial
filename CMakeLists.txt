@@ -245,3 +245,53 @@ if(BUILD_EXAMPLES)
     
     message(STATUS "Examples will be built - use 'make examples' to build them")
 endif()
+
+
+# Enable generation of compile_commands.json for tooling
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Path to tools
+set(LINT_TOOLS_DIR ${CMAKE_SOURCE_DIR}/tools)
+
+find_program(CPPLINT_EXECUTABLE NAMES cpplint cpplint.py)
+find_program(CPPCHECK_EXECUTABLE NAMES cppcheck)
+find_program(UNCRUSTIFY_EXECUTABLE NAMES uncrustify)
+
+if(CPPLINT_EXECUTABLE)
+  add_custom_target(cpplint
+    COMMAND ${CMAKE_COMMAND} -E echo "Running cpplint ..."
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/run_cpplint.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Running cpplint"
+  )
+else()
+  add_custom_target(cpplint
+    COMMAND ${CMAKE_COMMAND} -E echo "cpplint not found; install or set CPPLINT_EXECUTABLE"
+  )
+endif()
+
+if(CPPCHECK_EXECUTABLE)
+  add_custom_target(cppcheck
+    COMMAND ${CMAKE_COMMAND} -E echo "Running cppcheck ..."
+    COMMAND ${CMAKE_SOURCE_DIR}/tools/run_cppcheck.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Running cppcheck"
+  )
+else()
+  add_custom_target(cppcheck
+    COMMAND ${CMAKE_COMMAND} -E echo "cppcheck not found; install or set CPPCHECK_EXECUTABLE"
+  )
+endif()
+
+if(UNCRUSTIFY_EXECUTABLE)
+  add_custom_target(uncrustify
+    COMMAND ${CMAKE_COMMAND} -E echo "Running uncrustify (check-only) ..."
+    COMMAND ${CMAKE_COMMAND} -E chdir ${CMAKE_SOURCE_DIR} ${CMAKE_SOURCE_DIR}/tools/run_uncrustify.sh
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Running uncrustify"
+  )
+else()
+  add_custom_target(uncrustify
+    COMMAND ${CMAKE_COMMAND} -E echo "uncrustify not found; install it"
+  )
+endif()
