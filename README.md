@@ -1,32 +1,49 @@
-# libserial
+# CPPserial
 C++ Application Programming Interface to termios.h C library 
 
-The goal of this API is provide to developers a way to use the old C's ibrary,  termios.h, lthrough a modern C++ class. Concepts as Oriented-Object Programming, Smart Pointers and Templates are using here to give you more flexibilit and powerfull to your aplication that need serial communication in a Linux enviroment. 
+The goal of this API is provide to developers a way to use the old C's library,  termios.h, lthrough a modern C++ class. Concepts as Oriented-Object Programming, Smart Pointers, lambda function and more are using here to give you more flexibilit and powerfull to your aplication that need serial communication in a Linux enviroment. 
 
 
 ## Build and installation
 Clone the repository.
 ``` console
-foo@bar:~$ git clone https://github.com/NestorDP/libserial.git
-foo@bar:~$ cd libserial
+git clone https://github.com/NestorDP/libserial.git && cd libserial
 ```
 
-Building the source code. If you don't have any problem you will see these mensagens
+Building the source code.
 ``` console
-foo@bar:~$ make
-g++ -g -Wall -Werror -fpic -std=c++14 -I include -c src/serial.cpp -o build/serial.o
-g++ -g -Wall -shared build/serial.o -o lib/libserial.so
+mkdir build && cd build
+cmake ..
+make
 ```
 
 Install the library. You will to need put your sudo password to finish this step.
 ``` console
-foo@bar:~$ make install
-sudo cp lib/libserial.so /usr/lib 
-[sudo] password for foo: 
-sudo cp -R include/libserial/ /usr/include/
+make install
 ```
-<!-- ## Unit testing -->
+## Usage
 
+### Running Unit Tests
+```bash
+cd build
+cmake .. -DBUILD_TESTING=ON
+make && ctest -V
+```
+
+### Running Examples
+```bash
+cd build  
+cmake .. -DBUILD_EXAMPLES=ON
+make examples
+
+# Option 1: Automated script
+cd ../examples
+./run_basic_example.sh
+
+# Option 2: Manual setup
+socat -d -d pty,link=/tmp/ttyV0,raw,echo=0 pty,link=/tmp/ttyV1,raw,echo=0 &
+./examples/basic_communication /tmp/ttyV0
+```
 
 ## Run an example application
 You can run an example application to test the libserial library in your environment. Even without a hardware device you can to test the serial communication with a virtual serial port using the *socat* for to create an pair of virtual ports.
