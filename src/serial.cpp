@@ -8,6 +8,7 @@
 
 #include "libserial/serial.hpp"
 #include <string>
+#include <poll.h>
 
 namespace libserial {
 
@@ -94,22 +95,20 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
         throw SerialException("Read timeout exceeded while waiting for terminator");
       }
 
-      // Use select() to check if data is available with remaining timeout
-      fd_set read_fds;
-      FD_ZERO(&read_fds);
-      FD_SET(fd_serial_port_, &read_fds);
+      // Use poll() to check if data is available with remaining timeout.
+      // poll() does not have the FD_SETSIZE limitation that select() has
+      // and is more robust for larger file descriptor values.
+      struct pollfd pfd;
+      pfd.fd = fd_serial_port_;
+      pfd.events = POLLIN;
 
-      struct timeval timeout;
       int64_t remaining_timeout = read_timeout_ - elapsed;
-      timeout.tv_sec = remaining_timeout / 1000;
-      timeout.tv_usec = (remaining_timeout % 1000) * 1000;
+      int timeout_ms = static_cast<int>(remaining_timeout);
 
-      int select_result = select(fd_serial_port_ + 1, &read_fds, nullptr, nullptr, &timeout);
-
-      if (select_result < 0) {
-        throw SerialException("Error in select(): " + std::string(strerror(errno)));
-      }
-      else if (select_result == 0) {
+      int poll_result = poll(&pfd, 1, timeout_ms);
+      if (poll_result < 0) {
+        throw SerialException("Error in poll(): " + std::string(strerror(errno)));
+      } else if (poll_result == 0) {
         throw SerialException("Read timeout exceeded while waiting for data");
       }
     }
