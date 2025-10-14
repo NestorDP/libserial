@@ -11,4 +11,4 @@ fi
 EXCLUDES="--suppress=missingIncludeSystem --enable=all --inconclusive -I include -j$(nproc) --quiet"
 
 # Run cppcheck
-cppcheck ${EXCLUDES} ${CPPCHECK_PROJECT} "${ROOT_DIR}/src" "${ROOT_DIR}/include"
+cppcheck ${EXCLUDES} ${CPPCHECK_PROJECT} "${ROOT_DIR}/src" "${ROOT_DIR}/include" "${ROOT_DIR}/test"
