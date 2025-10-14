@@ -15,13 +15,13 @@ jobs:
       - name: Configure CMake
         run: |
           mkdir build && cd build
-          cmake -DCMAKE_BUILD_TYPE=Release ..
+          cmake ..
       - name: Run cpplint
         run: |
           ./tools/run_cpplint.sh
       - name: Run cppcheck
         run: |
           ./tools/run_cppcheck.sh
-      - name: Run uncrustify (check)
+      - name: Run uncrustify - check only
         run: |
-          ./tools/run_uncrustify.sh
+          ./tools/run_uncrustify_check.sh
