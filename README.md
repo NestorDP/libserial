@@ -6,111 +6,72 @@ The goal of this API is provide to developers a way to use the old C's library, 
 
 ## Build and installation
 Clone the repository.
-``` console
+``` bash
 git clone https://github.com/NestorDP/libserial.git && cd libserial
 ```
 
 Building the source code.
-``` console
+``` bash
 mkdir build && cd build
 cmake ..
 make
 ```
 
 Install the library. You will to need put your sudo password to finish this step.
-``` console
+``` bash
 make install
-```
-## Usage
-
-### Running Unit Tests
-```bash
-cd build
-cmake .. -DBUILD_TESTING=ON
-make && ctest -V
-```
-
-### Running Examples
-```bash
-cd build  
-cmake .. -DBUILD_EXAMPLES=ON
-make examples
-
-# Option 1: Automated script
-cd ../examples
-./run_basic_example.sh
-
-# Option 2: Manual setup
-socat -d -d pty,link=/tmp/ttyV0,raw,echo=0 pty,link=/tmp/ttyV1,raw,echo=0 &
-./examples/basic_communication /tmp/ttyV0
 ```
 
 ## Run an example application
 You can run an example application to test the libserial library in your environment. Even without a hardware device you can to test the serial communication with a virtual serial port using the *socat* for to create an pair of virtual ports.
 
-### Create a virtual serial port
+### Install socat (for virtual serial port)
+```bash
+# Ubuntu/Debian
+sudo apt-get install socat
 
-Frist install the *socat*
-``` console
-foo@bar:~$ sudo apt install socat
+# CentOS/RHEL/Fedora
+sudo yum install socat    # or dnf install socat
 ```
 
-Then you can to create the virtual ports pair, open a new console and run this command:
-``` console
-foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
+### Create a virtual serial port
+
+
+To create the virtual ports pair, open a new bash and run this command:
+``` bash
+# Terminal 1: Create virtual serial ports
+socat -d -d pty,link=/tmp/ttyV0,raw,echo=0 pty,link=/tmp/ttyV1,raw,echo=0
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/2
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/3
 2022/09/09 11:13:10 socat[19050] N starting data transfer loop with FDs [5,5] and [7,7]
 ```
-After this, your system have two serial ports virtuals connected, in this case we have the /dev/pts/2 and /dev/pts/3. Change in yours example code the port to match with one of these ports.
+After this, your system have two serial ports virtuals connected, in this case we have the /dev/pts/2 and /dev/pts/3 wich you can access through the links /tmp/ttyV0 and /tmp/ttyV1.
 
-### Source code
+### Building Examples
 
-``` c
-#include <iostream>
-#include <memory>
-#include <string>
+The examples can be built using the main CMake system:
 
-#include <libserial/serial.hpp>
-
-int main(int argc, char const *argv[]) {
-  serial::Serial s;
-  std::string *texto = new std::string();
-  std::shared_ptr<std::string> send_ptr(new std::string("texto"));
-
-  s.open_port("/dev/pts/4");
-  s.receive_msg(texto);
-  std::cout << *texto << std::endl;
-  s.send_msg(send_ptr);
-
-  return 0;
-}
+```bash
+cmake .. -DBUILD_EXAMPLES=ON
+make examples
 ```
 
-### Compile
-``` console
-foo@bar:~$ g++ -g -Wall -std=c++14 -o serial_app main.cpp -lserial
+Or compile individually:
+```bash
+g++ -std=c++14 -I../include examples/basic_communication.cpp -L../build -llibserial -o basic_communication
 ```
-
 ### Run 
+For a simple communication aplication run the basic_communication example
+```bash
+# Terminal 2: Run example
+./basic_communication /tmp/ttyV0
 
-Execute the serial_app
-``` console
-foo@bar:~$ ./serial_app
-Created Serial Object
-Open port /dev/pts/2
+# Terminal 3: Interact with the other end
+echo "Hello from terminal!" > /tmp/ttyV1
+cat /tmp/ttyV1
 ```
 
-Open another terminal and write
-
-``` console
-foo@bar:~$ cat < /dev/pts/3
+You can run the list_port example to show all serial devices avaliable in your system
+``` bash
+./examples/list_ports
 ```
-
-Now you will need another terminal to send a string to the serial aplication
-
-``` console
-foo@bar:~$ echo "Test" > /dev/pts/3
-```
-
-![run](https://user-images.githubusercontent.com/37759765/189499039-cacb1552-f256-4709-9ca7-401a1081c050.gif)
