@@ -1,99 +1,116 @@
-# libserial
-C++ Application Programming Interface to termios.h C library 
+# ⚙️ CPPserial
 
-The goal of this API is provide to developers a way to use the old C's ibrary,  termios.h, lthrough a modern C++ class. Concepts as Oriented-Object Programming, Smart Pointers and Templates are using here to give you more flexibilit and powerfull to your aplication that need serial communication in a Linux enviroment. 
+**C++ Application Programming Interface for the `termios.h` C library**
+
+---
+
+The goal of this API is to provide developers with a modern C++ interface to the traditional C `termios.h` library.  
+It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda functions**, and more to give your applications greater flexibility and power when dealing with **serial communication** in a **Linux environment**.
+
+---
+
+## ✨ Features
+
+- 🚀 Modern C++ API for serial communication  
+- 🧠 Object-Oriented design using smart pointers and RAII  
+- ⚙️ Full control of serial port configuration via `termios`  
+- 🧩 Example applications included  
+- 🐧 Works on Linux systems
+
+---
+
+## 🛠️ Build and Installation
 
 
-## Build and installation
-Clone the repository.
-``` console
-foo@bar:~$ git clone https://github.com/NestorDP/libserial.git
-foo@bar:~$ cd libserial
+```bash
+# Clone the repository:
+git clone https://github.com/NestorDP/libserial.git && cd libserial
+
+# Build the source code:
+mkdir build && cd build
+cmake ..
+make
+
+# Install the library (you will need to enter your sudo password):
+sudo make install
 ```
 
-Building the source code. If you don't have any problem you will see these mensagens
-``` console
-foo@bar:~$ make
-g++ -g -Wall -Werror -fpic -std=c++14 -I include -c src/serial.cpp -o build/serial.o
-g++ -g -Wall -shared build/serial.o -o lib/libserial.so
+## 🧪 Run an Example Application
+
+You can run an example application to test the libserial library in your environment.
+Even without a physical serial device, you can test serial communication using a virtual serial port created with socat.
+
+### 📦 Install socat (for virtual serial ports)
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install socat
+
+# CentOS/RHEL/Fedora
+sudo yum install socat    # or: sudo dnf install socat
 ```
 
-Install the library. You will to need put your sudo password to finish this step.
-``` console
-foo@bar:~$ make install
-sudo cp lib/libserial.so /usr/lib 
-[sudo] password for foo: 
-sudo cp -R include/libserial/ /usr/include/
-```
-<!-- ## Unit testing -->
+### 🔧 Create Virtual Serial Ports
 
+Open a new terminal and run:
 
-## Run an example application
-You can run an example application to test the libserial library in your environment. Even without a hardware device you can to test the serial communication with a virtual serial port using the *socat* for to create an pair of virtual ports.
-
-### Create a virtual serial port
-
-Frist install the *socat*
-``` console
-foo@bar:~$ sudo apt install socat
-```
-
-Then you can to create the virtual ports pair, open a new console and run this command:
-``` console
-foo@bar:~$ socat -d -d pty,raw,echo=0 pty,raw,echo=0
+```bash
+# Terminal 1: Create virtual serial ports
+socat -d -d pty,link=/tmp/ttyV0,raw,echo=0 pty,link=/tmp/ttyV1,raw,echo=0
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/2
 2022/09/09 11:13:10 socat[19050] N PTY is /dev/pts/3
 2022/09/09 11:13:10 socat[19050] N starting data transfer loop with FDs [5,5] and [7,7]
 ```
-After this, your system have two serial ports virtuals connected, in this case we have the /dev/pts/2 and /dev/pts/3. Change in yours example code the port to match with one of these ports.
 
-### Source code
+After this, your system will have two connected virtual serial ports.
+In this example, /dev/pts/2 and /dev/pts/3 are linked to /tmp/ttyV0 and /tmp/ttyV1, respectively.
 
-``` c
-#include <iostream>
-#include <memory>
-#include <string>
+### 🧰 Building Examples
 
-#include <libserial/serial.hpp>
+You can build the examples using the main CMake system:
 
-int main(int argc, char const *argv[]) {
-  serial::Serial s;
-  std::string *texto = new std::string();
-  std::shared_ptr<std::string> send_ptr(new std::string("texto"));
-
-  s.open_port("/dev/pts/4");
-  s.receive_msg(texto);
-  std::cout << *texto << std::endl;
-  s.send_msg(send_ptr);
-
-  return 0;
-}
+```bash
+cmake .. -DBUILD_EXAMPLES=ON
+make examples
 ```
 
-### Compile
-``` console
-foo@bar:~$ g++ -g -Wall -std=c++14 -o serial_app main.cpp -lserial
+Or compile them individually:
+
+```bash
+g++ -std=c++14 -I../include examples/basic_communication.cpp -L../build -llibserial -o basic_comm
 ```
 
-### Run 
+### ▶️ Run Examples
 
-Execute the serial_app
-``` console
-foo@bar:~$ ./serial_app
-Created Serial Object
-Open port /dev/pts/2
+To run a simple communication example, execute the basic_communication example:
+
+```bash
+# Terminal 2: Run the example
+./basic_communication /tmp/ttyV0
+
+# Terminal 3: Interact with the other end
+echo "Hello from terminal!" > /tmp/ttyV1
+cat /tmp/ttyV1
 ```
 
-Open another terminal and write
+You can also run the list_ports example to display all available serial devices on your system:
 
-``` console
-foo@bar:~$ cat < /dev/pts/3
+```bash
+./examples/list_ports
 ```
 
-Now you will need another terminal to send a string to the serial aplication
+### 🤝 Contributing
 
-``` console
-foo@bar:~$ echo "Test" > /dev/pts/3
-```
+Contributions, issues, and feature requests are welcome!
+Feel free to open an issue or submit a pull request to help improve this project.
 
-![run](https://user-images.githubusercontent.com/37759765/189499039-cacb1552-f256-4709-9ca7-401a1081c050.gif)
+Before submitting a PR, please:
+
+- Follow the existing coding style
+- Add or update documentation when necessary
+- Include tests for new features if possible
+
+### 📄 License
+
+This project is licensed under the GNU General Public License v3.0 (GPLv3).
+See the [LICENSE](./LICENSE) file for more details.
