@@ -1,4 +1,4 @@
-# ⚙️ CppSerial
+# CppSerial
 
 **C++ Application Programming Interface for the `asm/termbits.h` C library**
 
@@ -9,7 +9,7 @@ It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda f
 
 ---
 
-## ✨ Features
+## Features
 
 - 🚀 Modern C++ API for serial communication  
 - 🧠 Object-Oriented design using smart pointers and RAII  
@@ -19,7 +19,7 @@ It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda f
 
 ---
 
-## 🛠️ Build and Installation
+## Build and Installation
 
 
 ```bash
@@ -35,12 +35,12 @@ make
 sudo make install
 ```
 
-## 🧪 Run an Example Application
+## Run an Example Application
 
 You can run an example application to test the libserial library in your environment.
 Even without a physical serial device, you can test serial communication using a virtual serial port created with socat.
 
-### 📦 Install socat (for virtual serial ports)
+### Install socat (for virtual serial ports)
 
 ```bash
 # Ubuntu/Debian
@@ -50,7 +50,7 @@ sudo apt-get install socat
 sudo yum install socat    # or: sudo dnf install socat
 ```
 
-### 🔧 Create Virtual Serial Ports
+### Create Virtual Serial Ports
 
 Open a new terminal and run:
 
@@ -65,7 +65,7 @@ socat -d -d pty,link=/tmp/ttyV0,raw,echo=0 pty,link=/tmp/ttyV1,raw,echo=0
 After this, your system will have two connected virtual serial ports.
 In this example, /dev/pts/2 and /dev/pts/3 are linked to /tmp/ttyV0 and /tmp/ttyV1, respectively.
 
-### 🧰 Building Examples
+### Building Examples
 
 You can build the examples using the main CMake system:
 
@@ -80,7 +80,7 @@ Or compile them individually:
 g++ -std=c++14 -I../include examples/basic_communication.cpp -L../build -llibserial -o basic_comm
 ```
 
-### ▶️ Run Examples
+### Run Examples
 
 To run a simple communication example, execute the basic_communication example:
 
