@@ -1,10 +1,10 @@
 # ⚙️ CPPserial
 
-**C++ Application Programming Interface for the `termios.h` C library**
+**C++ Application Programming Interface for the `asm/termbits.h` C library**
 
 ---
 
-The goal of this API is to provide developers with a modern C++ interface to the traditional C `termios.h` library.  
+The goal of this API is to provide developers with a modern C++ interface to the traditional C `asm/termbits.h` library.  
 It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda functions**, and more to give your applications greater flexibility and power when dealing with **serial communication** in a **Linux environment**.
 
 ---
@@ -13,9 +13,9 @@ It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda f
 
 - 🚀 Modern C++ API for serial communication  
 - 🧠 Object-Oriented design using smart pointers and RAII  
-- ⚙️ Full control of serial port configuration via `termios`  
+- ⚙️ Full control of serial port configuration via `termios2`  
 - 🧩 Example applications included  
-- 🐧 Works on Linux systems
+- 🐧 Works only on Linux systems
 
 ---
 
