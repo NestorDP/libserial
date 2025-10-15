@@ -1,4 +1,4 @@
-# ⚙️ CPPserial
+# ⚙️ CppSerial
 
 **C++ Application Programming Interface for the `asm/termbits.h` C library**
 
