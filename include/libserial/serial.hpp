@@ -1,12 +1,5 @@
 //  @ Copyright 2022-2025 Nestor Neto
 
-/**
- * @mainpage Serial Interface Library
- * @section intro_sec Indroduction
- * This is an interface C++ library for serial serial
- *
- *
- */
 #ifndef INCLUDE_LIBSERIAL_SERIAL_HPP_
 #define INCLUDE_LIBSERIAL_SERIAL_HPP_
 

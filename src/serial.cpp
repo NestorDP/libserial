@@ -1,11 +1,5 @@
 // @ Copyright 2020
 
-/**
- *
- *
- * \file serial.cpp
- */
-
 #include "libserial/serial.hpp"
 #include <string>
 #include <poll.h>

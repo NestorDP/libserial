@@ -1,26 +1,10 @@
 //  @ Copyright 2022-2025 Nestor Neto
 
-/**
- * @file serial_types.hpp
- * @brief Type definitions and enumerations for serial port configuration
- * @author Ntor Neto
- *
- * This file contains type-safe enum classes used for configuring various
- * aspects of serial port communication including parity, stop bits, flow control,
- * canonical mode, terminators, and baud rates.
- */
-
 #ifndef INCLUDE_LIBSERIAL_SERIAL_TYPES_HPP_
 #define INCLUDE_LIBSERIAL_SERIAL_TYPES_HPP_
 
 #include <string>
-/**
- * @namespace libserial
- * @brief Main namespace for the LibSerial library
- *
- * Contains all classes, functions, and type definitions for serial port
- * communication functionality.
- */
+
 namespace libserial {
 
 struct DeviceStruct {
