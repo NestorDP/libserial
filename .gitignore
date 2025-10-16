@@ -85,7 +85,7 @@ dkms.conf
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
-.venv/
+*venv/
 
 # Local History for Visual Studio Code
 .history/
