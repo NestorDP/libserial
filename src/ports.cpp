@@ -23,7 +23,7 @@ uint16_t Ports::scanPorts() {
 
   // Directory where udev creates symlinks for serial devices by ID
   // this directory may not exist if no serial devices are connected
-  const char* by_id_dir = "/dev/serial/by-id";
+  const char* by_id_dir = kSysSerialByIdPath;
   DIR* dir = opendir(by_id_dir);
   if (!dir) {
     std::cout << "No serial devices directory: " << by_id_dir << "\n";

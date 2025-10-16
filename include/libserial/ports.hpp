@@ -1,12 +1,5 @@
-//  @ Copyright 2022 Nestor Neto
+//  @ Copyright 2022-2025 Nestor Neto
 
-/**
- * @mainpage Serial Interface Library
- * @section intro_sec Indroduction
- * This is an interface C++ library for serial serial
- *
- *
- */
 #ifndef INCLUDE_LIBSERIAL_PORTS_HPP_
 #define INCLUDE_LIBSERIAL_PORTS_HPP_
 
@@ -27,16 +20,17 @@
 #include "libserial/serial_exception.hpp"
 #include "libserial/serial_types.hpp"
 
-/**
- * @brief Ethernet Interface Library SERIAL namespace
- * @author Nestor Pereira Neto
- *
- */
-
 namespace libserial {
 
-
-
+/**
+ * @brief A class to manage and list available serial ports on the system
+ *
+ * The Ports class provides functionality to scan for available serial ports,
+ * retrieve their details, and find specific ports by unique identifiers.
+ * It leverages the udev system on Linux to discover connected serial devices.
+ *
+ * @author Nestor Pereira Neto
+ */
 class Ports {
 public:
 /**
@@ -52,23 +46,53 @@ Ports() = default;
 ~Ports() = default;
 
 /**
- * @brief Receive string over serial port
+ * @brief Scans the system for available serial ports
  *
- * @param N/D
- * @return std::string
+ * @return uint16_t The number of serial ports found
  */
 uint16_t scanPorts();
 
-
+/**
+ * @brief Retrieves the list of detected serial devices
+ *
+ * @param list A reference to a vector that will be populated with
+ *             DeviceStruct entries for each detected device
+ */
 void getDeviceList(std::vector<DeviceStruct> & list) const;
 
+/**
+ * @brief Finds the port path for a device with the specified ID
+ *
+ * @param id The unique identifier of the device to search for
+ * @return std::optional<std::string> The port path if found, or std::nullopt if not found
+ */
 std::optional<std::string> findPortPath(uint16_t id) const;
 
+/**
+ * @brief Finds the bus path for a device with the specified ID
+ *
+ * @param id The unique identifier of the device to search for
+ * @return std::optional<std::string> The bus path if found, or std::nullopt if not found
+ */
 std::optional<std::string> findBusPath(uint16_t id) const;
 
+/**
+ * @brief Finds the name for a device with the specified ID
+ *
+ * @param id The unique identifier of the device to search for
+ * @return std::optional<std::string> The name if found, or std::nullopt if not found
+ */
 std::optional<std::string> findName(uint16_t id) const;
 
 private:
+/**
+ * @brief System path where udev creates symlinks for serial devices by ID
+ */
+static constexpr const char* kSysSerialByIdPath = "/dev/serial/by-id/";
+
+/**
+ * @brief Internal list of detected serial devices
+ */
 std::vector<DeviceStruct> device_list_;
 };
 }  // namespace libserial
