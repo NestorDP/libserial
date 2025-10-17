@@ -38,12 +38,10 @@ enum class Parity {
  * serial communication. Common configurations include 1 stop bit (standard)
  * or 2 stop bits (for slower or noisy communication).
  *
- * @note This enum currently provides basic enable/disable functionality.
- *       Future versions may include specific stop bit counts (ONE, TWO).
  */
 enum class StopBits {
-  ENABLE,   ///< Enable stop bits configuration
-  DISABLE,  ///< Disable stop bits configuration
+  ONE,   ///< One stop bit
+  TWO,   ///< Two stop bits
 };
 
 /**
@@ -128,6 +126,22 @@ enum class BaudRate {
   BAUD_RATE_57600 = 57600,    ///< 57600 bps - High speed applications
   BAUD_RATE_115200 = 115200,  ///< 115200 bps - Very common high speed rate
   BAUD_RATE_230400 = 230400   ///< 230400 bps - Very high speed applications
+};
+
+/**
+ * @enum DataLength
+ * @brief Enumeration for serial port data bits configuration
+ *
+ * Data bits define the number of bits used to represent each byte of data
+ * in serial communication. Common configurations include 5, 6, 7, or 8 data
+ * bits per byte. The choice of data bits affects the range of values that
+ * can be transmitted and may need to match between communicating devices.
+ */
+enum class DataLength {
+  FIVE = 5,   ///< 5 data bits per byte
+  SIX  = 6,   ///< 6 data bits per byte
+  SEVEN = 7,  ///< 7 data bits per byte
+  EIGHT = 8   ///< 8 data bits per byte
 };
 
 }  // namespace libserial

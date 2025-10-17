@@ -185,33 +185,34 @@ void Serial::setWriteTimeout(unsigned int timeout) {
   write_timeout_ = timeout;
 }
 
-// void Serial::SetNumberBits(NumBits num_bits) {
-//   this->getTermios2();
+void Serial::setDataLength(DataLength nbits) {
+  this->getTermios2();
 
-//   // Clear bits
-//   options_.c_cflag &= ~CSIZE;
+  // Clear bits
+  options_.c_cflag &= ~CSIZE;
 
-//   switch (num_bits) {
-//     case NumBits::FIVE:
-//       options_.c_cflag |= CS5;
-//       break;
-//     case NumBits::SIX:
-//       options_.c_cflag |= CS6;
-//       break;
-//     case NumBits::SEVEN:
-//       options_.c_cflag |= CS7;
-//       break;
-//     case NumBits::EIGHT:
-//       options_.c_cflag |= CS8;
-//       break;
-//     default:
-//       options_.c_cflag |= CS8;
-//       break;
-//   }
-//   this->setTermios2();
-// }
+  switch (nbits) {
+    case DataLength::FIVE:
+      options_.c_cflag |= CS5;
+      break;
+    case DataLength::SIX:
+      options_.c_cflag |= CS6;
+      break;
+    case DataLength::SEVEN:
+      options_.c_cflag |= CS7;
+      break;
+    case DataLength::EIGHT:
+      options_.c_cflag |= CS8;
+      break;
+    default:
+      options_.c_cflag |= CS8;
+      break;
+  }
+  this->setTermios2();
+}
 
-// void Serial::SetParity(Parity parity) {
+
+void Serial::setParity([[maybe_unused]] Parity parity) {
 //   this->getTermios2();
 //   switch (parity) {
 //     case Parity::DISABLE:
@@ -225,9 +226,9 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 //       break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetTwoStopBits(StopBits stop_bits) {
+void Serial::setStopBits([[maybe_unused]] StopBits stop_bits) {
 //   this->getTermios2();
 //   switch (stop_bits) {
 //   case StopBits::DISABLE:
@@ -240,7 +241,7 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 //     break;
 //   }
 //   this->setTermios2();
-// }
+}
 
 // void Serial::SetFlowControl(FlowControl flow_control) {
 //   this->getTermios2();

@@ -209,10 +209,36 @@ void setReadTimeout(unsigned int timeout);
  */
 void setWriteTimeout(unsigned int timeout);
 
-// Future planned methods (not yet implemented):
-// void setNumberBits(NumBits num_bits);
-// void setParity(Parity parity);
-// void setStopBits(StopBits stop_bits);
+/**
+ * @brief Sets the number of data bits per byte
+ *
+ * Configures the number of data bits used in each byte of serial
+ * communication.
+ *
+ * @param nbits The desired number of data bits (5, 6, 7, or 8)
+ * @throws SerialException if number of bits cannot be set
+ */
+void setDataLength(DataLength nbits);
+
+/**
+ * @brief Sets the parity configuration
+ *
+ * Configures the parity checking mechanism for serial communication.
+ *
+ * @param parity The desired parity setting (ENABLE or DISABLE)
+ * @throws SerialException if parity cannot be set
+ */
+void setParity(Parity parity);
+
+/**
+ * @brief Sets the stop bits configuration
+ *
+ * Configures the number of stop bits used in serial communication.
+ *
+ * @param stop_bits The desired stop bits setting (ONE, ONE_AND_HALF, or TWO)
+ * @throws SerialException if stop bits cannot be set
+ */
+void setStopBits(StopBits stop_bits);
 
 
 private:
