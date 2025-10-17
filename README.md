@@ -35,6 +35,60 @@ make
 sudo make install
 ```
 
+## Generate Documentation
+
+You can build the API and user documentation with Doxygen and Sphinx.
+
+Prerequisites:
+
+- Doxygen (and optionally Graphviz for diagrams)
+- Python 3 with pip
+- Sphinx toolchain: see `docs/requirements.txt`
+
+Install Python deps (recommended in a virtual environment):
+
+```bash
+# Optional: create/activate a venv
+python3 -m venv .venv
+source .venv/bin/activate
+
+# Install Sphinx + theme + Breathe
+pip install -r docs/requirements.txt
+```
+
+### Build via CMake
+
+```bash
+mkdir -p build && cd build
+cmake .. -DBUILD_DOCUMENTATION=ON
+make docs     # builds Doxygen then Sphinx HTML
+```
+
+Output:
+
+- Sphinx HTML: `build/docs/html/index.html`
+- Doxygen HTML (optional): `build/doxygen/html/index.html`
+
+Install location (optional):
+
+```bash
+sudo make install  # installs HTML docs under /usr/local/share/doc/libserial/html
+```
+
+<!-- ### Option B: Build manually (without CMake)
+
+```bash
+# 1) Generate Doxygen (from the docs directory)
+cd docs
+doxygen Doxyfile
+
+# 2) Build Sphinx HTML
+cd ..
+sphinx-build -b html docs build/docs/html
+```
+
+Open `build/docs/html/index.html` in your browser. -->
+
 ## Run an Example Application
 
 You can run an example application to test the libserial library in your environment.
@@ -98,6 +152,7 @@ You can also run the list_ports example to display all available serial devices 
 ```bash
 ./examples/list_ports
 ```
+
 
 ### 🤝 Contributing
 
