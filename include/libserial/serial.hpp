@@ -213,7 +213,7 @@ void setWriteTimeout(unsigned int timeout);
 // void setNumberBits(NumBits num_bits);
 // void setParity(Parity parity);
 // void setStopBits(StopBits stop_bits);
-// void setTimeOut(int time);
+
 
 private:
 /**

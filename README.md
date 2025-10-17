@@ -84,10 +84,8 @@ doxygen Doxyfile
 
 # 2) Build Sphinx HTML
 cd ..
-sphinx-build -b html docs build/docs/html
-```
-
-Open `build/docs/html/index.html` in your browser. -->
+sphinx-build -b html docs build/docs/html  
+``` -->
 
 ## Run an Example Application
 
