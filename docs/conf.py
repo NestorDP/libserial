@@ -40,6 +40,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
+html_logo = 'images/cpp_serial_logo.png'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 html_theme_options = {
