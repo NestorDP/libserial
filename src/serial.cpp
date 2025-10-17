@@ -192,21 +192,21 @@ void Serial::setDataLength(DataLength nbits) {
   options_.c_cflag &= ~CSIZE;
 
   switch (nbits) {
-    case DataLength::FIVE:
-      options_.c_cflag |= CS5;
-      break;
-    case DataLength::SIX:
-      options_.c_cflag |= CS6;
-      break;
-    case DataLength::SEVEN:
-      options_.c_cflag |= CS7;
-      break;
-    case DataLength::EIGHT:
-      options_.c_cflag |= CS8;
-      break;
-    default:
-      options_.c_cflag |= CS8;
-      break;
+  case DataLength::FIVE:
+    options_.c_cflag |= CS5;
+    break;
+  case DataLength::SIX:
+    options_.c_cflag |= CS6;
+    break;
+  case DataLength::SEVEN:
+    options_.c_cflag |= CS7;
+    break;
+  case DataLength::EIGHT:
+    options_.c_cflag |= CS8;
+    break;
+  default:
+    options_.c_cflag |= CS8;
+    break;
   }
   this->setTermios2();
 }
@@ -285,7 +285,7 @@ void Serial::setFlowControl([[maybe_unused]] FlowControl flow_control) {
 //   this->setTermios2();
 }
 
-void Serial::setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode){
+void Serial::setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode) {
 //   this->getTermios2();
 //   switch (canonical_mode) {
 //   case CanonicalMode::ENABLE:
@@ -304,7 +304,7 @@ void Serial::setTerminator([[maybe_unused]] Terminator term) {
 //   terminator_ = (int)term;
 }
 
-void Serial::setTimeOut([[maybe_unused]]int time){
+void Serial::setTimeOut([[maybe_unused]] int time) {
 //   this->getTermios2();
 //   options_.c_cc[VTIME] = time;
 //   this->setTermios2();

@@ -279,7 +279,7 @@ void setTerminator([[maybe_unused]] Terminator term);
  * @param time Timeout in deciseconds
  * @throws SerialException if setting cannot be applied
  */
-void setTimeOut([[maybe_unused]]int time);
+void setTimeOut([[maybe_unused]] int time);
 
 /**
  * @brief Sets the minimum number of characters to read
