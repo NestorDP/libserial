@@ -49,6 +49,9 @@ Ports() = default;
  * @brief Scans the system for available serial ports
  *
  * @return uint16_t The number of serial ports found
+ * @throws SerialException if scanning fails
+ * @throws SerialException if no ports are found
+ * @throws PermissionDeniedException if insufficient permissions
  */
 uint16_t scanPorts();
 
@@ -57,6 +60,7 @@ uint16_t scanPorts();
  *
  * @param list A reference to a vector that will be populated with
  *             DeviceStruct entries for each detected device
+ * @throws SerialException if device list cannot be retrieved
  */
 void getDeviceList(std::vector<DeviceStruct> & list) const;
 
@@ -65,6 +69,7 @@ void getDeviceList(std::vector<DeviceStruct> & list) const;
  *
  * @param id The unique identifier of the device to search for
  * @return std::optional<std::string> The port path if found, or std::nullopt if not found
+ * @throws SerialException if search operation fails
  */
 std::optional<std::string> findPortPath(uint16_t id) const;
 
@@ -73,6 +78,7 @@ std::optional<std::string> findPortPath(uint16_t id) const;
  *
  * @param id The unique identifier of the device to search for
  * @return std::optional<std::string> The bus path if found, or std::nullopt if not found
+ * @throws SerialException if search operation fails
  */
 std::optional<std::string> findBusPath(uint16_t id) const;
 
@@ -81,6 +87,7 @@ std::optional<std::string> findBusPath(uint16_t id) const;
  *
  * @param id The unique identifier of the device to search for
  * @return std::optional<std::string> The name if found, or std::nullopt if not found
+ * @throws SerialException if search operation fails
  */
 std::optional<std::string> findName(uint16_t id) const;
 
