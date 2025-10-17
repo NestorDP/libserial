@@ -4,7 +4,8 @@
 
 ---
 
-The goal of this API is to provide developers with a modern C++ interface to the traditional C `asm/termbits.h` library.  
+The goal of this API is to provide developers with a modern C++ interface to the traditional C header asm/termbits.h.
+It allows setting any baud rate supported by the hardware, not just the standard ones, enabling a more flexible communication process that is ideal for industrial or embedded applications requiring non-standard baud rates.
 It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda functions**, and more to give your applications greater flexibility and power when dealing with **serial communication** in a **Linux environment**.
 
 ---
