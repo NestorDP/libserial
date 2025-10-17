@@ -196,6 +196,7 @@ int getAvailableData() const;
  * timing out. A value of 0 means no timeout (blocking).
  *
  * @param timeout Timeout in milliseconds
+ * @throws SerialException if setting cannot be applied
  */
 void setReadTimeout(unsigned int timeout);
 
@@ -206,6 +207,7 @@ void setReadTimeout(unsigned int timeout);
  * timing out. A value of 0 means no timeout (blocking).
  *
  * @param timeout Timeout in milliseconds
+ * @throws SerialException if setting cannot be applied
  */
 void setWriteTimeout(unsigned int timeout);
 
@@ -228,7 +230,7 @@ void setDataLength(DataLength nbits);
  * @param parity The desired parity setting (ENABLE or DISABLE)
  * @throws SerialException if parity cannot be set
  */
-void setParity(Parity parity);
+void setParity([[maybe_unused]] Parity parity);
 
 /**
  * @brief Sets the stop bits configuration
@@ -238,8 +240,54 @@ void setParity(Parity parity);
  * @param stop_bits The desired stop bits setting (ONE, ONE_AND_HALF, or TWO)
  * @throws SerialException if stop bits cannot be set
  */
-void setStopBits(StopBits stop_bits);
+void setStopBits([[maybe_unused]] StopBits stop_bits);
 
+/**
+ * @brief Sets the flow control configuration
+ *
+ * Configures the flow control mechanism for serial communication.
+ *
+ * @param flow_control The desired flow control setting (HARDWARE or SOFTWARE)
+ * @throws SerialException if flow control cannot be set
+ */
+void setFlowControl([[maybe_unused]] FlowControl flow_control);
+
+/**
+ * @brief Sets canonical mode for input processing
+ *
+ * Configures whether the input is processed in canonical (line-based)
+ * mode or non-canonical (raw) mode.
+ *
+ * @param canonical_mode The desired canonical mode setting (ENABLE or DISABLE)
+ * @throws SerialException if canonical mode cannot be set
+ */
+void setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode);
+
+/**
+ * @brief Sets the terminator character for readUntil operations
+ *
+ * Configures the character that signals the end of a readUntil operation.
+ *
+ * @param term The desired terminator character
+ * @throws SerialException if terminator cannot be set
+ */
+void setTerminator([[maybe_unused]] Terminator term);
+
+/**
+ * @brief Sets the read timeout in deciseconds
+ *
+ * @param time Timeout in deciseconds
+ * @throws SerialException if setting cannot be applied
+ */
+void setTimeOut([[maybe_unused]]int time);
+
+/**
+ * @brief Sets the minimum number of characters to read
+ *
+ * @param num Minimum number of characters to read
+ * @throws SerialException if setting cannot be applied
+ */
+void setMinNumberCharRead([[maybe_unused]] int num);
 
 private:
 /**

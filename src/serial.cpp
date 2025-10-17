@@ -243,7 +243,7 @@ void Serial::setStopBits([[maybe_unused]] StopBits stop_bits) {
 //   this->setTermios2();
 }
 
-// void Serial::SetFlowControl(FlowControl flow_control) {
+void Serial::setFlowControl([[maybe_unused]] FlowControl flow_control) {
 //   this->getTermios2();
 //   switch (flow_control) {
 //   case FlowControl::Software:
@@ -283,9 +283,9 @@ void Serial::setStopBits([[maybe_unused]] StopBits stop_bits) {
 //     break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetCanonicalMode(CanonicalMode canonical_mode){
+void Serial::setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode){
 //   this->getTermios2();
 //   switch (canonical_mode) {
 //   case CanonicalMode::ENABLE:
@@ -298,21 +298,21 @@ void Serial::setStopBits([[maybe_unused]] StopBits stop_bits) {
 //     break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetTerminator(Terminator term) {
+void Serial::setTerminator([[maybe_unused]] Terminator term) {
 //   terminator_ = (int)term;
-// }
+}
 
-// void Serial::SetTimeOut(int time){
+void Serial::setTimeOut([[maybe_unused]]int time){
 //   this->getTermios2();
 //   options_.c_cc[VTIME] = time;
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetMinNumberCharRead(int num) {
+void Serial::setMinNumberCharRead([[maybe_unused]] int num) {
 //   this->getTermios2();
 //   options_.c_cc[VMIN] = num;
 //   this->setTermios2();
-// }
+}
 }  // namespace libserial
