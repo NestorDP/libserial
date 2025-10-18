@@ -59,11 +59,11 @@ uint16_t scanPorts();
 /**
  * @brief Retrieves the list of detected serial devices
  *
- * @param list A reference to a vector that will be populated with
+ * @param devices A reference to a vector that will be populated with
  *             Device entries for each detected device
  * @throws SerialException if device list cannot be retrieved
  */
-void getDeviceList(std::vector<Device> & list) const;
+void getDevices(std::vector<Device> & devices) const;
 
 /**
  * @brief Finds the port path for a device with the specified ID

@@ -73,8 +73,8 @@ uint16_t Ports::scanPorts() {
   return (id_counter - 1);
 }
 
-void Ports::getDeviceList(std::vector<Device> & list) const {
-  list = devices_;
+void Ports::getDevices(std::vector<Device> & devices) const {
+  devices = devices_;
 }
 
 std::optional<std::string> Ports::findPortPath(uint16_t id) const {
