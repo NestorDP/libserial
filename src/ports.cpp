@@ -19,7 +19,7 @@
 namespace libserial {
 
 uint16_t Ports::scanPorts() {
-  device_list_.clear();
+  devices_.clear();
 
   // Directory where udev creates symlinks for serial devices by ID
   // this directory may not exist if no serial devices are connected
@@ -34,7 +34,6 @@ uint16_t Ports::scanPorts() {
   // inside a directory.
   struct dirent* entry;
   uint16_t id_counter = 0;
-
 
   while ((entry = readdir(dir)) != nullptr) {
     // Skip . and .. entries
@@ -59,14 +58,14 @@ uint16_t Ports::scanPorts() {
     auto resolved = std::string("/dev/") + std::string(bname);
 
     // Add to device list
-    DeviceStruct dev;
-    dev.id = id_counter++;
-    dev.name = device_name;
-    dev.bus_path = resolved;
-    dev.port_path = resolved;
+    Device dev;
+    dev.setId(id_counter++);
+    dev.setName(device_name);
+    dev.setBusPath(resolved);
+    dev.setPortPath(resolved);
 
     // Update the device list
-    device_list_.push_back(std::move(dev));
+    devices_.push_back(std::move(dev));
   }
 
   closedir(dir);
@@ -74,35 +73,35 @@ uint16_t Ports::scanPorts() {
   return (id_counter - 1);
 }
 
-void Ports::getDeviceList(std::vector<DeviceStruct> & list) const {
-  list = device_list_;
+void Ports::getDeviceList(std::vector<Device> & list) const {
+  list = devices_;
 }
 
 std::optional<std::string> Ports::findPortPath(uint16_t id) const {
-  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
-                         [id](const DeviceStruct& dev){
-      return dev.id == id;
+  auto it = std::find_if(devices_.cbegin(), devices_.cend(),
+                         [id](const Device& dev){
+      return dev.getId() == id;
     });
-  if (it == device_list_.cend()) return std::nullopt;
-  return it->port_path;
+  if (it == devices_.cend()) return std::nullopt;
+  return it->getPortPath();
 }
 
 std::optional<std::string> Ports::findBusPath(uint16_t id) const {
-  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
-                         [id](const DeviceStruct& dev){
-      return dev.id == id;
+  auto it = std::find_if(devices_.cbegin(), devices_.cend(),
+                         [id](const Device& dev){
+      return dev.getId() == id;
     });
-  if (it == device_list_.cend()) return std::nullopt;
-  return it->bus_path;
+  if (it == devices_.cend()) return std::nullopt;
+  return it->getBusPath();
 }
 
 std::optional<std::string> Ports::findName(uint16_t id) const {
-  auto it = std::find_if(device_list_.cbegin(), device_list_.cend(),
-                         [id](const DeviceStruct& dev){
-      return dev.id == id;
+  auto it = std::find_if(devices_.cbegin(), devices_.cend(),
+                         [id](const Device& dev){
+      return dev.getId() == id;
     });
-  if (it == device_list_.cend()) return std::nullopt;
-  return it->name;
+  if (it == devices_.cend()) return std::nullopt;
+  return it->getName();
 }
 
 }  // namespace libserial

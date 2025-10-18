@@ -17,6 +17,7 @@
 #include <algorithm>
 #include <optional>
 
+#include "libserial/device.hpp"
 #include "libserial/serial_exception.hpp"
 #include "libserial/serial_types.hpp"
 
@@ -59,10 +60,10 @@ uint16_t scanPorts();
  * @brief Retrieves the list of detected serial devices
  *
  * @param list A reference to a vector that will be populated with
- *             DeviceStruct entries for each detected device
+ *             Device entries for each detected device
  * @throws SerialException if device list cannot be retrieved
  */
-void getDeviceList(std::vector<DeviceStruct> & list) const;
+void getDeviceList(std::vector<Device> & list) const;
 
 /**
  * @brief Finds the port path for a device with the specified ID
@@ -100,7 +101,7 @@ static constexpr const char* kSysSerialByIdPath = "/dev/serial/by-id/";
 /**
  * @brief Internal list of detected serial devices
  */
-std::vector<DeviceStruct> device_list_;
+std::vector<Device> devices_;
 };
 }  // namespace libserial
 
