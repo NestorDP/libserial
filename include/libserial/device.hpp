@@ -39,9 +39,9 @@ Device() = default;
  * @param id The unique identifier of the device
  */
 Device(const std::string& name,
-    const std::string& port_path,
-    const std::string& bus_path,
-    uint16_t id);
+       const std::string& port_path,
+       const std::string& bus_path,
+       uint16_t id);
 
 /**
  * @brief Retrieves the name of the device
