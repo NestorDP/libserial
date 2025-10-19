@@ -70,7 +70,7 @@ uint16_t Ports::scanPorts() {
 
   closedir(dir);
 
-  return (id_counter - 1);
+  return id_counter;
 }
 
 void Ports::getDevices(std::vector<Device> & devices) const {

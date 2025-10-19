@@ -40,85 +40,65 @@ Device() = default;
  * @param id The unique identifier of the device
  */
 Device(const std::string& name,
-        const std::string& port_path,
-        const std::string& bus_path,
-        uint16_t id)
-    : name_(name),
-        port_path_(port_path),
-        bus_path_(bus_path),
-        id_(id) {}
+    const std::string& port_path,
+    const std::string& bus_path,
+    uint16_t id);
 
 /**
  * @brief Retrieves the name of the device
  *
  * @return std::string The name of the device
  */
-std::string getName() const {
-    return name_;
-}
+std::string getName() const;
 
 /**
  * @brief Retrieves the port path of the device
  *
  * @return std::string The port path of the device
  */
-std::string getPortPath() const {
-    return port_path_;
-}
+std::string getPortPath() const;
 
 /**
  * @brief Retrieves the bus path of the device
  *
  * @return std::string The bus path of the device
  */
-std::string getBusPath() const {
-    return bus_path_;
-}
+std::string getBusPath() const;
 
 /**
  * @brief Retrieves the unique identifier of the device
  *
  * @return uint16_t The unique identifier of the device
  */
-uint16_t getId() const {
-    return id_;
-}
+uint16_t getId() const;
 
 /**
  * @brief Sets the name of the device
  *
  * @param name The name to set
  */
-void setName(const std::string& name) {
-    name_ = name;
-}
+void setName(const std::string& name);
 
 /**
  * @brief Sets the port path of the device
  *
  * @param port_path The port path to set
  */
-void setPortPath(const std::string& port_path) {
-    port_path_ = port_path;
-}
+void setPortPath(const std::string& port_path);
 
 /**
  * @brief Sets the bus path of the device
  *
  * @param bus_path The bus path to set
  */
-void setBusPath(const std::string& bus_path) {
-    bus_path_ = bus_path;
-}
+void setBusPath(const std::string& bus_path);
 
 /**
  * @brief Sets the unique identifier of the device
  *
  * @param id The unique identifier to set
  */
-void setId(uint16_t id) {
-    id_ = id;
-}
+void setId(uint16_t id);
 
 private:
 /**
