@@ -18,7 +18,6 @@ namespace libserial {
  */
 class Device {
 public:
-
 /**
  * @brief Default constructor of the Device class
  *
@@ -104,17 +103,17 @@ private:
 /**
  * @brief The name of the device
  */
-std::string name_;
+std::string name_{"unknown"};
 
 /**
  * @brief The port path of the device
  */
-std::string port_path_;
+std::string port_path_{"unknown"};
 
 /**
  * @brief The bus path of the device
  */
-std::string bus_path_;
+std::string bus_path_{"unknown"};
 
 /**
  * @brief The unique identifier of the device

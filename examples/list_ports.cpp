@@ -3,6 +3,7 @@
 // Example: list serial ports using Ports class
 
 #include <iostream>
+#include <vector>
 
 #include "libserial/ports.hpp"
 #include "libserial/device.hpp"

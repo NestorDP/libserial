@@ -1,5 +1,8 @@
 //  @ Copyright 2022-2025 Nestor Neto
 
+#include <string>
+#include <cstdint>
+
 #include "libserial/device.hpp"
 
 namespace libserial {
