@@ -12,14 +12,28 @@ Classes
 .. doxygenclass:: libserial::Ports
    :members:
 
+.. doxygenclass:: libserial::Device
+   :members:
+
 Exceptions
 ----------
 
 .. doxygenclass:: libserial::SerialException
    :members:
 
-Data Structures
----------------
+Enumerations
+------------
 
-.. doxygenstruct:: libserial::DeviceStruct
-   :members:
+.. doxygenenum:: libserial::Parity
+
+.. doxygenenum:: libserial::StopBits
+
+.. doxygenenum:: libserial::FlowControl
+
+.. doxygenenum:: libserial::CanonicalMode
+
+.. doxygenenum:: libserial::Terminator
+
+.. doxygenenum:: libserial::BaudRate
+
+.. doxygenenum:: libserial::DataLength
