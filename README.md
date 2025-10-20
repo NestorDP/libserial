@@ -29,7 +29,7 @@ It uses **Object-Oriented Programming concepts**, **smart pointers**, **lambda f
 
 ```bash
 # Clone the repository:
-git clone https://github.com/NestorDP/libserial.git && cd libserial
+git clone https://github.com/NestorDP/cppserial.git && cd cppserial
 
 # Build the source code:
 mkdir build && cd build
