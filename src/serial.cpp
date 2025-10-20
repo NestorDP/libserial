@@ -185,33 +185,34 @@ void Serial::setWriteTimeout(unsigned int timeout) {
   write_timeout_ = timeout;
 }
 
-// void Serial::SetNumberBits(NumBits num_bits) {
-//   this->getTermios2();
+void Serial::setDataLength(DataLength nbits) {
+  this->getTermios2();
 
-//   // Clear bits
-//   options_.c_cflag &= ~CSIZE;
+  // Clear bits
+  options_.c_cflag &= ~CSIZE;
 
-//   switch (num_bits) {
-//     case NumBits::FIVE:
-//       options_.c_cflag |= CS5;
-//       break;
-//     case NumBits::SIX:
-//       options_.c_cflag |= CS6;
-//       break;
-//     case NumBits::SEVEN:
-//       options_.c_cflag |= CS7;
-//       break;
-//     case NumBits::EIGHT:
-//       options_.c_cflag |= CS8;
-//       break;
-//     default:
-//       options_.c_cflag |= CS8;
-//       break;
-//   }
-//   this->setTermios2();
-// }
+  switch (nbits) {
+  case DataLength::FIVE:
+    options_.c_cflag |= CS5;
+    break;
+  case DataLength::SIX:
+    options_.c_cflag |= CS6;
+    break;
+  case DataLength::SEVEN:
+    options_.c_cflag |= CS7;
+    break;
+  case DataLength::EIGHT:
+    options_.c_cflag |= CS8;
+    break;
+  default:
+    options_.c_cflag |= CS8;
+    break;
+  }
+  this->setTermios2();
+}
 
-// void Serial::SetParity(Parity parity) {
+
+void Serial::setParity([[maybe_unused]] Parity parity) {
 //   this->getTermios2();
 //   switch (parity) {
 //     case Parity::DISABLE:
@@ -225,9 +226,9 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 //       break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetTwoStopBits(StopBits stop_bits) {
+void Serial::setStopBits([[maybe_unused]] StopBits stop_bits) {
 //   this->getTermios2();
 //   switch (stop_bits) {
 //   case StopBits::DISABLE:
@@ -240,9 +241,9 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 //     break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetFlowControl(FlowControl flow_control) {
+void Serial::setFlowControl([[maybe_unused]] FlowControl flow_control) {
 //   this->getTermios2();
 //   switch (flow_control) {
 //   case FlowControl::Software:
@@ -282,9 +283,9 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 //     break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetCanonicalMode(CanonicalMode canonical_mode){
+void Serial::setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode) {
 //   this->getTermios2();
 //   switch (canonical_mode) {
 //   case CanonicalMode::ENABLE:
@@ -297,21 +298,21 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 //     break;
 //   }
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetTerminator(Terminator term) {
+void Serial::setTerminator([[maybe_unused]] Terminator term) {
 //   terminator_ = (int)term;
-// }
+}
 
-// void Serial::SetTimeOut(int time){
+void Serial::setTimeOut([[maybe_unused]] int time) {
 //   this->getTermios2();
 //   options_.c_cc[VTIME] = time;
 //   this->setTermios2();
-// }
+}
 
-// void Serial::SetMinNumberCharRead(int num) {
+void Serial::setMinNumberCharRead([[maybe_unused]] int num) {
 //   this->getTermios2();
 //   options_.c_cc[VMIN] = num;
 //   this->setTermios2();
-// }
+}
 }  // namespace libserial
