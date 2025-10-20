@@ -1,5 +1,8 @@
 # CppSerial
 
+[![unit-tests](https://github.com/NestorDP/cppserial/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/NestorDP/cppserial/actions/workflows/unit-tests.yml)
+[![coverage](https://github.com/NestorDP/cppserial/actions/workflows/coverage.yml/badge.svg)](https://github.com/NestorDP/cppserial/actions/workflows/coverage.yml)
+
 **C++ Application Programming Interface for the `asm/termbits.h` C library**
 
 ---

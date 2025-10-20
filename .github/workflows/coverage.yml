@@ -1,0 +1,89 @@
+name: coverage
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  coverage:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            git \
+            lcov \
+            python3 \
+            python3-pip
+
+      - name: Install Google Test
+        run: |
+          git clone https://github.com/google/googletest.git -b v1.14.0
+          cd googletest
+          cmake .
+          make -j$(nproc)
+          sudo make install
+
+      - name: Configure CMake with coverage
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DBUILD_TESTING=ON \
+            -DBUILD_COVERAGE=ON
+
+      - name: Build
+        run: |
+          cd build
+          cmake --build . -- -j$(nproc)
+
+      - name: Run tests with coverage
+        run: |
+          cd build
+          make coverage
+
+      - name: Generate coverage summary
+        run: |
+          cd build
+          make coverage-summary
+
+      - name: Upload coverage HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/coverage_html/
+          retention-days: 30
+
+      - name: Upload coverage to Codecov (optional)
+        if: github.event_name == 'push' || github.event_name == 'pull_request'
+        uses: codecov/codecov-action@v4
+        with:
+          file: build/coverage.info.cleaned
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Display coverage summary in logs
+        if: always()
+        run: |
+          cd build
+          if [ -f coverage.info.cleaned ]; then
+            echo "=== Coverage Summary ==="
+            lcov --summary coverage.info.cleaned
+          else
+            echo "Coverage file not found"
+          fi
