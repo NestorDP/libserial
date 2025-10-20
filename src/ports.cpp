@@ -26,8 +26,7 @@ uint16_t Ports::scanPorts() {
   const char* by_id_dir = kSysSerialByIdPath;
   DIR* dir = opendir(by_id_dir);
   if (!dir) {
-    std::cout << "No serial devices directory: " << by_id_dir << "\n";
-    return -1;
+    throw SerialException("Error while reading " + std::string(by_id_dir) + ": " + strerror(errno));
   }
 
   // The POSIX directory-entry structure used by readdir() to describe files

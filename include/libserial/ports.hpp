@@ -50,9 +50,7 @@ Ports() = default;
  * @brief Scans the system for available serial ports
  *
  * @return uint16_t The number of serial ports found
- * @throws SerialException if scanning fails
  * @throws SerialException if no ports are found
- * @throws PermissionDeniedException if insufficient permissions
  */
 uint16_t scanPorts();
 
