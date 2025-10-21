@@ -41,6 +41,15 @@ public:
 Ports() = default;
 
 /**
+ * @brief Testable constructor allowing a custom system path
+ *
+ * Primarily intended for testing to inject a non-existent or
+ * non-readable directory to validate error handling paths.
+ */
+explicit Ports(const char* sys_path) : sys_path_(sys_path) {
+}
+
+/**
  * @brief Destroyer of the Ports class
  *
  */
@@ -50,9 +59,7 @@ Ports() = default;
  * @brief Scans the system for available serial ports
  *
  * @return uint16_t The number of serial ports found
- * @throws SerialException if scanning fails
  * @throws SerialException if no ports are found
- * @throws PermissionDeniedException if insufficient permissions
  */
 uint16_t scanPorts();
 
@@ -97,6 +104,11 @@ private:
  * @brief System path where udev creates symlinks for serial devices by ID
  */
 static constexpr const char* kSysSerialByIdPath = "/dev/serial/by-id/";
+
+/**
+ * @brief Configurable path used by scanPorts; defaults to kSysSerialByIdPath
+ */
+const char* sys_path_ { kSysSerialByIdPath };
 
 /**
  * @brief Internal list of detected serial devices
