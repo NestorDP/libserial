@@ -302,3 +302,24 @@ else()
     COMMAND ${CMAKE_COMMAND} -E echo "uncrustify not found; install it"
   )
 endif()
+
+# Debian package configuration
+set(CPACK_GENERATOR "DEB")
+set(CPACK_PACKAGE_NAME "libserial")
+set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_CONTACT "Nestor Pereira Neto <your.email@example.com>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Modern C++ serial port communication library")
+set(CPACK_PACKAGE_DESCRIPTION "A modern C++ library for serial port communication on Linux systems using termios2 for arbitrary baud rates.")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Nestor Pereira Neto <your.email@example.com>")
+set(CPACK_DEBIAN_PACKAGE_SECTION "libs")
+set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/NestorDP/cppserial")
+
+# Debian dependencies
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.27)")
+
+# Generate package files
+set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/postinst;${CMAKE_CURRENT_SOURCE_DIR}/debian/postrm")
+
+# Include CPack
+include(CPack)
