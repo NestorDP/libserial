@@ -10,7 +10,7 @@ Prerequisites
 To build libserial from source, you'll need:
 
 * CMake (version 3.10 or higher)
-* A C++14 compatible compiler (GCC 5.4+ or Clang 3.4+)
+* A C++17 compatible compiler (GCC 5.4+ or Clang 3.4+)
 * Git (for cloning the repository)
 
 For documentation generation (optional):
@@ -28,8 +28,8 @@ Building the Library
 
 .. code-block:: bash
 
-   git clone https://github.com/NestorDP/libserial.git
-   cd libserial
+   git clone https://github.com/NestorDP/cppserial.git
+   cd cppserial
 
 2. Create a build directory:
 
@@ -69,28 +69,37 @@ You can customize the build with various CMake options:
    # Install to a custom location
    cmake -DCMAKE_INSTALL_PREFIX=/usr/local ..
 
-Package Installation
---------------------
+   # Enable testing
+   cmake -DBUILD_TESTING=ON ..
 
-Ubuntu/Debian
-~~~~~~~~~~~~~
+   # Enable coverage reports
+   cmake -DENABLE_COVERAGE=ON ..
 
-.. code-block:: bash
+   # Enable documentation generation
+   cmake -DBUILD_DOCUMENTATION=ON ..
 
-   sudo apt update
-   sudo apt install libserial-dev
+.. Package Installation
+.. --------------------
 
-(Note: Package availability depends on your distribution)
+.. Ubuntu/Debian
+.. ~~~~~~~~~~~~~
 
-From Binary Releases
-~~~~~~~~~~~~~~~~~~~~~
+.. .. code-block:: bash
 
-Download the latest release from the `GitHub releases page <https://github.com/NestorDP/libserial/releases>`_ and follow the installation instructions provided with the release.
+..    sudo apt update
+..    sudo apt install libserial-dev
+
+.. (Note: Package availability depends on your distribution)
+
+.. From Binary Releases
+.. ~~~~~~~~~~~~~~~~~~~~~
+
+.. Download the latest release from the `GitHub releases page <https://github.com/NestorDP/cppserial/releases>`_ and follow the installation instructions provided with the release.
 
 Verifying Installation
 ----------------------
 
-To verify that libserial is installed correctly, create a simple test program:
+To verify that cppserial is installed correctly, create a simple test program:
 
 .. code-block:: cpp
 
@@ -106,5 +115,5 @@ Compile and run:
 
 .. code-block:: bash
 
-   g++ -std=c++14 test.cpp -lserial -o test
+   g++ -std=c++17 test.cpp -lserial -o test
    ./test

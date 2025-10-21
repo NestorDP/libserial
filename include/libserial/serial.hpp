@@ -120,6 +120,18 @@ void write(std::shared_ptr<std::string> data);
 size_t read(std::shared_ptr<std::string> buffer, size_t max_length);
 
 /**
+ * @brief Read a single byte from the serial port
+ *
+ * Reads one byte from the serial port and stores it in the provided buffer.
+ *
+ * @param buffer Shared pointer to string where the byte will be stored
+ * @return Number of bytes actually read (1 if successful, 0 on error)
+ * @throws SerialException if read operation fails
+ * @throws SerialException if buffer is null
+ */
+void readByte([[maybe_unused]] std::shared_ptr<std::string> buffer);
+
+/**
  * @brief Reads data until a specific terminator character is found
  *
  * Continues reading byte by byte until the specified terminator
