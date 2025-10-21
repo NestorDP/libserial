@@ -2,6 +2,7 @@
 
 #include "libserial/serial.hpp"
 #include <string>
+#include <memory>
 #include <poll.h>
 
 namespace libserial {
