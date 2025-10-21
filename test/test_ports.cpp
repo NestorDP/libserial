@@ -1,10 +1,13 @@
 // Copyright 2020-2025 Nestor Neto
 
 #include <gtest/gtest.h>
+#include <cstdlib>
+#include <cstring>
+#include <dirent.h>
+#include <unistd.h>
 #include <memory>
 #include <string>
 
-// Include libserial headers
 #include "libserial/ports.hpp"
 #include "libserial/serial_exception.hpp"
 
@@ -12,12 +15,28 @@
 class PortsTest : public ::testing::Test {
 protected:
 void SetUp() override {
-  // Test setup if needed
+  char temp_template[] = "/tmp/fake_serial_XXXXXX";
+  ASSERT_NE(mkdtemp(temp_template), nullptr) << "Failed to create temp directory";
+  temp_dir_ = temp_template;
 }
 
 void TearDown() override {
-  // Test cleanup if needed
+  // Clean up all symlinks in temp_dir_
+  DIR* dir = opendir(temp_dir_.c_str());
+  if (dir) {
+    struct dirent* entry;
+    while ((entry = readdir(dir)) != nullptr) {
+      if (entry->d_name[0] != '.') {
+        std::string path = temp_dir_ + "/" + entry->d_name;
+        unlink(path.c_str());
+      }
+    }
+    closedir(dir);
+  }
+  rmdir(temp_dir_.c_str());
 }
+
+std::string temp_dir_;
 };
 
 TEST_F(PortsTest, DefaultConstructor) {
@@ -32,17 +51,47 @@ TEST_F(PortsTest, ScanPortsThrowsWhenPathMissing) {
   libserial::Ports ports(missing_path);
 
 
-  try {
+    try {
     (void)ports.scanPorts();
+    FAIL() << "Expected libserial::SerialException to be thrown";
   } catch (const libserial::SerialException& e) {
     std::cout << "Caught SerialException: " << e.what() << std::endl;
     // Optionally assert something about the message:
-    // EXPECT_NE(std::string(e.what()).find("Error while reading"), std::string::npos);
+    EXPECT_NE(std::string(e.what()).find("Error while reading"), std::string::npos);
+  } catch (...) {
+    FAIL() << "Expected libserial::SerialException, but got a different exception";
   }
+}
 
-  EXPECT_THROW({
-    (void)ports.scanPorts();
-  }, libserial::PortNotFoundException);
+TEST_F(PortsTest, ScanPortsWithFakeDevices) {
+
+  // Create fake device symlinks
+  std::string fake_device1 = std::string(temp_dir_) + "/usb-FTDI_FT232R_USB_UART_A1B2C3D4";
+  std::string fake_device2 = std::string(temp_dir_) + "/usb-Arduino_Uno_12345678";
+  
+  // Create symlinks pointing to fake /dev/ttyUSB* paths
+  // The actual target doesn't need to exist for scanPorts to process it
+  ASSERT_EQ(symlink("../../ttyUSB0", fake_device1.c_str()), 0);
+  ASSERT_EQ(symlink("../../ttyUSB1", fake_device2.c_str()), 0);
+
+  // Test scanPorts with the fake directory
+  libserial::Ports ports(temp_dir_.c_str());
+  uint16_t count = 0;
+  EXPECT_NO_THROW({
+    count = ports.scanPorts();
+  });
+  
+  EXPECT_EQ(count, 2) << "Should find 2 fake devices";
+
+  // Verify device details
+  std::vector<libserial::Device> devices;
+  ports.getDevices(devices);
+  ASSERT_EQ(devices.size(), 2);
+  
+  EXPECT_EQ(devices[1].getName(), "usb-FTDI_FT232R_USB_UART_A1B2C3D4");
+  EXPECT_EQ(devices[1].getPortPath(), "/dev/ttyUSB0");
+  EXPECT_EQ(devices[0].getName(), "usb-Arduino_Uno_12345678");
+  EXPECT_EQ(devices[0].getPortPath(), "/dev/ttyUSB1");
 }
 
 
