@@ -23,11 +23,11 @@ uint16_t Ports::scanPorts() {
 
   // Directory where udev creates symlinks for serial devices by ID
   // this directory may not exist if no serial devices are connected
-  const char* by_id_dir = kSysSerialByIdPath;
+  const char* by_id_dir = sys_path_;
   DIR* dir = opendir(by_id_dir);
   if (!dir) {
-    std::cout << "No serial devices directory: " << by_id_dir << "\n";
-    return -1;
+    throw PortNotFoundException("Error while reading " + std::string(by_id_dir) + ": " +
+                                strerror(errno));
   }
 
   // The POSIX directory-entry structure used by readdir() to describe files
