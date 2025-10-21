@@ -26,7 +26,8 @@ uint16_t Ports::scanPorts() {
   const char* by_id_dir = sys_path_;
   DIR* dir = opendir(by_id_dir);
   if (!dir) {
-    throw PortNotFoundException("Error while reading " + std::string(by_id_dir) + ": " + strerror(errno));
+    throw PortNotFoundException("Error while reading " + std::string(by_id_dir) + ": " +
+                                strerror(errno));
   }
 
   // The POSIX directory-entry structure used by readdir() to describe files

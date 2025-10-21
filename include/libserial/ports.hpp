@@ -46,7 +46,8 @@ Ports() = default;
  * Primarily intended for testing to inject a non-existent or
  * non-readable directory to validate error handling paths.
  */
-explicit Ports(const char* sys_path) : sys_path_(sys_path) {}
+explicit Ports(const char* sys_path) : sys_path_(sys_path) {
+}
 
 /**
  * @brief Destroyer of the Ports class

@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <memory>
 #include <string>
+#include <iostream>
 
 #include "libserial/ports.hpp"
 #include "libserial/serial_exception.hpp"
@@ -51,24 +52,25 @@ TEST_F(PortsTest, ScanPortsThrowsWhenPathMissing) {
   libserial::Ports ports(missing_path);
 
 
-    try {
+  try {
     (void)ports.scanPorts();
     FAIL() << "Expected libserial::SerialException to be thrown";
-  } catch (const libserial::SerialException& e) {
+  }
+  catch (const libserial::SerialException& e) {
     std::cout << "Caught SerialException: " << e.what() << std::endl;
     // Optionally assert something about the message:
     EXPECT_NE(std::string(e.what()).find("Error while reading"), std::string::npos);
-  } catch (...) {
+  }
+  catch (...) {
     FAIL() << "Expected libserial::SerialException, but got a different exception";
   }
 }
 
 TEST_F(PortsTest, ScanPortsWithFakeDevices) {
-
   // Create fake device symlinks
   std::string fake_device1 = std::string(temp_dir_) + "/usb-FTDI_FT232R_USB_UART_A1B2C3D4";
   std::string fake_device2 = std::string(temp_dir_) + "/usb-Arduino_Uno_12345678";
-  
+
   // Create symlinks pointing to fake /dev/ttyUSB* paths
   // The actual target doesn't need to exist for scanPorts to process it
   ASSERT_EQ(symlink("../../ttyUSB0", fake_device1.c_str()), 0);
@@ -80,7 +82,7 @@ TEST_F(PortsTest, ScanPortsWithFakeDevices) {
   EXPECT_NO_THROW({
     count = ports.scanPorts();
   });
-  
+
   EXPECT_EQ(count, 2) << "Should find 2 fake devices";
 
   EXPECT_EQ(ports.findName(1).value(), "usb-FTDI_FT232R_USB_UART_A1B2C3D4");
