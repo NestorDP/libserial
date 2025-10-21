@@ -69,8 +69,13 @@ size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
   return static_cast<size_t>(bytes_read);
 }
 
-void Serial::readByte([[maybe_unused]] std::shared_ptr<std::string> buffer) {
-  // Implementation can be added here if needed
+char Serial::readByte() {
+  char byte = 0;
+  ssize_t bytes_read = ::read(fd_serial_port_, &byte, 1);
+  if (bytes_read < 0) {
+    throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+  }
+  return byte;
 }
 
 size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
