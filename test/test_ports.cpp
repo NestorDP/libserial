@@ -83,15 +83,12 @@ TEST_F(PortsTest, ScanPortsWithFakeDevices) {
   
   EXPECT_EQ(count, 2) << "Should find 2 fake devices";
 
-  // Verify device details
-  std::vector<libserial::Device> devices;
-  ports.getDevices(devices);
-  ASSERT_EQ(devices.size(), 2);
-  
-  EXPECT_EQ(devices[1].getName(), "usb-FTDI_FT232R_USB_UART_A1B2C3D4");
-  EXPECT_EQ(devices[1].getPortPath(), "/dev/ttyUSB0");
-  EXPECT_EQ(devices[0].getName(), "usb-Arduino_Uno_12345678");
-  EXPECT_EQ(devices[0].getPortPath(), "/dev/ttyUSB1");
+  EXPECT_EQ(ports.findName(1).value(), "usb-FTDI_FT232R_USB_UART_A1B2C3D4");
+  EXPECT_EQ(ports.findName(0).value(), "usb-Arduino_Uno_12345678");
+  EXPECT_EQ(ports.findPortPath(1).value(), "/dev/ttyUSB0");
+  EXPECT_EQ(ports.findPortPath(0).value(), "/dev/ttyUSB1");
+  EXPECT_EQ(ports.findBusPath(1).value(), "/dev/ttyUSB0");
+  EXPECT_EQ(ports.findBusPath(0).value(), "/dev/ttyUSB1");
 }
 
 
