@@ -51,7 +51,6 @@ TEST_F(PortsTest, ScanPortsThrowsWhenPathMissing) {
   const char* missing_path = "/this/path/should/not/exist/serial/by-id";
   libserial::Ports ports(missing_path);
 
-
   try {
     (void)ports.scanPorts();
     FAIL() << "Expected libserial::SerialException to be thrown";
