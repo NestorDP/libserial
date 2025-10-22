@@ -92,4 +92,27 @@ TEST_F(PortsTest, ScanPortsWithFakeDevices) {
   EXPECT_EQ(ports.findBusPath(0).value(), "/dev/ttyUSB1");
 }
 
+TEST_F(PortsTest, GetDevicesPopulatesList) {
+  // Create fake device symlinks
+  std::string fake_device1 = std::string(temp_dir_) + "/usb-Device_One_0001";
+  std::string fake_device2 = std::string(temp_dir_) + "/usb-Device_Two_0002";
+
+  ASSERT_EQ(symlink("../../ttyUSB2", fake_device1.c_str()), 0);
+  ASSERT_EQ(symlink("../../ttyUSB3", fake_device2.c_str()), 0);
+
+  libserial::Ports ports(temp_dir_.c_str());
+  EXPECT_NO_THROW({
+    ports.scanPorts();
+  });
+
+  std::vector<libserial::Device> devices;
+  EXPECT_NO_THROW({
+    ports.getDevices(devices);
+  });
+
+  EXPECT_EQ(devices.size(), 2);
+  EXPECT_EQ(devices[0].getName(), "usb-Device_Two_0002");
+  EXPECT_EQ(devices[1].getName(), "usb-Device_One_0001");
+}
+
 
