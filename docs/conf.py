@@ -29,7 +29,7 @@ extensions = [
 
 # Breathe Configuration for C++ documentation
 breathe_projects = {
-    "libserial": "../build/doxygen/xml"
+    "libserial": "_doxygen/xml"
 }
 breathe_default_project = "libserial"
 
