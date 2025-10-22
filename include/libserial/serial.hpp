@@ -352,6 +352,8 @@ unsigned int read_timeout_{1000};    ///< Read timeout in milliseconds (default 
  * before timing out. Default is 1000ms.
  */
 unsigned int write_timeout_{1000};    ///< Write timeout in milliseconds (default 1000ms)
+
+static constexpr size_t kMaxSafeReadSize = 2048;  // 2KB limit
 };
 
 }  // namespace libserial
