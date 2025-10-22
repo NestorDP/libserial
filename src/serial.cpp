@@ -39,19 +39,29 @@ void Serial::close() {
 
 void Serial::write(std::shared_ptr<std::string> data) {
   if (!data) {
-    throw SerialException("Null pointer passed to write function");
+    throw IOException("Null pointer passed to write function");
   }
 
   ssize_t bytes_written = ::write(fd_serial_port_, data->c_str(), data->size());
 
   if (bytes_written < 0) {
-    throw SerialException("Error writing to serial port: " + std::string(strerror(errno)));
+    throw IOException("Error writing to serial port: " + std::string(strerror(errno)));
   }
 }
 
 size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
   if (!buffer) {
-    throw SerialException("Null pointer passed to read function");
+    throw IOException("Null pointer passed to read function");
+  }
+
+  if (max_length > kMaxSafeReadSize) {
+    throw IOException("Read size exceeds maximum safe limit of " +
+                      std::to_string(kMaxSafeReadSize) + " bytes");
+  }
+
+  if (max_length == 0) {
+    buffer->clear();
+    return 0;
   }
 
   // Resize the string to accommodate the maximum possible data
@@ -60,7 +70,7 @@ size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
   // Use const_cast to get non-const pointer for read operation
   ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), max_length);
   if (bytes_read < 0) {
-    throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+    throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
 
   // Resize the string to the actual number of bytes read
@@ -80,7 +90,7 @@ char Serial::readByte() {
 
 size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
   if (!buffer) {
-    throw SerialException("Null pointer passed to readUntil function");
+    throw IOException("Null pointer passed to readUntil function");
   }
 
   buffer->clear();
@@ -89,6 +99,12 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
   auto start_time = std::chrono::steady_clock::now();
 
   while (temp_char != terminator) {
+    // Check buffer size limit to prevent excessive memory usage
+    if (buffer->size() >= kMaxSafeReadSize) {
+      throw IOException("Read buffer exceeded maximum size limit of " +
+                        std::to_string(kMaxSafeReadSize) +
+                        " bytes without finding terminator");
+    }
     // Check timeout if enabled (0 means no timeout)
     if (read_timeout_ > 0) {
       auto current_time = std::chrono::steady_clock::now();
@@ -96,7 +112,7 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
                                                                            start_time).count();
 
       if (elapsed >= static_cast<int64_t>(read_timeout_)) {
-        throw SerialException("Read timeout exceeded while waiting for terminator");
+        throw IOException("Read timeout exceeded while waiting for terminator");
       }
 
       // Use poll() to check if data is available with remaining timeout.
@@ -111,10 +127,10 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
 
       int poll_result = poll(&pfd, 1, timeout_ms);
       if (poll_result < 0) {
-        throw SerialException("Error in poll(): " + std::string(strerror(errno)));
+        throw IOException("Error in poll(): " + std::string(strerror(errno)));
       }
       else if (poll_result == 0) {
-        throw SerialException("Read timeout exceeded while waiting for data");
+        throw IOException("Read timeout exceeded while waiting for data");
       }
     }
 
