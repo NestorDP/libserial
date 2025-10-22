@@ -138,9 +138,10 @@ if(BUILD_TESTING)
     find_package(GTest REQUIRED)
 
     add_executable(serial_tests
-        test/test_serial_simple.cpp
-        test/test_serial_pty.cpp
+        test/test_device.cpp
         test/test_ports.cpp
+        test/test_serial_pty.cpp
+        test/test_serial_simple.cpp
     )
     
     target_include_directories(serial_tests PRIVATE
