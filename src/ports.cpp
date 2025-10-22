@@ -43,15 +43,21 @@ uint16_t Ports::scanPorts() {
     std::string symlink_path = std::string(by_id_dir) + "/" + device_name;
 
     // Store the relative path the symlink points to
-    char target[PATH_MAX] = {0};
-
-    // Resolve the symlink to get the actual device path relative to /dev
-    // from the /dev/serial/by-id/ directory (e.g., ../../ttyUSB0)
-    ssize_t len = readlink(symlink_path.c_str(), target, sizeof(target) - 1);
-    target[len] = '\0';
-
+    std::string target;
+    try {
+      getSymlinkTarget(symlink_path, target);
+    } catch (const ScanPortsException& e) {
+      throw ScanPortsException("Failed to get symlink target for " + symlink_path + ": " + e.what());
+      continue;
+    }
+    
     // Resolve the relative path to an absolute path
-    const char* bname = strrchr(target, '/');
+    const char* bname = strrchr(target.c_str(), '/');
+    if (!bname) {
+      // No slash found - malformed symlink, skip
+      std::cerr << "Warning: Malformed symlink target for " << symlink_path << std::endl;
+      continue;
+    }
     bname++;
 
     // Construct the full /dev/ttyXXX path
@@ -102,6 +108,35 @@ std::optional<std::string> Ports::findName(uint16_t id) const {
     });
   if (it == devices_.cend()) return std::nullopt;
   return it->getName();
+}
+
+void Ports::getSymlinkTarget(const std::string& symlink_path, std::string& target) {
+  struct stat stat_buf;
+  char buffer[PATH_MAX];
+  
+  // Verify it's actually a symlink
+  if (lstat(symlink_path.c_str(), &stat_buf) == -1) {
+      throw ScanPortsException("lstat failed for " + symlink_path + ": " +
+                               std::string(strerror(errno)));
+  }
+  
+  if (!S_ISLNK(stat_buf.st_mode)) {
+      throw ScanPortsException("Not a symlink");
+  }
+  
+  // Read the symlink target
+  ssize_t len = readlink(symlink_path.c_str(), buffer, sizeof(buffer) - 1);
+  if (len < 0) {
+    throw ScanPortsException("Failed to read symlink: " +
+                              std::string(strerror(errno)));
+  } else if (len >= static_cast<ssize_t>(sizeof(buffer))) {
+    // Path too long - skip this entry
+    throw ScanPortsException("Symlink path too long: " +
+      std::string(strerror(errno)));
+  }
+
+  buffer[len] = '\0';
+  target.assign(buffer, len);
 }
 
 }  // namespace libserial

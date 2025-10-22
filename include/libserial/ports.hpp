@@ -101,6 +101,15 @@ std::optional<std::string> findName(uint16_t id) const;
 
 private:
 /**
+ * @brief Safely retrieves the target of a symlink
+ *
+ * @param symlink_path The path to the symlink
+ * @param target A reference to a string that will be populated with the target path
+ * @return true if the target was successfully retrieved, false otherwise
+ */
+void getSymlinkTarget(const std::string& symlink_path, std::string& target);
+
+/**
  * @brief System path where udev creates symlinks for serial devices by ID
  */
 static constexpr const char* kSysSerialByIdPath = "/dev/serial/by-id/";
