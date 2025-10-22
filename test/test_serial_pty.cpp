@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
+#include <chrono>
+#include <thread>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -106,7 +108,7 @@ TEST_F(PseudoTerminalTest, GetAvailableData) {
 
   // Force flush and give more time for data to propagate
   fsync(master_fd);
-  usleep(100000);    // 100ms delay
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Now check available data again - should match what we wrote
   int available{0};
@@ -127,7 +129,7 @@ TEST_F(PseudoTerminalTest, ReadWithValidSharedPtr) {
 
   // Give time for data to propagate
   fsync(master_fd);
-  usleep(100000);    // 100ms delay
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Check that data is available before attempting to read
   int available = serial_port.getAvailableData();
@@ -155,7 +157,7 @@ TEST_F(PseudoTerminalTest, ReadUntil) {
 
   // Give time for data to propagate
   fsync(master_fd);
-  usleep(100000);    // 100ms delay
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Test reading with shared pointer - only read what's available
   auto read_buffer = std::make_shared<std::string>();
@@ -178,7 +180,7 @@ TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
 
   // Give time for data to propagate
   fsync(master_fd);
-  usleep(100000);    // 100ms delay
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Test reading with shared pointer - only read what's available
   auto read_buffer = std::make_shared<std::string>();
@@ -207,7 +209,7 @@ TEST_F(PseudoTerminalTest, WriteTest) {
     std::cout << "Successfully wrote data via Serial class" << std::endl;
 
     // Give time for data to propagate
-    usleep(50000);      // 50ms
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
     // Try to read from master end to verify
     char buffer[100] = {0};
@@ -244,7 +246,7 @@ TEST_F(PseudoTerminalTest, ReadWithSharedPtr) {
 
   // Give time for data to propagate
   fsync(master_fd);
-  usleep(100000);    // 100ms delay
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Check that data is available before attempting to read
   int available = 0;
