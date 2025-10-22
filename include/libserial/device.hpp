@@ -33,6 +33,9 @@ Device() = default;
 /**
  * @brief Parameterized constructor of the Device class
  *
+ * With this constructor, you can create a Device instance by providing
+ * its name, port path, bus path, and unique identifier. 
+ *
  * @param name The name of the device
  * @param port_path The port path of the device
  * @param bus_path The bus path of the device
