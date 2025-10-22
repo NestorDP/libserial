@@ -19,7 +19,7 @@
 #include "libserial/serial_exception.hpp"
 
 // Integration test using pseudo-terminals
-class WorkingPseudoTerminalTest : public ::testing::Test {
+class PseudoTerminalTest : public ::testing::Test {
 protected:
 int master_fd{-1};
 int slave_fd{-1};
@@ -63,7 +63,7 @@ void TearDown() override {
 }
 };
 
-TEST_F(WorkingPseudoTerminalTest, OpenClosePort) {
+TEST_F(PseudoTerminalTest, OpenClosePort) {
   libserial::Serial serial_port;
 
   // Test opening the port
@@ -73,7 +73,7 @@ TEST_F(WorkingPseudoTerminalTest, OpenClosePort) {
   EXPECT_NO_THROW({ serial_port.close(); });
 }
 
-TEST_F(WorkingPseudoTerminalTest, GetBaudRate) {
+TEST_F(PseudoTerminalTest, GetBaudRate) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
@@ -89,7 +89,7 @@ TEST_F(WorkingPseudoTerminalTest, GetBaudRate) {
   serial_port.close();
 }
 
-TEST_F(WorkingPseudoTerminalTest, GetAvailableData) {
+TEST_F(PseudoTerminalTest, GetAvailableData) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
@@ -114,7 +114,7 @@ TEST_F(WorkingPseudoTerminalTest, GetAvailableData) {
   EXPECT_EQ(available, bytes_written);
 }
 
-TEST_F(WorkingPseudoTerminalTest, ReadWithValidSharedPtr) {
+TEST_F(PseudoTerminalTest, ReadWithValidSharedPtr) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
@@ -142,7 +142,7 @@ TEST_F(WorkingPseudoTerminalTest, ReadWithValidSharedPtr) {
   EXPECT_EQ(*read_buffer, test_message);
 }
 
-TEST_F(WorkingPseudoTerminalTest, ReadUntil) {
+TEST_F(PseudoTerminalTest, ReadUntil) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
@@ -165,7 +165,7 @@ TEST_F(WorkingPseudoTerminalTest, ReadUntil) {
   EXPECT_EQ(*read_buffer, "Read Until!");
 }
 
-TEST_F(WorkingPseudoTerminalTest, ReadUntilTimeout) {
+TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
@@ -186,7 +186,7 @@ TEST_F(WorkingPseudoTerminalTest, ReadUntilTimeout) {
   EXPECT_THROW({serial_port.readUntil(read_buffer, '!'); }, libserial::SerialException);
 }
 
-TEST_F(WorkingPseudoTerminalTest, WriteTest) {
+TEST_F(PseudoTerminalTest, WriteTest) {
   libserial::Serial serial_port;
 
   try {
@@ -228,7 +228,7 @@ TEST_F(WorkingPseudoTerminalTest, WriteTest) {
   }
 }
 
-TEST_F(WorkingPseudoTerminalTest, ReadWithSharedPtr) {
+TEST_F(PseudoTerminalTest, ReadWithSharedPtr) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
