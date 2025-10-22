@@ -54,27 +54,29 @@ size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
     throw IOException("Null pointer passed to read function");
   }
 
-  if (max_length > kMaxSafeReadSize) {
-    throw IOException("Read size exceeds maximum safe limit of " +
-                      std::to_string(kMaxSafeReadSize) + " bytes");
-  }
+  // Use the minimum of requested max_length and safe limit
+  size_t safe_max_length = std::min(max_length, kMaxSafeReadSize);
 
-  if (max_length == 0) {
+  // Check for zero length after applying safe limit TODO: check this point
+  if (safe_max_length == 0) {
     buffer->clear();
     return 0;
   }
 
-  // Resize the string to accommodate the maximum possible data
-  buffer->resize(max_length);
+  // Ensure the buffer has enough capacity
+  if (buffer->capacity() < safe_max_length) {
+      buffer->reserve(safe_max_length);
+  }
 
-  // Use const_cast to get non-const pointer for read operation
-  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), max_length);
+  std::vector<char> temp_buffer(safe_max_length);
+
+  ssize_t bytes_read = ::read(fd_serial_port_, temp_buffer.data(), safe_max_length);
   if (bytes_read < 0) {
     throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
 
-  // Resize the string to the actual number of bytes read
-  buffer->resize(static_cast<size_t>(bytes_read));
+  // Safely assign to the string
+  buffer->assign(temp_buffer.data(), static_cast<size_t>(bytes_read));
 
   return static_cast<size_t>(bytes_read);
 }
