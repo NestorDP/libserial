@@ -3,9 +3,9 @@
 [![release](https://img.shields.io/github/v/release/NestorDP/cppserial)](https://github.com/NestorDP/cppserial/releases)
 [![unit-tests](https://github.com/NestorDP/cppserial/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/NestorDP/cppserial/actions/workflows/unit-tests.yml)
 [![codecov](https://codecov.io/gh/NestorDP/cppserial/branch/main/graph/badge.svg)](https://codecov.io/gh/NestorDP/cppserial)
-<!-- [![License](https://img.shields.io/github/license/NestorDP/cppserial)](https://github.com/NestorDP/cppserial/blob/main/LICENSE) -->
 [![Documentation Status](https://readthedocs.org/projects/cppserial/badge/?version=latest)](https://cppserial.readthedocs.io/en/latest/?badge=latest)
 
+<!-- [![License](https://img.shields.io/github/license/NestorDP/cppserial)](https://github.com/NestorDP/cppserial/blob/main/LICENSE) -->
 <!--[![coverage](https://github.com/NestorDP/cppserial/actions/workflows/coverage.yml/badge.svg)](https://github.com/NestorDP/cppserial/actions/workflows/coverage.yml)-->
 
 **C++ Application Programming Interface for the `asm/termbits.h` C library**
