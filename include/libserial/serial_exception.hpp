@@ -87,6 +87,21 @@ explicit IOException(std::string message)
 }
 };  // class IOException
 
+/**
+ * @class ScanPortsException
+ * @brief Exception class for port scanning errors
+ *
+ * The ScanPortsException class is derived from SerialException
+ * and is used to indicate that an error occurred while scanning
+ * for serial ports.
+ */
+class ScanPortsException : public SerialException {
+public:
+explicit ScanPortsException(std::string message)
+  : SerialException(std::move(message)) {
+}
+};  // class ScanPortsException
+
 }  // namespace libserial
 
 #endif  // INCLUDE_LIBSERIAL_SERIAL_EXCEPTION_HPP_
