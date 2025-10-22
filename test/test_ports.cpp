@@ -8,6 +8,7 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <vector>
 
 #include "libserial/ports.hpp"
 #include "libserial/serial_exception.hpp"
