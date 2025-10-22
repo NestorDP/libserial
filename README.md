@@ -44,7 +44,7 @@ make
 sudo make install
 ```
 
-## Generate Documentation
+<!-- ## Generate Documentation
 
 You can build the API and user documentation with Doxygen and Sphinx.
 
@@ -82,7 +82,7 @@ Install location (optional):
 
 ```bash
 sudo make install  # installs HTML docs under /usr/local/share/doc/libserial/html
-```
+``` -->
 
 <!-- ### Option B: Build manually (without CMake)
 
