@@ -69,7 +69,7 @@ explicit Serial(const std::string& port);
  * Automatically closes the serial port if it's open, ensuring
  * proper resource cleanup.
  */
-~Serial();
+~Serial() noexcept;
 
 /**
  * @brief Opens a serial port for communication
@@ -110,14 +110,13 @@ void write(std::shared_ptr<std::string> data);
  * memory management and avoids unnecessary string copies.
  *
  * @param buffer Shared pointer to string where data will be stored
- * @param max_length Maximum number of bytes to read
  * @return Number of bytes actually read
  * @throws SerialException if read operation fails
  * @throws SerialException if buffer is null
  *
  * @note The buffer will be resized to contain exactly the read data
  */
-size_t read(std::shared_ptr<std::string> buffer, size_t max_length);
+size_t read(std::shared_ptr<std::string> buffer);
 
 /**
  * @brief Read a single byte from the serial port
@@ -299,6 +298,15 @@ void setTimeOut([[maybe_unused]] int time);
  * @throws SerialException if setting cannot be applied
  */
 void setMinNumberCharRead([[maybe_unused]] int num);
+
+#ifdef BUILD_TESTING_ON
+// Test helper: allow unit tests to inject a file descriptor to force
+// error paths (e.g., closing an invalid descriptor). This is intended
+// for tests only and should not be used in production code.
+void setFdForTest(int fd) {
+  fd_serial_port_ = fd;
+}
+#endif
 
 private:
 /**

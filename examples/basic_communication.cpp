@@ -50,7 +50,7 @@ int main(int argc, const char* argv[]) {
 
     if (available > 0) {
       auto buffer = std::make_shared<std::string>();
-      size_t bytes_read = serial.read(buffer, available);
+      size_t bytes_read = serial.read(buffer);
       std::cout << "Received (" << bytes_read << " bytes): '" << *buffer << "'" << std::endl;
     } else {
       std::cout << "No response received." << std::endl;
@@ -79,7 +79,7 @@ int main(int argc, const char* argv[]) {
 
       if (available > 0) {
         auto buffer = std::make_shared<std::string>();
-        size_t bytes_read = serial.read(buffer, available);
+        size_t bytes_read = serial.read(buffer);
         std::cout << "Received (" << bytes_read << " bytes): '" << *buffer << "'" << std::endl;
       }
     }

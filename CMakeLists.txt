@@ -134,6 +134,7 @@ if(BUILD_COVERAGE)
 endif()
 
 if(BUILD_TESTING)
+    add_compile_definitions(BUILD_TESTING_ON)
     enable_testing()
     find_package(GTest REQUIRED)
 
