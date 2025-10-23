@@ -13,7 +13,10 @@ Serial::Serial(const std::string& port) {
 }
 
 Serial::~Serial() {
-  this->close();
+  if (fd_serial_port_ != -1) {
+    ::close(fd_serial_port_);
+    fd_serial_port_ = -1;
+  }
 }
 
 void Serial::open(const std::string& port) {
