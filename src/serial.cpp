@@ -59,11 +59,6 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
     throw IOException("Null pointer passed to read function");
   }
 
-  if (buffer->size() > kMaxSafeReadSize) {
-    throw IOException("Read buffer exceeds maximum safe limit of " +
-                      std::to_string(kMaxSafeReadSize) + " bytes");
-  }
-
   // Resize the string to accommodate the maximum possible data
   buffer->clear();
   buffer->resize(kMaxSafeReadSize);
@@ -174,17 +169,12 @@ int Serial::getAvailableData() const {
 }
 
 void Serial::setBaudRate(int baud_rate) {
-  try {
-    this->getTermios2();
-    options_.c_cflag &= ~CBAUD;
-    options_.c_cflag |= BOTHER;
-    options_.c_ispeed = baud_rate;
-    options_.c_ospeed = baud_rate;
-    this->setTermios2();
-  }
-  catch(...) {
-    throw;
-  }
+  this->getTermios2();
+  options_.c_cflag &= ~CBAUD;
+  options_.c_cflag |= BOTHER;
+  options_.c_ispeed = baud_rate;
+  options_.c_ospeed = baud_rate;
+  this->setTermios2();
 }
 
 void Serial::setBaudRate(BaudRate baud_rate) {
