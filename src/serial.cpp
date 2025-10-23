@@ -80,7 +80,7 @@ char Serial::readByte() {
   char byte = 0;
   ssize_t bytes_read = ::read(fd_serial_port_, &byte, 1);
   if (bytes_read < 0) {
-    throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+    throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
   return byte;
 }
