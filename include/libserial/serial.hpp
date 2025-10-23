@@ -300,9 +300,10 @@ void setTimeOut([[maybe_unused]] int time);
 void setMinNumberCharRead([[maybe_unused]] int num);
 
 #ifdef BUILD_TESTING_ON
-// Test helper: allow unit tests to inject a file descriptor to force
-// error paths (e.g., closing an invalid descriptor). This is intended
-// for tests only and should not be used in production code.
+// WARNING: Test helper only! This function bypasses normal initialization
+// and may leave the Serial object in an inconsistent state. It is intended
+// strictly for unit tests to inject a file descriptor and should NEVER be
+// used in production code.
 void setFdForTest(int fd) {
   fd_serial_port_ = fd;
 }

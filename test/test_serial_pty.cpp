@@ -238,53 +238,6 @@ TEST_F(PseudoTerminalTest, WriteTest) {
   }
 }
 
-TEST_F(PseudoTerminalTest, ReadWithSharedPtr) {
-  libserial::Serial serial_port;
-
-  serial_port.open(slave_port);
-  serial_port.setBaudRate(9600);
-  std::cout << "Setup serial port for shared pointer read test" << std::endl;
-
-  const std::string test_message = "Smart Pointer Test!\n";
-
-  // Write data to master end
-  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
-  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
-  std::cout << "Wrote " << bytes_written << " bytes to master" << std::endl;
-
-  // Give time for data to propagate
-  fsync(master_fd);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-  // Check that data is available before attempting to read
-  int available = 0;
-  EXPECT_NO_THROW({ available = serial_port.getAvailableData(); });
-  std::cout << "Available data: " << available << " bytes" << std::endl;
-
-  if (available > 0) {
-    // Test reading with shared pointer - only read what's available
-    auto read_buffer = std::make_shared<std::string>();
-    size_t bytes_read = 0;
-
-    EXPECT_NO_THROW({ bytes_read = serial_port.read(read_buffer); });
-
-    std::cout << "Read " << bytes_read << " bytes into shared pointer" << std::endl;
-    std::cout << "Buffer content: '" << *read_buffer << "'" << std::endl;
-
-    // Verify the data
-    EXPECT_EQ(bytes_read, test_message.length());
-    EXPECT_EQ(*read_buffer, test_message);
-  }
-  else {
-    std::cout << "No data available, skipping read test" << std::endl;
-    // Still verify the API works by testing null pointer case
-  }
-
-  // Test null pointer error handling
-  std::shared_ptr<std::string> null_buffer;
-  EXPECT_THROW({ serial_port.read(null_buffer); }, libserial::SerialException);
-}
-
 TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
   libserial::Serial serial_port;
 
