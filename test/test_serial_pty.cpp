@@ -25,7 +25,7 @@ class PseudoTerminalTest : public ::testing::Test {
 protected:
 int master_fd_{-1};
 int slave_fd_{-1};
-std::string slave_port_{};
+std::string slave_port_;
 
 void SetUp() override {
   // Create pseudo-terminal pair
