@@ -23,45 +23,45 @@
 // Integration test using pseudo-terminals
 class PseudoTerminalTest : public ::testing::Test {
 protected:
-int master_fd{-1};
-int slave_fd{-1};
-std::string slave_port;  // NOLINT(runtime/string)
+int master_fd_{-1};
+int slave_fd_{-1};
+std::string slave_port_{};
 
 void SetUp() override {
   // Create pseudo-terminal pair
-  master_fd = posix_openpt(O_RDWR | O_NOCTTY);
-  if (master_fd == -1) {
+  master_fd_ = posix_openpt(O_RDWR | O_NOCTTY);
+  if (master_fd_ == -1) {
     FAIL() << "Failed to open master pseudo-terminal";
     return;
   }
 
-  if (grantpt(master_fd) == -1 || unlockpt(master_fd) == -1) {
-    close(master_fd);
+  if (grantpt(master_fd_) == -1 || unlockpt(master_fd_) == -1) {
+    close(master_fd_);
     FAIL() << "Failed to setup master pseudo-terminal";
     return;
   }
 
-  char *slave_name = ptsname(master_fd);
+  char *slave_name = ptsname(master_fd_);
   if (!slave_name) {
-    close(master_fd);
+    close(master_fd_);
     FAIL() << "Failed to get slave pseudo-terminal name";
     return;
   }
 
-  slave_port = std::string(slave_name);
+  slave_port_ = std::string(slave_name);
 
   // Open slave end for internal testing
-  slave_fd = open(slave_name, O_RDWR | O_NOCTTY);
-  if (slave_fd == -1) {
-    close(master_fd);
+  slave_fd_ = open(slave_name, O_RDWR | O_NOCTTY);
+  if (slave_fd_ == -1) {
+    close(master_fd_);
     FAIL() << "Failed to open slave pseudo-terminal";
     return;
   }
 }
 
 void TearDown() override {
-  if (master_fd != -1) close(master_fd);
-  if (slave_fd != -1) close(slave_fd);
+  if (master_fd_ != -1) close(master_fd_);
+  if (slave_fd_ != -1) close(slave_fd_);
 }
 };
 
@@ -69,20 +69,20 @@ TEST_F(PseudoTerminalTest, OpenClosePort) {
   libserial::Serial serial_port;
 
   // Test opening the port
-  EXPECT_NO_THROW({ serial_port.open(slave_port); });
+  EXPECT_NO_THROW({ serial_port.open(slave_port_); });
 
   // Test closing the port
   EXPECT_NO_THROW({ serial_port.close(); });
 }
 
 TEST_F(PseudoTerminalTest, ParameterizedConstructor) {
-  libserial::Serial serial_port(slave_port);
+  libserial::Serial serial_port(slave_port_);
 }
 
 TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
 
   // Set baud rate using int
   EXPECT_NO_THROW({ serial_port.setBaudRate(9600); });
@@ -105,7 +105,7 @@ TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
 TEST_F(PseudoTerminalTest, GetAvailableData) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
   serial_port.setBaudRate(9600);
 
   // First check that no data is available initially
@@ -114,11 +114,11 @@ TEST_F(PseudoTerminalTest, GetAvailableData) {
   EXPECT_EQ(initial_available, 0);
 
   const std::string test_message = "Hello World!\n";
-  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
   ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
 
   // Force flush and give more time for data to propagate
-  fsync(master_fd);
+  fsync(master_fd_);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Now check available data again - should match what we wrote
@@ -130,16 +130,16 @@ TEST_F(PseudoTerminalTest, GetAvailableData) {
 TEST_F(PseudoTerminalTest, ReadWithValidSharedPtr) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
   serial_port.setBaudRate(9600);
 
   const std::string test_message{"Smart Pointer Test!\n"};
 
-  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
   ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
 
   // Give time for data to propagate
-  fsync(master_fd);
+  fsync(master_fd_);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Test reading with shared pointer
@@ -155,16 +155,16 @@ TEST_F(PseudoTerminalTest, ReadWithValidSharedPtr) {
 TEST_F(PseudoTerminalTest, ReadUntil) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
   serial_port.setBaudRate(9600);
 
   const std::string test_message = "Read Until! Test!\n";
 
-  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
   ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
 
   // Give time for data to propagate
-  fsync(master_fd);
+  fsync(master_fd_);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Test reading with shared pointer - only read what's available
@@ -178,16 +178,16 @@ TEST_F(PseudoTerminalTest, ReadUntil) {
 TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
   serial_port.setBaudRate(9600);
 
   const std::string test_message = "Read Until Test";
 
-  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
   ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
 
   // Give time for data to propagate
-  fsync(master_fd);
+  fsync(master_fd_);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Test reading with shared pointer - only read what's available
@@ -200,7 +200,7 @@ TEST_F(PseudoTerminalTest, WriteTest) {
   libserial::Serial serial_port;
 
   try {
-    serial_port.open(slave_port);
+    serial_port.open(slave_port_);
     serial_port.setBaudRate(115200);
     std::cout << "Setup serial port for write test" << std::endl;
   }
@@ -221,7 +221,7 @@ TEST_F(PseudoTerminalTest, WriteTest) {
 
     // Try to read from master end to verify
     char buffer[100] = {0};
-    ssize_t bytes_read = read(master_fd, buffer, sizeof(buffer) - 1);
+    ssize_t bytes_read = read(master_fd_, buffer, sizeof(buffer) - 1);
 
     if (bytes_read > 0) {
       std::string received(buffer, bytes_read);
@@ -241,7 +241,7 @@ TEST_F(PseudoTerminalTest, WriteTest) {
 TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
   serial_port.setBaudRate(9600);
 
   std::shared_ptr<std::string> null_buffer;
@@ -265,16 +265,16 @@ TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
 TEST_F(PseudoTerminalTest, ReadByte) {
   libserial::Serial serial_port;
 
-  serial_port.open(slave_port);
+  serial_port.open(slave_port_);
   serial_port.setBaudRate(9600);
 
   const std::string test_message{"ABC\n"};
 
-  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
   ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
 
   // Give time for data to propagate
-  fsync(master_fd);
+  fsync(master_fd_);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
   // Read bytes one by one
