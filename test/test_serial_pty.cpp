@@ -143,14 +143,11 @@ TEST_F(PseudoTerminalTest, ReadWithValidSharedPtr) {
   fsync(master_fd);
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-  // Check that data is available before attempting to read
-  int available = serial_port.getAvailableData();
-
-  // Test reading with shared pointer - only read what's available
+  // Test reading with shared pointer
   auto read_buffer = std::make_shared<std::string>();
   size_t bytes_read = 0;
 
-  EXPECT_NO_THROW({ bytes_read = serial_port.read(read_buffer, available); });
+  EXPECT_NO_THROW({ bytes_read = serial_port.read(read_buffer); });
 
   EXPECT_EQ(bytes_read, test_message.length());
   EXPECT_EQ(*read_buffer, test_message);
@@ -270,7 +267,7 @@ TEST_F(PseudoTerminalTest, ReadWithSharedPtr) {
     auto read_buffer = std::make_shared<std::string>();
     size_t bytes_read = 0;
 
-    EXPECT_NO_THROW({ bytes_read = serial_port.read(read_buffer, available); });
+    EXPECT_NO_THROW({ bytes_read = serial_port.read(read_buffer); });
 
     std::cout << "Read " << bytes_read << " bytes into shared pointer" << std::endl;
     std::cout << "Buffer content: '" << *read_buffer << "'" << std::endl;
@@ -286,5 +283,26 @@ TEST_F(PseudoTerminalTest, ReadWithSharedPtr) {
 
   // Test null pointer error handling
   std::shared_ptr<std::string> null_buffer;
-  EXPECT_THROW({ serial_port.read(null_buffer, 10); }, libserial::SerialException);
+  EXPECT_THROW({ serial_port.read(null_buffer); }, libserial::SerialException);
+}
+
+TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port);
+  serial_port.setBaudRate(9600);
+
+  std::shared_ptr<std::string> null_buffer;
+  
+  try {
+    serial_port.read(null_buffer);
+    ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  } catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  } catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  } catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
 }

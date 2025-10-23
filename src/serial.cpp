@@ -52,29 +52,28 @@ void Serial::write(std::shared_ptr<std::string> data) {
   }
 }
 
-size_t Serial::read(std::shared_ptr<std::string> buffer, size_t max_length) {
+size_t Serial::read(std::shared_ptr<std::string> buffer) {
   if (!buffer) {
     throw IOException("Null pointer passed to read function");
   }
 
-  if (max_length > kMaxSafeReadSize) {
-    throw IOException("Read size exceeds maximum safe limit of " +
+  if (buffer->size() > kMaxSafeReadSize) {
+    throw IOException("Read buffer exceeds maximum safe limit of " +
                       std::to_string(kMaxSafeReadSize) + " bytes");
   }
 
-  if (max_length == 0) {
-    buffer->clear();
-    return 0;
-  }
-
   // Resize the string to accommodate the maximum possible data
-  buffer->resize(max_length);
+  buffer->clear();
+  buffer->resize(kMaxSafeReadSize);
 
   // Use const_cast to get non-const pointer for read operation
-  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), max_length);
+  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  
   if (bytes_read < 0) {
     throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
+
+  std::cout << "Bytes read: " << bytes_read << std::endl;
 
   // Resize the string to the actual number of bytes read
   buffer->resize(static_cast<size_t>(bytes_read));
@@ -175,12 +174,17 @@ int Serial::getAvailableData() const {
 }
 
 void Serial::setBaudRate(int baud_rate) {
-  this->getTermios2();
+  try{
+    this->getTermios2();
   options_.c_cflag &= ~CBAUD;
   options_.c_cflag |= BOTHER;
   options_.c_ispeed = baud_rate;
   options_.c_ospeed = baud_rate;
-  this->setTermios2();
+    this->setTermios2();
+  }
+  catch(...) {
+    throw;
+  }
 }
 
 void Serial::setBaudRate(BaudRate baud_rate) {
