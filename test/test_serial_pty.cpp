@@ -75,7 +75,12 @@ TEST_F(PseudoTerminalTest, OpenClosePort) {
   EXPECT_NO_THROW({ serial_port.close(); });
 }
 
-TEST_F(PseudoTerminalTest, GetBaudRate) {
+
+TEST_F(PseudoTerminalTest, ParameterizedConstructor) {
+  libserial::Serial serial_port(slave_port);
+}
+
+TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
