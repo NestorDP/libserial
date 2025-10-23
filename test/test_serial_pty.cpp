@@ -75,7 +75,6 @@ TEST_F(PseudoTerminalTest, OpenClosePort) {
   EXPECT_NO_THROW({ serial_port.close(); });
 }
 
-
 TEST_F(PseudoTerminalTest, ParameterizedConstructor) {
   libserial::Serial serial_port(slave_port);
 }
@@ -134,7 +133,7 @@ TEST_F(PseudoTerminalTest, ReadWithValidSharedPtr) {
   serial_port.open(slave_port);
   serial_port.setBaudRate(9600);
 
-  const std::string test_message = "Smart Pointer Test!\n";
+  const std::string test_message{"Smart Pointer Test!\n"};
 
   ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
   ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
@@ -304,5 +303,28 @@ TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
     ADD_FAILURE() << "Expected SerialException but got: " << e.what();
   } catch (...) {
     ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}
+
+TEST_F(PseudoTerminalTest, ReadByte){
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port);
+  serial_port.setBaudRate(9600);
+
+  const std::string test_message{"ABC\n"};
+
+  ssize_t bytes_written = write(master_fd, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Read bytes one by one
+  for (char expected_char : test_message) {
+    char read_char = '\0';
+    EXPECT_NO_THROW({ read_char = serial_port.readByte(); });
+    EXPECT_EQ(read_char, expected_char);
   }
 }
