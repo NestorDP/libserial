@@ -85,13 +85,20 @@ TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
 
   serial_port.open(slave_port);
 
-  // Set a valid baud rate
+  // Set baud rate using int
   EXPECT_NO_THROW({ serial_port.setBaudRate(9600); });
 
-  // Get the baud rate and verify
-  int baud_rate{0};
+  // Get baud rate and verify
+  int baud_rate = 0;
   EXPECT_NO_THROW({ baud_rate = serial_port.getBaudRate(); });
   EXPECT_EQ(baud_rate, 9600);
+
+  // Set baud rate using BaudRate enum
+  EXPECT_NO_THROW({ serial_port.setBaudRate(libserial::BaudRate::BAUD_RATE_115200); });
+
+  // Get the baud rate and verify
+  EXPECT_NO_THROW({ baud_rate = serial_port.getBaudRate(); });
+  EXPECT_EQ(baud_rate, 115200);
 
   serial_port.close();
 }
