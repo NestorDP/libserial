@@ -40,6 +40,7 @@ public:
  */
 Ports() = default;
 
+#ifdef BUILD_TESTING_ON
 /**
  * @brief Testable constructor allowing a custom system path
  *
@@ -48,6 +49,7 @@ Ports() = default;
  */
 explicit Ports(const char* sys_path) : sys_path_(sys_path) {
 }
+#endif
 
 /**
  * @brief Destroyer of the Ports class
