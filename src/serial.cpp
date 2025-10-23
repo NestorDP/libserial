@@ -79,7 +79,6 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
 char Serial::readByte() {
   char byte = 0;
   ssize_t bytes_read = ::read(fd_serial_port_, &byte, 1);
-  std::cout << "Read byte: " << byte << std::endl;
   if (bytes_read < 0) {
     throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
