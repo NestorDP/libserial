@@ -88,7 +88,8 @@ TEST_F(SerialTest, CloseWithInvalidFd) {
   try {
     serial.close();
     FAIL() << "Expected libserial::SerialException";
-  } catch (const libserial::SerialException& e) {
+  }
+  catch (const libserial::SerialException& e) {
     std::string msg = e.what();
     EXPECT_EQ(msg, "Error closing port: Bad file descriptor");
   }

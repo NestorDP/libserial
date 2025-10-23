@@ -1,6 +1,8 @@
 // @ Copyright 2020
 
 #include "libserial/serial.hpp"
+
+#include <iostream>
 #include <string>
 #include <memory>
 #include <poll.h>
@@ -68,7 +70,7 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
 
   // Use const_cast to get non-const pointer for read operation
   ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
-  
+
   if (bytes_read < 0) {
     throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
@@ -176,12 +178,12 @@ int Serial::getAvailableData() const {
 }
 
 void Serial::setBaudRate(int baud_rate) {
-  try{
+  try {
     this->getTermios2();
-  options_.c_cflag &= ~CBAUD;
-  options_.c_cflag |= BOTHER;
-  options_.c_ispeed = baud_rate;
-  options_.c_ospeed = baud_rate;
+    options_.c_cflag &= ~CBAUD;
+    options_.c_cflag |= BOTHER;
+    options_.c_ispeed = baud_rate;
+    options_.c_ospeed = baud_rate;
     this->setTermios2();
   }
   catch(...) {

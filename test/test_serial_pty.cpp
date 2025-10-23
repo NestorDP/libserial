@@ -292,21 +292,24 @@ TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
   serial_port.setBaudRate(9600);
 
   std::shared_ptr<std::string> null_buffer;
-  
+
   try {
     serial_port.read(null_buffer);
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
-  } catch (const libserial::IOException& e) {
+  }
+  catch (const libserial::IOException& e) {
     std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
     SUCCEED();
-  } catch (const std::exception& e) {
+  }
+  catch (const std::exception& e) {
     ADD_FAILURE() << "Expected SerialException but got: " << e.what();
-  } catch (...) {
+  }
+  catch (...) {
     ADD_FAILURE() << "Expected SerialException but got unknown exception type";
   }
 }
 
-TEST_F(PseudoTerminalTest, ReadByte){
+TEST_F(PseudoTerminalTest, ReadByte) {
   libserial::Serial serial_port;
 
   serial_port.open(slave_port);
