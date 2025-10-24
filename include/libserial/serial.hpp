@@ -365,6 +365,12 @@ unsigned int read_timeout_{1000};    ///< Read timeout in milliseconds (default 
  */
 unsigned int write_timeout_{1000};    ///< Write timeout in milliseconds (default 1000ms)
 
+/**
+ * @brief Maximum safe read size
+ *
+ * Defines the maximum number of bytes that can be read
+ * in a single read operation to prevent excessive memory usage.
+ */
 static constexpr size_t kMaxSafeReadSize = 2048;  // 2KB limit
 
 uint16_t timeout_{1000};
