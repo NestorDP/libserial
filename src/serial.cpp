@@ -55,34 +55,69 @@ void Serial::write(std::shared_ptr<std::string> data) {
 }
 
 size_t Serial::read(std::shared_ptr<std::string> buffer) {
+  if (canonical_mode_ == CanonicalMode::DISABLE) {
+    throw IOException(
+            "read() is not supported in non-canonical mode; use readBytes() or readUntil() instead");
+  }
+
   if (!buffer) {
     throw IOException("Null pointer passed to read function");
   }
 
-  // Resize the string to accommodate the maximum possible data
   buffer->clear();
   buffer->resize(kMaxSafeReadSize);
 
-  // Use const_cast to get non-const pointer for read operation
-  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  struct pollfd fd_poll;
+  fd_poll.fd = fd_serial_port_;
+  fd_poll.events = POLLIN;
 
-  if (bytes_read < 0) {
-    throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
+  // 0 => no wait (immediate return), -1 => block forever, positive => wait specified milliseconds
+  int timeout_ms = static_cast<int>(read_timeout_ms_.count());
+  int pr = poll(&fd_poll, 1, timeout_ms);
+  if (pr < 0) {
+    if (errno == EINTR) {
+      throw IOException("Interrupted while polling");
+    }
+    throw IOException(std::string("Error in poll(): ") + strerror(errno));
+  }
+  if (pr == 0) {
+    throw IOException("Read operation timed out after " + std::to_string(timeout_ms) + "ms");
   }
 
-  // Resize the string to the actual number of bytes read
+  // Data available: do the read
+  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  if (bytes_read < 0) {
+    throw IOException(std::string("Error reading from serial port: ") + strerror(errno));
+  }
   buffer->resize(static_cast<size_t>(bytes_read));
-
   return static_cast<size_t>(bytes_read);
 }
 
-char Serial::readByte() {
-  char byte = 0;
-  ssize_t bytes_read = ::read(fd_serial_port_, &byte, 1);
+size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) {
+  if (canonical_mode_ == CanonicalMode::ENABLE) {
+    throw IOException(
+            "readBytes() is not supported in canonical mode; use read() or readUntil() instead");
+  }
+
+  if (!buffer) {
+    throw IOException("Null pointer passed to readBytes function");
+  }
+
+  if (num_bytes == 0) {
+    throw IOException("Invalid number of bytes requested");
+  }
+
+  buffer->clear();
+  buffer->resize(num_bytes);
+
+  ssize_t bytes_read = ::read(fd_serial_port_, buffer->data(), num_bytes);  // codacy-ignore[buffer-boundary]
+
   if (bytes_read < 0) {
     throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
   }
-  return byte;
+
+  buffer->resize(static_cast<size_t>(bytes_read));
+  return static_cast<size_t>(bytes_read);
 }
 
 size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
@@ -103,12 +138,12 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
                         " bytes without finding terminator");
     }
     // Check timeout if enabled (0 means no timeout)
-    if (read_timeout_ > 0) {
+    if (read_timeout_ms_.count() > 0) {
       auto current_time = std::chrono::steady_clock::now();
       auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time -
                                                                            start_time).count();
 
-      if (elapsed >= static_cast<int64_t>(read_timeout_)) {
+      if (elapsed >= static_cast<int64_t>(read_timeout_ms_.count())) {
         throw IOException("Read timeout exceeded while waiting for terminator");
       }
 
@@ -119,7 +154,7 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
       pfd.fd = fd_serial_port_;
       pfd.events = POLLIN;
 
-      int64_t remaining_timeout = read_timeout_ - elapsed;
+      int64_t remaining_timeout = read_timeout_ms_.count() - elapsed;
       int timeout_ms = static_cast<int>(remaining_timeout);
 
       int poll_result = poll(&pfd, 1, timeout_ms);
@@ -160,15 +195,7 @@ void Serial::flushInputBuffer() {
   }
 }
 
-int Serial::getAvailableData() const {
-  int bytes_available;
-  if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0) {
-    throw SerialException("Error getting available data: " + std::string(strerror(errno)));
-  }
-  return bytes_available;
-}
-
-void Serial::setBaudRate(int baud_rate) {
+void Serial::setBaudRate(unsigned int baud_rate) {
   this->getTermios2();
   options_.c_cflag &= ~CBAUD;
   options_.c_cflag |= BOTHER;
@@ -178,19 +205,7 @@ void Serial::setBaudRate(int baud_rate) {
 }
 
 void Serial::setBaudRate(BaudRate baud_rate) {
-  setBaudRate(static_cast<int>(baud_rate));
-}
-
-int Serial::getBaudRate() const {
-  this->getTermios2();
-  return (static_cast<int>(options_.c_ispeed));
-}
-
-void Serial::getTermios2() const {
-  ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
-  if (error < 0) {
-    throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
-  }
+  this->setBaudRate(static_cast<unsigned int>(baud_rate));
 }
 
 void Serial::setTermios2() {
@@ -200,20 +215,20 @@ void Serial::setTermios2() {
   }
 }
 
-void Serial::setReadTimeout(unsigned int timeout) {
-  read_timeout_ = timeout;
+void Serial::setReadTimeout(std::chrono::milliseconds timeout) {
+  read_timeout_ms_ = timeout;
 }
 
-void Serial::setWriteTimeout(unsigned int timeout) {
-  write_timeout_ = timeout;
+void Serial::setWriteTimeout(std::chrono::milliseconds timeout) {
+  write_timeout_ms_ = timeout;
 }
 
 void Serial::setDataLength(DataLength nbits) {
-  this->getTermios2();
+  data_length_ = nbits;
 
+  this->getTermios2();
   // Clear bits
   options_.c_cflag &= ~CSIZE;
-
   switch (nbits) {
   case DataLength::FIVE:
     options_.c_cflag |= CS5;
@@ -227,13 +242,9 @@ void Serial::setDataLength(DataLength nbits) {
   case DataLength::EIGHT:
     options_.c_cflag |= CS8;
     break;
-  default:
-    options_.c_cflag |= CS8;
-    break;
   }
   this->setTermios2();
 }
-
 
 void Serial::setParity([[maybe_unused]] Parity parity) {
 //   this->getTermios2();
@@ -308,34 +319,56 @@ void Serial::setFlowControl([[maybe_unused]] FlowControl flow_control) {
 //   this->setTermios2();
 }
 
-void Serial::setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode) {
-//   this->getTermios2();
-//   switch (canonical_mode) {
-//   case CanonicalMode::ENABLE:
-//     options_.c_lflag |=  (ICANON);
-//     // options_.c_lflag &= ~(ECHOE | ECHO | ECHONL);
-//     options_.c_cc[VEOF] = '\n';
-//     break;
-//   case CanonicalMode::DISABLE:
-//     options_.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | ECHONL);
-//     break;
-//   }
-//   this->setTermios2();
+void Serial::setCanonicalMode(CanonicalMode mode) {
+  canonical_mode_ = mode;
+  this->getTermios2();
+  switch (canonical_mode_) {
+  case CanonicalMode::ENABLE:
+    options_.c_lflag |=  (ICANON);
+    break;
+  case CanonicalMode::DISABLE:
+    options_.c_lflag &= ~(ICANON);
+    break;
+  }
+  this->setTermios2();
 }
 
-void Serial::setTerminator([[maybe_unused]] Terminator term) {
-//   terminator_ = (int)term;
+void Serial::setTerminator(Terminator term) {
+  terminator_ = term;
 }
 
-void Serial::setTimeOut([[maybe_unused]] int time) {
-//   this->getTermios2();
-//   options_.c_cc[VTIME] = time;
-//   this->setTermios2();
+void Serial::setTimeOut(uint16_t time) {
+  timeout_ = time;
+  this->getTermios2();
+  options_.c_cc[VTIME] = timeout_;
+  this->setTermios2();
 }
 
-void Serial::setMinNumberCharRead([[maybe_unused]] int num) {
-//   this->getTermios2();
-//   options_.c_cc[VMIN] = num;
-//   this->setTermios2();
+void Serial::setMinNumberCharRead(uint16_t num) {
+  min_number_char_read_ = num;
+  this->getTermios2();
+  options_.c_cc[VMIN] = min_number_char_read_;
+  this->setTermios2();
 }
+
+int Serial::getAvailableData() const {
+  int bytes_available;
+  if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0) {
+    throw SerialException("Error getting available data: " + std::string(strerror(errno)));
+  }
+  return bytes_available;
+}
+
+int Serial::getBaudRate() const {
+  this->getTermios2();
+  return (static_cast<int>(options_.c_ispeed));
+}
+
+void Serial::getTermios2() const {
+  ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
+  if (error < 0) {
+    throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
+  }
+}
+
 }  // namespace libserial

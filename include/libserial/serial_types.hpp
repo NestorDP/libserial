@@ -60,8 +60,8 @@ enum class FlowControl {
  * mode (raw mode), input is available immediately without line buffering.
  */
 enum class CanonicalMode {
-  ENABLE,   ///< Enable canonical mode (line-buffered, processed input)
   DISABLE,  ///< Disable canonical mode (raw mode, immediate input)
+  ENABLE,   ///< Enable canonical mode (line-buffered, processed input)
 };
 
 /**
@@ -73,7 +73,6 @@ enum class CanonicalMode {
  * identify message boundaries in continuous data streams.
  */
 enum class Terminator {
-  EOT = 4,   ///< End of Transmission (ASCII 4, Ctrl+D)
   CR  = 13,  ///< Carriage Return (ASCII 13, '\r')
   LF  = 10   ///< Line Feed (ASCII 10, '\n')
 };

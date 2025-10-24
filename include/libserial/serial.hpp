@@ -107,7 +107,8 @@ void write(std::shared_ptr<std::string> data);
  *
  * Reads up to max_length bytes from the serial port and stores them
  * in the provided shared string buffer. This version provides better
- * memory management and avoids unnecessary string copies.
+ * memory management and avoids unnecessary string copies. Just works
+ * in canonical mode.
  *
  * @param buffer Shared pointer to string where data will be stored
  * @return Number of bytes actually read
@@ -119,21 +120,28 @@ void write(std::shared_ptr<std::string> data);
 size_t read(std::shared_ptr<std::string> buffer);
 
 /**
- * @brief Read a single byte from the serial port
+ * @brief Reads a specific number of bytes from the serial port
  *
- * Reads one byte from the serial port.
+ * Reads exactly num_bytes from the serial port and stores them
+ * in the provided shared string buffer. Just works in non-canonical mode.
  *
- * @return The byte read from the serial port
+ * @param buffer Shared pointer to string where data will be stored
+ * @param num_bytes Number of bytes to read
+ * @return Number of bytes actually read
  * @throws SerialException if read operation fails
  * @throws SerialException if buffer is null
+ * @throws SerialException if num_bytes is zero
+ *
+ * @note The buffer will be resized to contain exactly the read data
  */
-char readByte();
+size_t readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes);
 
 /**
  * @brief Reads data until a specific terminator character is found
  *
  * Continues reading byte by byte until the specified terminator
  * character is encountered. The terminator is included in the result.
+ * Works in both canonical and non-canonical modes.
  *
  * @param terminator The character to stop reading at
  * @return String containing all read data including the terminator
@@ -165,28 +173,7 @@ void flushInputBuffer();
  *
  * @note The port must be opened before calling this method
  */
-void setBaudRate(int baud_rate);
-
-/**
- * @brief Set the baud rate using BaudRate enum
- *
- * This overloaded version accepts a BaudRate enum value, providing
- * type safety and preventing invalid baud rate values.
- *
- * @param baud_rate The baud rate from BaudRate enum
- * @throws SerialException if baud rate cannot be set
- *
- * @note The port must be opened before calling this method
- */
-void setBaudRate(BaudRate baud_rate);
-
-/**
- * @brief Gets the current baud rate
- *
- * @return The current baud rate
- * @throws SerialException if unable to retrieve baud rate
- */
-int getBaudRate() const;
+void setBaudRate(unsigned int baud_rate);
 
 /**
  * @brief Gets the number of bytes available for reading
@@ -208,7 +195,7 @@ int getAvailableData() const;
  * @param timeout Timeout in milliseconds
  * @throws SerialException if setting cannot be applied
  */
-void setReadTimeout(unsigned int timeout);
+void setReadTimeout(std::chrono::milliseconds timeout);
 
 /**
  * @brief Sets the write timeout in milliseconds
@@ -219,7 +206,7 @@ void setReadTimeout(unsigned int timeout);
  * @param timeout Timeout in milliseconds
  * @throws SerialException if setting cannot be applied
  */
-void setWriteTimeout(unsigned int timeout);
+void setWriteTimeout(std::chrono::milliseconds timeout);
 
 /**
  * @brief Sets the number of data bits per byte
@@ -271,7 +258,7 @@ void setFlowControl([[maybe_unused]] FlowControl flow_control);
  * @param canonical_mode The desired canonical mode setting (ENABLE or DISABLE)
  * @throws SerialException if canonical mode cannot be set
  */
-void setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode);
+void setCanonicalMode(CanonicalMode mode);
 
 /**
  * @brief Sets the terminator character for readUntil operations
@@ -281,7 +268,7 @@ void setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode);
  * @param term The desired terminator character
  * @throws SerialException if terminator cannot be set
  */
-void setTerminator([[maybe_unused]] Terminator term);
+void setTerminator(Terminator term);
 
 /**
  * @brief Sets the read timeout in deciseconds
@@ -289,7 +276,7 @@ void setTerminator([[maybe_unused]] Terminator term);
  * @param time Timeout in deciseconds
  * @throws SerialException if setting cannot be applied
  */
-void setTimeOut([[maybe_unused]] int time);
+void setTimeOut(uint16_t time);
 
 /**
  * @brief Sets the minimum number of characters to read
@@ -297,7 +284,28 @@ void setTimeOut([[maybe_unused]] int time);
  * @param num Minimum number of characters to read
  * @throws SerialException if setting cannot be applied
  */
-void setMinNumberCharRead([[maybe_unused]] int num);
+void setMinNumberCharRead(uint16_t);
+
+/**
+ * @brief Set the baud rate using BaudRate enum
+ *
+ * This overloaded version accepts a BaudRate enum value, providing
+ * type safety and preventing invalid baud rate values.
+ *
+ * @param baud_rate The baud rate from BaudRate enum
+ * @throws SerialException if baud rate cannot be set
+ *
+ * @note The port must be opened before calling this method
+ */
+void setBaudRate(BaudRate baud_rate);
+
+/**
+ * @brief Gets the current baud rate
+ *
+ * @return The current baud rate
+ * @throws SerialException if unable to retrieve baud rate
+ */
+int getBaudRate() const;
 
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
@@ -311,16 +319,6 @@ void setFdForTest(int fd) {
 
 private:
 /**
- * @brief Retrieves current terminal settings
- *
- * Internal method to read the current termios2 configuration
- * from the serial port file descriptor.
- *
- * @throws SerialException if ioctl operation fails
- */
-void getTermios2() const;
-
-/**
  * @brief Applies terminal settings to the port
  *
  * Internal method to write the termios2 configuration
@@ -329,6 +327,16 @@ void getTermios2() const;
  * @throws SerialException if ioctl operation fails
  */
 void setTermios2();
+
+/**
+ * @brief Retrieves current terminal settings
+ *
+ * Internal method to read the current termios2 configuration
+ * from the serial port file descriptor.
+ *
+ * @throws SerialException if ioctl operation fails
+ */
+void getTermios2() const;
 
 /**
  * @brief Terminal configuration structure
@@ -352,7 +360,7 @@ int fd_serial_port_{-1};
  * Specifies the maximum time to wait for read operations
  * before timing out. Default is 1000ms.
  */
-unsigned int read_timeout_{1000};    ///< Read timeout in milliseconds (default 1000ms)
+std::chrono::milliseconds read_timeout_ms_{1000};    ///< Read timeout in milliseconds (default 1000ms)
 
 /**
  * @brief Write timeout in milliseconds
@@ -360,9 +368,50 @@ unsigned int read_timeout_{1000};    ///< Read timeout in milliseconds (default 
  * Specifies the maximum time to wait for write operations
  * before timing out. Default is 1000ms.
  */
-unsigned int write_timeout_{1000};    ///< Write timeout in milliseconds (default 1000ms)
+std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in milliseconds (default 1000ms)
 
+/**
+ * @brief Maximum safe read size
+ *
+ * Defines the maximum number of bytes that can be read
+ * in a single read operation to prevent excessive memory usage.
+ */
 static constexpr size_t kMaxSafeReadSize = 2048;  // 2KB limit
+
+/**
+ * @brief Timeout value in milliseconds
+ *
+ * Used for configuring certain serial port timeouts (default 1000ms).
+ */
+uint16_t timeout_{1000};
+
+/**
+ * @brief Minimum number of characters to read
+ *
+ * Specifies the minimum number of characters required for a read operation to return (default 0).
+ */
+uint16_t min_number_char_read_{0};
+
+/**
+ * @brief Canonical mode setting
+ *
+ * Determines whether canonical (line-based) input processing is enabled (default ENABLE).
+ */
+CanonicalMode canonical_mode_{CanonicalMode::ENABLE};
+
+/**
+ * @brief Data length setting
+ *
+ * Specifies the number of data bits per character (default EIGHT).
+ */
+DataLength data_length_{DataLength::EIGHT};
+
+/**
+ * @brief Line terminator character
+ *
+ * Specifies the character used to terminate lines (default LF).
+ */
+Terminator terminator_{Terminator::LF};
 };
 
 }  // namespace libserial
