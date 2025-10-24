@@ -64,27 +64,39 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
     throw IOException("Null pointer passed to read function");
   }
 
-  // Resize the string to accommodate the maximum possible data
   buffer->clear();
   buffer->resize(kMaxSafeReadSize);
 
-  // Use const_cast to get non-const pointer for read operation
-  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  struct pollfd fd_poll;
+  fd_poll.fd = fd_serial_port_;
+  fd_poll.events = POLLIN;
 
-  if (bytes_read < 0) {
-    throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
+  // 0 => wait 0ms, -1 => block forever
+  int timeout_ms = static_cast<int>(read_timeout_ms_.count());
+  int pr = poll(&fd_poll, 1, timeout_ms);
+  if (pr < 0) {
+    if (errno == EINTR) {
+      throw IOException("Interrupted while polling");
+    }
+    throw IOException(std::string("Error in poll(): ") + strerror(errno));
+  }
+  if (pr == 0) {
+    throw IOException("Read operation timed out after " + std::to_string(timeout_ms) + "ms");
   }
 
-  // Resize the string to the actual number of bytes read
+  // Data available: do the read
+  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  if (bytes_read < 0) {
+    throw IOException(std::string("Error reading from serial port: ") + strerror(errno));
+  }
   buffer->resize(static_cast<size_t>(bytes_read));
-
   return static_cast<size_t>(bytes_read);
 }
 
 size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) {
   if (canonical_mode_ == CanonicalMode::ENABLE) {
     throw IOException(
-            "readBytes() not supported in canonical mode enable; use read() or readByte() instead");
+            "readBytes() not supported in canonical mode enable; use read() or readUntil() instead");
   }
 
   if (!buffer) {
@@ -126,12 +138,12 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
                         " bytes without finding terminator");
     }
     // Check timeout if enabled (0 means no timeout)
-    if (read_timeout_ > 0) {
+    if (read_timeout_ms_.count() > 0) {
       auto current_time = std::chrono::steady_clock::now();
       auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time -
                                                                            start_time).count();
 
-      if (elapsed >= static_cast<int64_t>(read_timeout_)) {
+      if (elapsed >= static_cast<int64_t>(read_timeout_ms_.count())) {
         throw IOException("Read timeout exceeded while waiting for terminator");
       }
 
@@ -142,7 +154,7 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
       pfd.fd = fd_serial_port_;
       pfd.events = POLLIN;
 
-      int64_t remaining_timeout = read_timeout_ - elapsed;
+      int64_t remaining_timeout = read_timeout_ms_.count() - elapsed;
       int timeout_ms = static_cast<int>(remaining_timeout);
 
       int poll_result = poll(&pfd, 1, timeout_ms);
@@ -204,12 +216,12 @@ void Serial::setTermios2() {
   }
 }
 
-void Serial::setReadTimeout(unsigned int timeout) {
-  read_timeout_ = timeout;
+void Serial::setReadTimeout(std::chrono::milliseconds timeout) {
+  read_timeout_ms_ = timeout;
 }
 
-void Serial::setWriteTimeout(unsigned int timeout) {
-  write_timeout_ = timeout;
+void Serial::setWriteTimeout(std::chrono::milliseconds timeout) {
+  write_timeout_ms_ = timeout;
 }
 
 void Serial::setDataLength(DataLength nbits) {

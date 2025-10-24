@@ -195,7 +195,7 @@ int getAvailableData() const;
  * @param timeout Timeout in milliseconds
  * @throws SerialException if setting cannot be applied
  */
-void setReadTimeout(unsigned int timeout);
+void setReadTimeout(std::chrono::milliseconds timeout);
 
 /**
  * @brief Sets the write timeout in milliseconds
@@ -206,7 +206,7 @@ void setReadTimeout(unsigned int timeout);
  * @param timeout Timeout in milliseconds
  * @throws SerialException if setting cannot be applied
  */
-void setWriteTimeout(unsigned int timeout);
+void setWriteTimeout(std::chrono::milliseconds timeout);
 
 /**
  * @brief Sets the number of data bits per byte
@@ -360,7 +360,7 @@ int fd_serial_port_{-1};
  * Specifies the maximum time to wait for read operations
  * before timing out. Default is 1000ms.
  */
-unsigned int read_timeout_{1000};    ///< Read timeout in milliseconds (default 1000ms)
+std::chrono::milliseconds read_timeout_ms_{1000};    ///< Read timeout in milliseconds (default 1000ms)
 
 /**
  * @brief Write timeout in milliseconds
@@ -368,7 +368,7 @@ unsigned int read_timeout_{1000};    ///< Read timeout in milliseconds (default 
  * Specifies the maximum time to wait for write operations
  * before timing out. Default is 1000ms.
  */
-unsigned int write_timeout_{1000};    ///< Write timeout in milliseconds (default 1000ms)
+std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in milliseconds (default 1000ms)
 
 /**
  * @brief Maximum safe read size

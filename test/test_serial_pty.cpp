@@ -177,7 +177,6 @@ TEST_F(PseudoTerminalTest, WriteTest) {
   try {
     serial_port.open(slave_port_);
     serial_port.setBaudRate(115200);
-    std::cout << "Setup serial port for write test" << std::endl;
   }
   catch (const libserial::SerialException& e) {
     FAIL() << "Failed to setup serial port: " << e.what();
@@ -189,7 +188,6 @@ TEST_F(PseudoTerminalTest, WriteTest) {
   // Write using our Serial class
   try {
     serial_port.write(test_data);
-    std::cout << "Successfully wrote data via Serial class" << std::endl;
 
     // Give time for data to propagate
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
@@ -200,7 +198,6 @@ TEST_F(PseudoTerminalTest, WriteTest) {
 
     if (bytes_read > 0) {
       std::string received(buffer, bytes_read);
-      std::cout << "Master received: '" << received << "'" << std::endl;
       // The write method sends data as-is
       EXPECT_EQ(received, *test_data);
     }
@@ -251,7 +248,7 @@ TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -286,7 +283,7 @@ TEST_F(PseudoTerminalTest, ReadNonCanonicalMode) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -296,6 +293,34 @@ TEST_F(PseudoTerminalTest, ReadNonCanonicalMode) {
     ADD_FAILURE() << "Expected SerialException but got unknown exception type";
   }
 }
+
+TEST_F(PseudoTerminalTest, ReadTimeout) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+
+  // Set a short read timeout
+  serial_port.setReadTimeout(std::chrono::milliseconds(100));
+
+  auto read_buffer = std::make_shared<std::string>();
+
+  try {
+    serial_port.read(read_buffer);
+    ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  }
+  catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  }
+  catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  }
+  catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}
+
 
 TEST_F(PseudoTerminalTest, ReadBytesNonCanonicalMode) {
   libserial::Serial serial_port;
@@ -337,7 +362,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithNullBuffer) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -362,7 +387,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithInvalidNumBytes) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -387,7 +412,7 @@ TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
     SUCCEED();
   }
   catch (const std::exception& e) {
