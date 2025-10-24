@@ -176,27 +176,6 @@ void flushInputBuffer();
 void setBaudRate(unsigned int baud_rate);
 
 /**
- * @brief Set the baud rate using BaudRate enum
- *
- * This overloaded version accepts a BaudRate enum value, providing
- * type safety and preventing invalid baud rate values.
- *
- * @param baud_rate The baud rate from BaudRate enum
- * @throws SerialException if baud rate cannot be set
- *
- * @note The port must be opened before calling this method
- */
-void setBaudRate(BaudRate baud_rate);
-
-/**
- * @brief Gets the current baud rate
- *
- * @return The current baud rate
- * @throws SerialException if unable to retrieve baud rate
- */
-int getBaudRate() const;
-
-/**
  * @brief Gets the number of bytes available for reading
  *
  * Returns the number of bytes currently available in the input buffer
@@ -307,6 +286,27 @@ void setTimeOut(uint16_t time);
  */
 void setMinNumberCharRead(uint16_t);
 
+/**
+ * @brief Set the baud rate using BaudRate enum
+ *
+ * This overloaded version accepts a BaudRate enum value, providing
+ * type safety and preventing invalid baud rate values.
+ *
+ * @param baud_rate The baud rate from BaudRate enum
+ * @throws SerialException if baud rate cannot be set
+ *
+ * @note The port must be opened before calling this method
+ */
+void setBaudRate(BaudRate baud_rate);
+
+/**
+ * @brief Gets the current baud rate
+ *
+ * @return The current baud rate
+ * @throws SerialException if unable to retrieve baud rate
+ */
+int getBaudRate() const;
+
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
 // and may leave the Serial object in an inconsistent state. It is intended
@@ -319,16 +319,6 @@ void setFdForTest(int fd) {
 
 private:
 /**
- * @brief Retrieves current terminal settings
- *
- * Internal method to read the current termios2 configuration
- * from the serial port file descriptor.
- *
- * @throws SerialException if ioctl operation fails
- */
-void getTermios2() const;
-
-/**
  * @brief Applies terminal settings to the port
  *
  * Internal method to write the termios2 configuration
@@ -337,6 +327,16 @@ void getTermios2() const;
  * @throws SerialException if ioctl operation fails
  */
 void setTermios2();
+
+/**
+ * @brief Retrieves current terminal settings
+ *
+ * Internal method to read the current termios2 configuration
+ * from the serial port file descriptor.
+ *
+ * @throws SerialException if ioctl operation fails
+ */
+void getTermios2() const;
 
 /**
  * @brief Terminal configuration structure

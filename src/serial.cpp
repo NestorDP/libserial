@@ -183,14 +183,6 @@ void Serial::flushInputBuffer() {
   }
 }
 
-int Serial::getAvailableData() const {
-  int bytes_available;
-  if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0) {
-    throw SerialException("Error getting available data: " + std::string(strerror(errno)));
-  }
-  return bytes_available;
-}
-
 void Serial::setBaudRate(unsigned int baud_rate) {
   this->getTermios2();
   options_.c_cflag &= ~CBAUD;
@@ -203,18 +195,6 @@ void Serial::setBaudRate(unsigned int baud_rate) {
 void Serial::setBaudRate(BaudRate baud_rate) {
   baud_rate_ = static_cast<unsigned int>(baud_rate);
   this->setBaudRate(baud_rate_);
-}
-
-int Serial::getBaudRate() const {
-  this->getTermios2();
-  return (static_cast<int>(options_.c_ispeed));
-}
-
-void Serial::getTermios2() const {
-  ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
-  if (error < 0) {
-    throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
-  }
 }
 
 void Serial::setTermios2() {
@@ -254,7 +234,6 @@ void Serial::setDataLength(DataLength nbits) {
   }
   this->setTermios2();
 }
-
 
 void Serial::setParity([[maybe_unused]] Parity parity) {
 //   this->getTermios2();
@@ -360,4 +339,25 @@ void Serial::setMinNumberCharRead(uint16_t num) {
   options_.c_cc[VMIN] = min_number_char_read_;
   this->setTermios2();
 }
+
+int Serial::getAvailableData() const {
+  int bytes_available;
+  if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0) {
+    throw SerialException("Error getting available data: " + std::string(strerror(errno)));
+  }
+  return bytes_available;
+}
+
+int Serial::getBaudRate() const {
+  this->getTermios2();
+  return (static_cast<int>(options_.c_ispeed));
+}
+
+void Serial::getTermios2() const {
+  ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
+  if (error < 0) {
+    throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
+  }
+}
+
 }  // namespace libserial
