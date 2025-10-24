@@ -378,14 +378,39 @@ std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in mill
  */
 static constexpr size_t kMaxSafeReadSize = 2048;  // 2KB limit
 
+/**
+ * @brief Timeout value in milliseconds
+ *
+ * Used for configuring certain serial port timeouts (default 1000ms).
+ */
 uint16_t timeout_{1000};
 
+/**
+ * @brief Minimum number of characters to read
+ *
+ * Specifies the minimum number of characters required for a read operation to return (default 0).
+ */
 uint16_t min_number_char_read_{0};
 
+/**
+ * @brief Canonical mode setting
+ *
+ * Determines whether canonical (line-based) input processing is enabled (default ENABLE).
+ */
 CanonicalMode canonical_mode_{CanonicalMode::ENABLE};
 
+/**
+ * @brief Data length setting
+ *
+ * Specifies the number of data bits per character (default EIGHT).
+ */
 DataLength data_length_{DataLength::EIGHT};
 
+/**
+ * @brief Line terminator character
+ *
+ * Specifies the character used to terminate lines (default LF).
+ */
 Terminator terminator_{Terminator::LF};
 };
 

@@ -57,7 +57,7 @@ void Serial::write(std::shared_ptr<std::string> data) {
 size_t Serial::read(std::shared_ptr<std::string> buffer) {
   if (canonical_mode_ == CanonicalMode::DISABLE) {
     throw IOException(
-            "read() not supported in canonical mode disable; use readBytes or readUntil() instead");
+            "read() is not supported in non-canonical mode; use readBytes() or readUntil() instead");
   }
 
   if (!buffer) {
@@ -71,7 +71,7 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
   fd_poll.fd = fd_serial_port_;
   fd_poll.events = POLLIN;
 
-  // 0 => wait 0ms, -1 => block forever
+  // 0 => no wait (immediate return), -1 => block forever, positive => wait specified milliseconds
   int timeout_ms = static_cast<int>(read_timeout_ms_.count());
   int pr = poll(&fd_poll, 1, timeout_ms);
   if (pr < 0) {
@@ -96,7 +96,7 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
 size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) {
   if (canonical_mode_ == CanonicalMode::ENABLE) {
     throw IOException(
-            "readBytes() not supported in canonical mode enable; use read() or readUntil() instead");
+            "readBytes() is not supported in canonical mode; use read() or readUntil() instead");
   }
 
   if (!buffer) {

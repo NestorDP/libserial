@@ -174,13 +174,8 @@ TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
 TEST_F(PseudoTerminalTest, WriteTest) {
   libserial::Serial serial_port;
 
-  try {
-    serial_port.open(slave_port_);
-    serial_port.setBaudRate(115200);
-  }
-  catch (const libserial::SerialException& e) {
-    FAIL() << "Failed to setup serial port: " << e.what();
-  }
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(115200);
 
   // Create test data using smart pointer
   auto test_data = std::make_shared<std::string>("Test Write Data");
