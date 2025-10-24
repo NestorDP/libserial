@@ -326,8 +326,8 @@ void Serial::setCanonicalMode(CanonicalMode mode) {
   this->setTermios2();
 }
 
-void Serial::setTerminator([[maybe_unused]] Terminator term) {
-//   terminator_ = (int)term;
+void Serial::setTerminator(Terminator term) {
+  terminator_ = term;
 }
 
 void Serial::setTimeOut([[maybe_unused]] int time) {

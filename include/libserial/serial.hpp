@@ -284,7 +284,7 @@ void setCanonicalMode(CanonicalMode mode);
  * @param term The desired terminator character
  * @throws SerialException if terminator cannot be set
  */
-void setTerminator([[maybe_unused]] Terminator term);
+void setTerminator(Terminator term);
 
 /**
  * @brief Sets the read timeout in deciseconds
