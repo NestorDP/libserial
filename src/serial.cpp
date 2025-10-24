@@ -85,6 +85,12 @@ char Serial::readByte() {
   return byte;
 }
 
+size_t readBytes([[maybe_unused]] std::shared_ptr<std::string> buffer,
+                 [[maybe_unused]] size_t num_bytes) {
+  // Placeholder implementation
+  return 0;
+}
+
 size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
   if (!buffer) {
     throw IOException("Null pointer passed to readUntil function");

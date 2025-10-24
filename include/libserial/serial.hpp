@@ -129,6 +129,9 @@ size_t read(std::shared_ptr<std::string> buffer);
  */
 char readByte();
 
+size_t readBytes([[maybe_unused]] std::shared_ptr<std::string> buffer,
+                 [[maybe_unused]] size_t num_bytes);
+
 /**
  * @brief Reads data until a specific terminator character is found
  *
