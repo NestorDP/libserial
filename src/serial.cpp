@@ -337,9 +337,10 @@ void Serial::setTimeOut(uint16_t time) {
   this->setTermios2();
 }
 
-void Serial::setMinNumberCharRead([[maybe_unused]] int num) {
-//   this->getTermios2();
-//   options_.c_cc[VMIN] = num;
-//   this->setTermios2();
+void Serial::setMinNumberCharRead(uint16_t num) {
+  min_number_char_read_ = num;
+  this->getTermios2();
+  options_.c_cc[VMIN] = min_number_char_read_;
+  this->setTermios2();
 }
 }  // namespace libserial

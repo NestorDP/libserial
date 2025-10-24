@@ -300,7 +300,7 @@ void setTimeOut(uint16_t time);
  * @param num Minimum number of characters to read
  * @throws SerialException if setting cannot be applied
  */
-void setMinNumberCharRead([[maybe_unused]] int num);
+void setMinNumberCharRead(uint16_t);
 
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
