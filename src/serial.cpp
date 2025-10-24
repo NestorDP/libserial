@@ -55,6 +55,10 @@ void Serial::write(std::shared_ptr<std::string> data) {
 }
 
 size_t Serial::read(std::shared_ptr<std::string> buffer) {
+  if(canonical_mode_ == CanonicalMode::DISABLE) {
+    throw IOException("read() not supported in canonical mode disable; use readBytes or readUntil() instead");
+  }
+
   if (!buffer) {
     throw IOException("Null pointer passed to read function");
   }
@@ -77,6 +81,9 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
 }
 
 char Serial::readByte() {
+  if(canonical_mode_ == CanonicalMode::DISABLE) {
+    throw IOException("readByte() not supported in canonical mode disable; use readBytes or readUntil() instead");
+  }
   char byte = 0;
   ssize_t bytes_read = ::read(fd_serial_port_, &byte, 1);
   if (bytes_read < 0) {

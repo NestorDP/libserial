@@ -284,3 +284,73 @@ TEST_F(PseudoTerminalTest, ReadByte) {
     EXPECT_EQ(read_char, expected_char);
   }
 }
+
+TEST_F(PseudoTerminalTest, ReadNonCanonicalMode) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::DISABLE);
+
+  const std::string test_message{"Non-Canonical Test\n"};
+
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Attempt to read using read() - should throw exception
+  auto read_buffer = std::make_shared<std::string>();
+
+  try {
+  serial_port.read(read_buffer);
+  ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  }
+  catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  }
+  catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  }
+  catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}
+
+TEST_F(PseudoTerminalTest, ReadByteNonCanonicalMode) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::DISABLE);
+
+  const std::string test_message{"N\n"};
+
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Attempt to read using read() - should throw exception
+  auto read_buffer = std::make_shared<std::string>();
+
+  try {
+  serial_port.readByte();
+  ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  }
+  catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  }
+  catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  }
+  catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}

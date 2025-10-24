@@ -60,8 +60,8 @@ enum class FlowControl {
  * mode (raw mode), input is available immediately without line buffering.
  */
 enum class CanonicalMode {
-  ENABLE,   ///< Enable canonical mode (line-buffered, processed input)
   DISABLE,  ///< Disable canonical mode (raw mode, immediate input)
+  ENABLE,   ///< Enable canonical mode (line-buffered, processed input)
 };
 
 /**
