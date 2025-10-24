@@ -138,25 +138,25 @@ if(BUILD_TESTING)
     enable_testing()
     find_package(GTest REQUIRED)
 
-    add_executable(serial_tests
+    add_executable(cppserial_tests
         test/test_device.cpp
         test/test_ports.cpp
         test/test_serial_pty.cpp
         test/test_serial_simple.cpp
     )
     
-    target_include_directories(serial_tests PRIVATE
+    target_include_directories(cppserial_tests PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     )
     
-    target_link_libraries(serial_tests PRIVATE
+    target_link_libraries(cppserial_tests PRIVATE
         ${PROJECT_NAME}
         GTest::gtest
         GTest::gtest_main
         pthread
     )
 
-    add_test(NAME SerialTests COMMAND serial_tests)
+    add_test(NAME SerialTests COMMAND cppserial_tests)
     
     # Coverage targets (only if BUILD_COVERAGE is enabled)
     if(BUILD_COVERAGE)
@@ -177,7 +177,7 @@ if(BUILD_TESTING)
             # Setup target to run tests and generate coverage data
             add_custom_target(coverage-run
                 COMMAND ${CMAKE_CTEST_COMMAND} --verbose
-                DEPENDS serial_tests
+                DEPENDS cppserial_tests
                 WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
                 COMMENT "Running tests for coverage analysis"
             )
