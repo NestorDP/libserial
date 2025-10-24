@@ -274,7 +274,7 @@ void setFlowControl([[maybe_unused]] FlowControl flow_control);
  * @param canonical_mode The desired canonical mode setting (ENABLE or DISABLE)
  * @throws SerialException if canonical mode cannot be set
  */
-void setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode);
+void setCanonicalMode(CanonicalMode mode);
 
 /**
  * @brief Sets the terminator character for readUntil operations

@@ -312,19 +312,18 @@ void Serial::setFlowControl([[maybe_unused]] FlowControl flow_control) {
 //   this->setTermios2();
 }
 
-void Serial::setCanonicalMode([[maybe_unused]] CanonicalMode canonical_mode) {
-//   this->getTermios2();
-//   switch (canonical_mode) {
-//   case CanonicalMode::ENABLE:
-//     options_.c_lflag |=  (ICANON);
-//     // options_.c_lflag &= ~(ECHOE | ECHO | ECHONL);
-//     options_.c_cc[VEOF] = '\n';
-//     break;
-//   case CanonicalMode::DISABLE:
-//     options_.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG | ECHONL);
-//     break;
-//   }
-//   this->setTermios2();
+void Serial::setCanonicalMode(CanonicalMode mode) {
+  canonical_mode_ = mode;
+  this->getTermios2();
+  switch (canonical_mode_) {
+  case CanonicalMode::ENABLE:
+    options_.c_lflag |=  (ICANON);
+    break;
+  case CanonicalMode::DISABLE:
+    options_.c_lflag &= ~(ICANON);
+    break;
+  }
+  this->setTermios2();
 }
 
 void Serial::setTerminator([[maybe_unused]] Terminator term) {
