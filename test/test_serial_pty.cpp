@@ -182,7 +182,7 @@ TEST_F(PseudoTerminalTest, WriteTest) {
 
   // Write using our Serial class
   EXPECT_NO_THROW({ serial_port.write(test_data); });
-  
+
   // Give time for data to propagate
   std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
@@ -231,7 +231,8 @@ TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
   EXPECT_THROW({
     try {
       serial_port.read(null_buffer);
-    } catch (const libserial::IOException& e) {
+    }
+    catch (const libserial::IOException& e) {
       EXPECT_STREQ("Null pointer passed to read function", e.what());
       throw;
     }
@@ -260,8 +261,11 @@ TEST_F(PseudoTerminalTest, ReadNonCanonicalMode) {
   EXPECT_THROW({
     try {
       serial_port.read(read_buffer);
-    } catch (const libserial::IOException& e) {
-      EXPECT_STREQ("read() is not supported in non-canonical mode; use readBytes() or readUntil() instead", e.what());
+    }
+    catch (const libserial::IOException& e) {
+      EXPECT_STREQ(
+        "read() is not supported in non-canonical mode; use readBytes() or readUntil() instead",
+        e.what());
       throw;
     }
   }, libserial::IOException);
@@ -287,7 +291,6 @@ TEST_F(PseudoTerminalTest, ReadTimeout) {
       throw;
     }
   }, libserial::IOException);
-
 }
 
 TEST_F(PseudoTerminalTest, ReadBytesNonCanonicalMode) {
@@ -354,7 +357,6 @@ TEST_F(PseudoTerminalTest, ReadBytesWithInvalidNumBytes) {
       throw;
     }
   }, libserial::IOException);
-
 }
 
 TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
