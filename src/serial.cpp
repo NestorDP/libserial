@@ -92,10 +92,30 @@ char Serial::readByte() {
   return byte;
 }
 
-size_t readBytes([[maybe_unused]] std::shared_ptr<std::string> buffer,
-                 [[maybe_unused]] size_t num_bytes) {
-  // Placeholder implementation
-  return 0;
+size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) {
+  if(canonical_mode_ == CanonicalMode::ENABLE) {
+    throw IOException("readBytes() not supported in canonical mode enable; use read() or readByte() instead");
+  }
+
+  if (!buffer) {
+    throw IOException("Null pointer passed to readBytes function");
+  }
+
+  if (num_bytes == 0) {
+    throw IOException("Invalid number of bytes requested");
+  }
+
+  buffer->clear();
+  buffer->resize(num_bytes);
+
+  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), num_bytes);
+
+  if (bytes_read < 0) {
+    throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
+  }
+
+  buffer->resize(static_cast<size_t>(bytes_read));
+  return static_cast<size_t>(bytes_read);
 }
 
 size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {

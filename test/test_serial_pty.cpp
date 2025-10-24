@@ -354,3 +354,54 @@ TEST_F(PseudoTerminalTest, ReadByteNonCanonicalMode) {
     ADD_FAILURE() << "Expected SerialException but got unknown exception type";
   }
 }
+
+TEST_F(PseudoTerminalTest, ReadBytesNonCanonicalMode) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::DISABLE);
+
+  const std::string test_message{"ReadBytes Test!"};
+
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Test reading with shared pointer
+  auto read_buffer = std::make_shared<std::string>();
+  size_t bytes_read = 0;
+
+  EXPECT_NO_THROW({ bytes_read = serial_port.readBytes(read_buffer, test_message.length()); });
+
+  EXPECT_EQ(bytes_read, test_message.length());
+  EXPECT_EQ(*read_buffer, test_message);
+}
+
+TEST_F(PseudoTerminalTest, ReadBytesWithNullBuffer) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::DISABLE);
+
+  std::shared_ptr<std::string> null_buffer;
+
+  try {
+    serial_port.readBytes(null_buffer, 10);
+    ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  }
+  catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  }
+  catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  }
+  catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}
