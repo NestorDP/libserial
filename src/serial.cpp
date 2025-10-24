@@ -216,11 +216,11 @@ void Serial::setWriteTimeout(unsigned int timeout) {
 }
 
 void Serial::setDataLength(DataLength nbits) {
-  this->getTermios2();
+  data_length_ = nbits;
 
+  this->getTermios2();
   // Clear bits
   options_.c_cflag &= ~CSIZE;
-
   switch (nbits) {
   case DataLength::FIVE:
     options_.c_cflag |= CS5;
@@ -232,9 +232,6 @@ void Serial::setDataLength(DataLength nbits) {
     options_.c_cflag |= CS7;
     break;
   case DataLength::EIGHT:
-    options_.c_cflag |= CS8;
-    break;
-  default:
     options_.c_cflag |= CS8;
     break;
   }
