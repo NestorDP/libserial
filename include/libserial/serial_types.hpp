@@ -73,7 +73,6 @@ enum class CanonicalMode {
  * identify message boundaries in continuous data streams.
  */
 enum class Terminator {
-  EOT = 4,   ///< End of Transmission (ASCII 4, Ctrl+D)
   CR  = 13,  ///< Carriage Return (ASCII 13, '\r')
   LF  = 10   ///< Line Feed (ASCII 10, '\n')
 };
