@@ -205,8 +205,7 @@ void Serial::setBaudRate(unsigned int baud_rate) {
 }
 
 void Serial::setBaudRate(BaudRate baud_rate) {
-  baud_rate_ = static_cast<unsigned int>(baud_rate);
-  this->setBaudRate(baud_rate_);
+  this->setBaudRate(static_cast<unsigned int>(baud_rate));
 }
 
 void Serial::setTermios2() {

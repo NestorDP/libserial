@@ -321,7 +321,6 @@ TEST_F(PseudoTerminalTest, ReadTimeout) {
   }
 }
 
-
 TEST_F(PseudoTerminalTest, ReadBytesNonCanonicalMode) {
   libserial::Serial serial_port;
 

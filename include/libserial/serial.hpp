@@ -382,8 +382,6 @@ uint16_t timeout_{1000};
 
 uint16_t min_number_char_read_{0};
 
-unsigned int baud_rate_{static_cast<unsigned int>(BaudRate::BAUD_RATE_9600)};
-
 CanonicalMode canonical_mode_{CanonicalMode::ENABLE};
 
 DataLength data_length_{DataLength::EIGHT};
