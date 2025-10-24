@@ -248,7 +248,7 @@ TEST_F(PseudoTerminalTest, ReadWithNullBuffer) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    GTEST_LOG_(INFO) << "Exception: " << e.what();
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -283,7 +283,7 @@ TEST_F(PseudoTerminalTest, ReadNonCanonicalMode) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    GTEST_LOG_(INFO) << "Exception: " << e.what();
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -310,7 +310,7 @@ TEST_F(PseudoTerminalTest, ReadTimeout) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    GTEST_LOG_(INFO) << "Exception: " << e.what();
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -362,7 +362,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithNullBuffer) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    GTEST_LOG_(INFO) << "Exception: " << e.what();
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -387,7 +387,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithInvalidNumBytes) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    GTEST_LOG_(INFO) << "Exception: " << e.what();
     SUCCEED();
   }
   catch (const std::exception& e) {
@@ -412,7 +412,7 @@ TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
     ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
-    std::cout << "[EXPECTED  ] Exception: " << e.what() << std::endl;
+    GTEST_LOG_(INFO) << "Exception: " << e.what();
     SUCCEED();
   }
   catch (const std::exception& e) {
