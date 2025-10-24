@@ -405,3 +405,53 @@ TEST_F(PseudoTerminalTest, ReadBytesWithNullBuffer) {
     ADD_FAILURE() << "Expected SerialException but got unknown exception type";
   }
 }
+
+TEST_F(PseudoTerminalTest, ReadBytesWithInvalidNumBytes) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::DISABLE);
+
+  auto read_buffer = std::make_shared<std::string>();
+
+  try {
+    serial_port.readBytes(read_buffer, 0);
+    ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  }
+  catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  }
+  catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  }
+  catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}
+
+TEST_F(PseudoTerminalTest, ReadyBytesCanonicalMode) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::ENABLE);
+
+  auto read_buffer = std::make_shared<std::string>();
+
+  try {
+    serial_port.readBytes(read_buffer, 5);
+    ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+  }
+  catch (const libserial::IOException& e) {
+    std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
+    SUCCEED();
+  }
+  catch (const std::exception& e) {
+    ADD_FAILURE() << "Expected SerialException but got: " << e.what();
+  }
+  catch (...) {
+    ADD_FAILURE() << "Expected SerialException but got unknown exception type";
+  }
+}
