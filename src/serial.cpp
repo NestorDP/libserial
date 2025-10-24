@@ -330,10 +330,11 @@ void Serial::setTerminator(Terminator term) {
   terminator_ = term;
 }
 
-void Serial::setTimeOut([[maybe_unused]] int time) {
-//   this->getTermios2();
-//   options_.c_cc[VTIME] = time;
-//   this->setTermios2();
+void Serial::setTimeOut(uint16_t time) {
+  timeout_ = time;
+  this->getTermios2();
+  options_.c_cc[VTIME] = timeout_;
+  this->setTermios2();
 }
 
 void Serial::setMinNumberCharRead([[maybe_unused]] int num) {
