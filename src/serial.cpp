@@ -174,7 +174,7 @@ int Serial::getAvailableData() const {
   return bytes_available;
 }
 
-void Serial::setBaudRate(int baud_rate) {
+void Serial::setBaudRate(unsigned int baud_rate) {
   this->getTermios2();
   options_.c_cflag &= ~CBAUD;
   options_.c_cflag |= BOTHER;
@@ -184,7 +184,8 @@ void Serial::setBaudRate(int baud_rate) {
 }
 
 void Serial::setBaudRate(BaudRate baud_rate) {
-  setBaudRate(static_cast<int>(baud_rate));
+  baud_rate_ = static_cast<unsigned int>(baud_rate);
+  this->setBaudRate(baud_rate_);
 }
 
 int Serial::getBaudRate() const {

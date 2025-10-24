@@ -168,7 +168,7 @@ void flushInputBuffer();
  *
  * @note The port must be opened before calling this method
  */
-void setBaudRate(int baud_rate);
+void setBaudRate(unsigned int baud_rate);
 
 /**
  * @brief Set the baud rate using BaudRate enum
