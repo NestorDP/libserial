@@ -110,7 +110,7 @@ size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) 
   buffer->clear();
   buffer->resize(num_bytes);
 
-  ssize_t bytes_read = ::read(fd_serial_port_, buffer->data(), num_bytes);
+  ssize_t bytes_read = ::read(fd_serial_port_, buffer->data(), num_bytes); // codacy-ignore[buffer-boundary]
 
   if (bytes_read < 0) {
     throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
