@@ -66,7 +66,8 @@ TEST_F(SerialTest, APIExists) {
   EXPECT_THROW(serial.flushInputBuffer(), libserial::SerialException);
   EXPECT_THROW(serial.setBaudRate(9600), libserial::SerialException);
   EXPECT_THROW(serial.getAvailableData(), libserial::SerialException);
-  EXPECT_THROW(serial.setCanonicalMode(libserial::CanonicalMode::ENABLE), libserial::SerialException);
+  EXPECT_THROW(serial.setCanonicalMode(libserial::CanonicalMode::ENABLE),
+               libserial::SerialException);
 
 
   // Test new shared pointer read API

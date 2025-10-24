@@ -55,8 +55,9 @@ void Serial::write(std::shared_ptr<std::string> data) {
 }
 
 size_t Serial::read(std::shared_ptr<std::string> buffer) {
-  if(canonical_mode_ == CanonicalMode::DISABLE) {
-    throw IOException("read() not supported in canonical mode disable; use readBytes or readUntil() instead");
+  if (canonical_mode_ == CanonicalMode::DISABLE) {
+    throw IOException(
+            "read() not supported in canonical mode disable; use readBytes or readUntil() instead");
   }
 
   if (!buffer) {
@@ -81,8 +82,9 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
 }
 
 size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) {
-  if(canonical_mode_ == CanonicalMode::ENABLE) {
-    throw IOException("readBytes() not supported in canonical mode enable; use read() or readByte() instead");
+  if (canonical_mode_ == CanonicalMode::ENABLE) {
+    throw IOException(
+            "readBytes() not supported in canonical mode enable; use read() or readByte() instead");
   }
 
   if (!buffer) {

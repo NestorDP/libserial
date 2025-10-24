@@ -282,8 +282,8 @@ TEST_F(PseudoTerminalTest, ReadNonCanonicalMode) {
   auto read_buffer = std::make_shared<std::string>();
 
   try {
-  serial_port.read(read_buffer);
-  ADD_FAILURE() << "Expected SerialException but no exception was thrown";
+    serial_port.read(read_buffer);
+    ADD_FAILURE() << "Expected SerialException but no exception was thrown";
   }
   catch (const libserial::IOException& e) {
     std::cout << "[EXPECTED] Exception: " << e.what() << std::endl;
