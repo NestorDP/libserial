@@ -72,7 +72,6 @@ TEST_F(SerialTest, APIExists) {
   // Test new shared pointer read API
   auto buffer = std::make_shared<std::string>();
   EXPECT_THROW(serial.read(buffer), libserial::IOException);
-  EXPECT_THROW(serial.readByte(), libserial::IOException);
   EXPECT_THROW(serial.readUntil(buffer, '\n'), libserial::IOException);
 }
 

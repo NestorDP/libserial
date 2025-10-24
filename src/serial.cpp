@@ -80,18 +80,6 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
   return static_cast<size_t>(bytes_read);
 }
 
-char Serial::readByte() {
-  if(canonical_mode_ == CanonicalMode::DISABLE) {
-    throw IOException("readByte() not supported in canonical mode disable; use readBytes or readUntil() instead");
-  }
-  char byte = 0;
-  ssize_t bytes_read = ::read(fd_serial_port_, &byte, 1);
-  if (bytes_read < 0) {
-    throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
-  }
-  return byte;
-}
-
 size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) {
   if(canonical_mode_ == CanonicalMode::ENABLE) {
     throw IOException("readBytes() not supported in canonical mode enable; use read() or readByte() instead");

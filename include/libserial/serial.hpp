@@ -107,7 +107,8 @@ void write(std::shared_ptr<std::string> data);
  *
  * Reads up to max_length bytes from the serial port and stores them
  * in the provided shared string buffer. This version provides better
- * memory management and avoids unnecessary string copies.
+ * memory management and avoids unnecessary string copies. Just works
+ * in canonical mode.
  *
  * @param buffer Shared pointer to string where data will be stored
  * @return Number of bytes actually read
@@ -119,24 +120,28 @@ void write(std::shared_ptr<std::string> data);
 size_t read(std::shared_ptr<std::string> buffer);
 
 /**
- * @brief Read a single byte from the serial port
+ * @brief Reads a specific number of bytes from the serial port
  *
- * Reads one byte from the serial port.
+ * Reads exactly num_bytes from the serial port and stores them
+ * in the provided shared string buffer. Just works in non-canonical mode.
  *
- * @return The byte read from the serial port
+ * @param buffer Shared pointer to string where data will be stored
+ * @param num_bytes Number of bytes to read
+ * @return Number of bytes actually read
  * @throws SerialException if read operation fails
  * @throws SerialException if buffer is null
+ * @throws SerialException if num_bytes is zero
+ *
+ * @note The buffer will be resized to contain exactly the read data
  */
-char readByte();
-
-size_t readBytes([[maybe_unused]] std::shared_ptr<std::string> buffer,
-                 [[maybe_unused]] size_t num_bytes);
+size_t readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes);
 
 /**
  * @brief Reads data until a specific terminator character is found
  *
  * Continues reading byte by byte until the specified terminator
  * character is encountered. The terminator is included in the result.
+ * Works in both canonical and non-canonical modes.
  *
  * @param terminator The character to stop reading at
  * @return String containing all read data including the terminator
