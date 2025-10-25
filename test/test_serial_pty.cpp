@@ -493,6 +493,38 @@ TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
   EXPECT_THROW({serial_port.readUntil(read_buffer, '!'); }, libserial::IOException);
 }
 
+TEST_F(PseudoTerminalTest, ReadUntilWithReadFail) {
+  libserial::Serial serial_port;
+  auto read_buffer = std::make_shared<std::string>();
+
+  for (const auto& [error_num, error_msg] : erros_read_) {
+    if (error_num == EAGAIN || error_num == EWOULDBLOCK) {
+      // Skip these as they are handled differently in readUntil
+      continue;
+    }
+    serial_port.setSystemCallFunctions(
+      [](struct pollfd*, nfds_t, int) -> int {
+      return 1;
+    },
+      [error_num](int, void*, size_t) -> ssize_t {
+      errno = error_num;
+      return -1;
+    });
+
+    auto expected_what = "Error reading from serial port: " + error_msg;
+
+    EXPECT_THROW({
+      try {
+        serial_port.readUntil(read_buffer, '!');
+      }
+      catch (const libserial::IOException& e) {
+        EXPECT_STREQ(expected_what.c_str(), e.what());
+        throw;
+      }
+    }, libserial::IOException);
+  }
+}
+
 TEST_F(PseudoTerminalTest, ReadUntilWithPollFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();

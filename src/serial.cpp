@@ -173,11 +173,11 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         continue;
       }
-      throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+      throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
     }
     else if (bytes_read == 0) {
       // End of file or connection closed
-      throw SerialException("Connection closed while reading");
+      throw IOException("Connection closed while reading: no terminator found");
     }
 
     // Add the character to buffer (including terminator)
