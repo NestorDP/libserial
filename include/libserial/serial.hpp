@@ -335,7 +335,7 @@ void setSystemCallFunctions(
 private:
 /**
  * @brief Poll system call function wrapper
- * 
+ *
  * Allows injection of custom poll function for testing.
  */
 std::function<int(struct pollfd*, nfds_t, int)> poll_ =
@@ -345,7 +345,7 @@ std::function<int(struct pollfd*, nfds_t, int)> poll_ =
 
 /**
  * @brief Read system call function wrapper
- * 
+ *
  * Allows injection of custom read function for testing.
  */
 std::function<ssize_t(int, void*, size_t)> read_ =
