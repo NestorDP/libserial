@@ -303,6 +303,26 @@ void setMinNumberCharRead(uint16_t);
 void setBaudRate(BaudRate baud_rate);
 
 /**
+ * @brief Sets the maximum safe read size
+ *
+ * Configures the maximum number of bytes that can be read
+ * in a single read operation to prevent excessive memory usage.
+ *
+ * @param size The desired maximum safe read size in bytes
+ */
+void setMaxSafeReadSize(size_t size);
+
+/**
+ * @brief Gets the maximum safe read size
+ *
+ * Retrieves the maximum number of bytes that can be read
+ * in a single read operation to prevent excessive memory usage.
+ *
+ * @return The maximum safe read size in bytes
+ */
+size_t getMaxSafeReadSize() const;
+
+/**
  * @brief Gets the current baud rate
  *
  * @return The current baud rate
@@ -318,8 +338,9 @@ int getBaudRate() const;
 void setFdForTest(int fd) {
   fd_serial_port_ = fd;
 }
-
-// For testing - allow injection of mock functions
+// WARNING: Test helper only! This function allows injection of custom
+// system call functions for testing error handling. It should NEVER be
+// used in production code.
 void setSystemCallFunctions(
   std::function<int(struct pollfd*, nfds_t, int)> poll_func,
   std::function<ssize_t(int, void*, size_t)> read_func) {
@@ -410,8 +431,9 @@ std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in mill
  *
  * Defines the maximum number of bytes that can be read
  * in a single read operation to prevent excessive memory usage.
+ * Default is 2048 bytes (2KB).
  */
-static constexpr size_t kMaxSafeReadSize = 2048;  // 2KB limit
+size_t max_safe_read_size_{2048};  // 2KB limit
 
 /**
  * @brief Timeout value in milliseconds
