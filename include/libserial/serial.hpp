@@ -309,7 +309,6 @@ void setBaudRate(BaudRate baud_rate);
  * in a single read operation to prevent excessive memory usage.
  *
  * @param size The desired maximum safe read size in bytes
- * @throws SerialException if size cannot be set
  */
 void setMaxSafeReadSize(size_t size);
 
@@ -432,7 +431,7 @@ std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in mill
  *
  * Defines the maximum number of bytes that can be read
  * in a single read operation to prevent excessive memory usage.
- * default is 2048 bytes (2KB).
+ * Default is 2048 bytes (2KB).
  */
 size_t max_safe_read_size_{2048};  // 2KB limit
 
