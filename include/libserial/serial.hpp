@@ -339,8 +339,9 @@ int getBaudRate() const;
 void setFdForTest(int fd) {
   fd_serial_port_ = fd;
 }
-
-// For testing - allow injection of mock functions
+// WARNING: Test helper only! This function allows injection of custom
+// system call functions for testing error handling. It should NEVER be
+// used in production code.
 void setSystemCallFunctions(
   std::function<int(struct pollfd*, nfds_t, int)> poll_func,
   std::function<ssize_t(int, void*, size_t)> read_func) {
