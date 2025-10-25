@@ -426,6 +426,39 @@ TEST_F(PseudoTerminalTest, ReadBytesWithInvalidNumBytes) {
   }, libserial::IOException);
 }
 
+TEST_F(PseudoTerminalTest, ReadBytesWithReadFail) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  serial_port.setCanonicalMode(libserial::CanonicalMode::DISABLE);
+
+  auto read_buffer = std::make_shared<std::string>();
+
+  for (const auto& [error_num, error_msg] : errors_read_) {
+    serial_port.setSystemCallFunctions(
+      [](struct pollfd*, nfds_t, int) -> int {
+      return 1;
+    },
+      [error_num](int, void*, size_t) -> ssize_t {
+      errno = error_num;
+      return -1;
+    });
+
+    auto expected_what = "Error reading from serial port: " + error_msg;
+
+    EXPECT_THROW({
+      try {
+        serial_port.readBytes(read_buffer, 10);
+      }
+      catch (const libserial::IOException& e) {
+        EXPECT_STREQ(expected_what.c_str(), e.what());
+        throw;
+      }
+    }, libserial::IOException);
+  }
+}
+
 TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
   libserial::Serial serial_port;
 
@@ -470,6 +503,25 @@ TEST_F(PseudoTerminalTest, ReadUntil) {
   EXPECT_NO_THROW({serial_port.readUntil(read_buffer, '!'); });
 
   EXPECT_EQ(*read_buffer, "Read Until!");
+}
+
+TEST_F(PseudoTerminalTest, ReadUntilWithNullBuffer) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+
+  std::shared_ptr<std::string> null_buffer;
+
+  EXPECT_THROW({
+    try {
+      serial_port.readUntil(null_buffer, '!');
+    }
+    catch (const libserial::IOException& e) {
+      EXPECT_STREQ("Null pointer passed to readUntil function", e.what());
+      throw;
+    }
+  }, libserial::IOException);
 }
 
 TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
@@ -551,4 +603,39 @@ TEST_F(PseudoTerminalTest, ReadUntilWithPollFail) {
       }
     }, libserial::IOException);
   }
+}
+
+TEST_F(PseudoTerminalTest, ReadUntilWithOverflowBuffer) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+  EXPECT_NO_THROW(serial_port.setMaxSafeReadSize(10));  // Set max safe read size to 10 bytes
+
+  std::string test_message(15, 'a');
+  test_message.push_back('\n');
+
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Test reading with shared pointer - only read what's available
+  auto read_buffer = std::make_shared<std::string>();
+
+  auto expected_what = "Read buffer exceeded maximum size limit of " +
+                       std::to_string(serial_port.getMaxSafeReadSize()) +
+                       " bytes without finding terminator";
+
+  EXPECT_THROW({
+    try {
+      serial_port.readUntil(read_buffer, '!');
+    }
+    catch (const libserial::IOException& e) {
+      EXPECT_STREQ(expected_what.c_str(), e.what());
+      throw;
+    }
+  }, libserial::IOException);
 }
