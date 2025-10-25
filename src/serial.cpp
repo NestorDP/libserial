@@ -65,7 +65,7 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
   }
 
   buffer->clear();
-  buffer->resize(kMaxSafeReadSize);
+  buffer->resize(max_safe_read_size_);
 
   struct pollfd fd_poll;
   fd_poll.fd = fd_serial_port_;
@@ -83,7 +83,8 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
   }
 
   // Data available: do the read
-  ssize_t bytes_read = read_(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  ssize_t bytes_read = read_(fd_serial_port_, const_cast<char*>(buffer->data()),
+                             max_safe_read_size_);
   if (bytes_read < 0) {
     throw IOException(std::string("Error reading from serial port: ") + strerror(errno));
   }
@@ -130,9 +131,9 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
 
   while (temp_char != terminator) {
     // Check buffer size limit to prevent excessive memory usage
-    if (buffer->size() >= kMaxSafeReadSize) {
+    if (buffer->size() >= max_safe_read_size_) {
       throw IOException("Read buffer exceeded maximum size limit of " +
-                        std::to_string(kMaxSafeReadSize) +
+                        std::to_string(max_safe_read_size_) +
                         " bytes without finding terminator");
     }
     // Check timeout if enabled (0 means no timeout)
@@ -342,6 +343,14 @@ void Serial::setMinNumberCharRead(uint16_t num) {
   this->getTermios2();
   options_.c_cc[VMIN] = min_number_char_read_;
   this->setTermios2();
+}
+
+void Serial::setMaxSafeReadSize(size_t size) {
+  max_safe_read_size_ = size;
+}
+
+size_t Serial::getMaxSafeReadSize() const {
+  return max_safe_read_size_;
 }
 
 int Serial::getAvailableData() const {
