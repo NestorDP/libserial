@@ -301,7 +301,7 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  const std::vector<std::pair<int, std::string> > errorScenarios = {
+  const std::vector<std::pair<int, std::string> > error_scenarios = {
     {EBADF, "Bad file descriptor"},
     {EIO, "Input/output error"},
     {EINTR, "Interrupted system call"},
@@ -309,7 +309,7 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
     {EISDIR, "Is a directory"}
   };
 
-  for (const auto& [error_num, error_msg] : errorScenarios) {
+  for (const auto& [error_num, error_msg] : error_scenarios) {
     serial_port.setSystemCallFunctions(
       [](struct pollfd*, nfds_t, int) -> int {
       return 1;
@@ -320,6 +320,44 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
     });
 
     auto expected_what = "Error reading from serial port: " + error_msg;
+
+    EXPECT_THROW({
+      try {
+        serial_port.read(read_buffer);
+      }
+      catch (const libserial::IOException& e) {
+        EXPECT_STREQ(expected_what.c_str(), e.what());
+        throw;
+      }
+    }, libserial::IOException);
+  }
+}
+
+TEST_F(PseudoTerminalTest, ReadWithPollFail) {
+  libserial::Serial serial_port;
+  auto read_buffer = std::make_shared<std::string>();
+
+  const std::vector<std::pair<int, std::string> > error_scenarios = {
+    {EAGAIN, "Resource temporarily unavailable"},
+    {ENOMEM, "Cannot allocate memory"},
+    {EINVAL, "Invalid argument"},
+    {EPERM, "Operation not permitted"},
+    {EBADF, "Bad file descriptor"},
+    {EEXIST, "File exists"},
+    {ENOENT, "No such file or directory"}
+  };
+
+  for (const auto& [error_num, error_msg] : error_scenarios) {
+    serial_port.setSystemCallFunctions(
+      [error_num](struct pollfd*, nfds_t, int) -> int {
+      errno = error_num;
+      return -1;
+    },
+      [](int, void*, size_t) -> ssize_t {
+      return 1;
+    });
+
+    auto expected_what = "Error in poll(): " + error_msg;
 
     EXPECT_THROW({
       try {

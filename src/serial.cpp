@@ -75,9 +75,6 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
   int timeout_ms = static_cast<int>(read_timeout_ms_.count());
   int pr = poll_(&fd_poll, 1, timeout_ms);
   if (pr < 0) {
-    if (errno == EINTR) {
-      throw IOException("Interrupted while polling");
-    }
     throw IOException(std::string("Error in poll(): ") + strerror(errno));
   }
   if (pr == 0) {
