@@ -73,19 +73,17 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
 
   // 0 => no wait (immediate return), -1 => block forever, positive => wait specified milliseconds
   int timeout_ms = static_cast<int>(read_timeout_ms_.count());
-  int pr = poll(&fd_poll, 1, timeout_ms);
+  int pr = poll_(&fd_poll, 1, timeout_ms);
   if (pr < 0) {
-    if (errno == EINTR) {
-      throw IOException("Interrupted while polling");
-    }
     throw IOException(std::string("Error in poll(): ") + strerror(errno));
   }
   if (pr == 0) {
-    throw IOException("Read operation timed out after " + std::to_string(timeout_ms) + "ms");
+    throw IOException("Read operation timed out after " + std::to_string(timeout_ms) +
+                      " milliseconds");
   }
 
   // Data available: do the read
-  ssize_t bytes_read = ::read(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
+  ssize_t bytes_read = read_(fd_serial_port_, const_cast<char*>(buffer->data()), kMaxSafeReadSize);
   if (bytes_read < 0) {
     throw IOException(std::string("Error reading from serial port: ") + strerror(errno));
   }
@@ -104,7 +102,7 @@ size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) 
   }
 
   if (num_bytes == 0) {
-    throw IOException("Invalid number of bytes requested");
+    throw IOException("Number of bytes requested must be greater than zero");
   }
 
   buffer->clear();
@@ -157,7 +155,7 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
       int64_t remaining_timeout = read_timeout_ms_.count() - elapsed;
       int timeout_ms = static_cast<int>(remaining_timeout);
 
-      int poll_result = poll(&pfd, 1, timeout_ms);
+      int poll_result = poll_(&pfd, 1, timeout_ms);
       if (poll_result < 0) {
         throw IOException("Error in poll(): " + std::string(strerror(errno)));
       }
@@ -167,7 +165,7 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
     }
 
     // Data is available, perform the read
-    ssize_t bytes_read = ::read(fd_serial_port_, &temp_char, 1);
+    ssize_t bytes_read = read_(fd_serial_port_, &temp_char, 1);
 
     if (bytes_read < 0) {
       if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -175,11 +173,11 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         continue;
       }
-      throw SerialException("Error reading from serial port: " + std::string(strerror(errno)));
+      throw IOException("Error reading from serial port: " + std::string(strerror(errno)));
     }
     else if (bytes_read == 0) {
       // End of file or connection closed
-      throw SerialException("Connection closed while reading");
+      throw IOException("Connection closed while reading: no terminator found");
     }
 
     // Add the character to buffer (including terminator)
@@ -246,35 +244,30 @@ void Serial::setDataLength(DataLength nbits) {
   this->setTermios2();
 }
 
-void Serial::setParity([[maybe_unused]] Parity parity) {
-//   this->getTermios2();
-//   switch (parity) {
-//     case Parity::DISABLE:
-//       options_.c_cflag &= ~PARENB;
-//       break;
-//     case Parity::ENABLE:
-//       options_.c_cflag |= PARENB;
-//       break;
-//     default:
-//       options_.c_cflag &= ~PARENB;
-//       break;
-//   }
-//   this->setTermios2();
+void Serial::setParity(Parity parity) {
+  this->getTermios2();
+  switch (parity) {
+  case Parity::DISABLE:
+    options_.c_cflag &= ~PARENB;
+    break;
+  case Parity::ENABLE:
+    options_.c_cflag |= PARENB;
+    break;
+  }
+  this->setTermios2();
 }
 
-void Serial::setStopBits([[maybe_unused]] StopBits stop_bits) {
-//   this->getTermios2();
-//   switch (stop_bits) {
-//   case StopBits::DISABLE:
-//     options_.c_cflag &= ~CSTOP;
-//     break;
-//   case StopBits::ENABLE:
-//     options_.c_cflag |= CSTOP;
-//   default:
-//     options_.c_cflag &= ~CSTOP;
-//     break;
-//   }
-//   this->setTermios2();
+void Serial::setStopBits(StopBits stop_bits) {
+  this->getTermios2();
+  switch (stop_bits) {
+  case StopBits::ONE:
+    options_.c_cflag &= ~CSTOP;
+    break;
+  case StopBits::TWO:
+    options_.c_cflag |= CSTOP;
+    break;
+  }
+  this->setTermios2();
 }
 
 void Serial::setFlowControl([[maybe_unused]] FlowControl flow_control) {
