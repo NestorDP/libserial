@@ -58,7 +58,7 @@ void SetUp() override {
     return;
   }
 
-  erros_poll_ = {
+  errors_poll_ = {
     {EAGAIN, "Resource temporarily unavailable"},
     {ENOMEM, "Cannot allocate memory"},
     {EINVAL, "Invalid argument"},
@@ -69,7 +69,7 @@ void SetUp() override {
     {EINTR, "Interrupted system call"}
   };
 
-  erros_read_ = {
+  errors_read_ = {
     {EBADF, "Bad file descriptor"},
     {EIO, "Input/output error"},
     {EINTR, "Interrupted system call"},
@@ -84,8 +84,8 @@ void TearDown() override {
   if (slave_fd_ != -1) close(slave_fd_);
 }
 
-std::vector<std::pair<int, std::string> > erros_poll_;
-std::vector<std::pair<int, std::string> > erros_read_;
+std::vector<std::pair<int, std::string> > errors_poll_;
+std::vector<std::pair<int, std::string> > errors_read_;
 };
 
 TEST_F(PseudoTerminalTest, OpenClosePort) {
@@ -308,7 +308,7 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  for (const auto& [error_num, error_msg] : erros_read_) {
+  for (const auto& [error_num, error_msg] : errors_read_) {
     serial_port.setSystemCallFunctions(
       [](struct pollfd*, nfds_t, int) -> int {
       return 1;
@@ -336,7 +336,7 @@ TEST_F(PseudoTerminalTest, ReadWithPollFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  for (const auto& [error_num, error_msg] : erros_poll_) {
+  for (const auto& [error_num, error_msg] : errors_poll_) {
     serial_port.setSystemCallFunctions(
       [error_num](struct pollfd*, nfds_t, int) -> int {
       errno = error_num;
@@ -497,7 +497,7 @@ TEST_F(PseudoTerminalTest, ReadUntilWithReadFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  for (const auto& [error_num, error_msg] : erros_read_) {
+  for (const auto& [error_num, error_msg] : errors_read_) {
     if (error_num == EAGAIN || error_num == EWOULDBLOCK) {
       // Skip these as they are handled differently in readUntil
       continue;
@@ -529,7 +529,7 @@ TEST_F(PseudoTerminalTest, ReadUntilWithPollFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  for (const auto& [error_num, error_msg] : erros_poll_) {
+  for (const auto& [error_num, error_msg] : errors_poll_) {
     serial_port.setSystemCallFunctions(
       [error_num](struct pollfd*, nfds_t, int) -> int {
       errno = error_num;
