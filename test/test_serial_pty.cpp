@@ -283,7 +283,8 @@ TEST_F(PseudoTerminalTest, ReadTimeout) {
 
   auto read_buffer = std::make_shared<std::string>();
 
-  auto expected_what = "Read operation timed out after " + std::to_string(time_out_ms) + " milliseconds";
+  auto expected_what = "Read operation timed out after " + std::to_string(time_out_ms) +
+                       " milliseconds";
 
   EXPECT_THROW({
     try {
@@ -413,7 +414,9 @@ TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
       ADD_FAILURE() << "Expected SerialException but no exception was thrown";
     }
     catch (const libserial::IOException& e) {
-      EXPECT_STREQ("readBytes() is not supported in canonical mode; use read() or readUntil() instead", e.what());
+      EXPECT_STREQ(
+        "readBytes() is not supported in canonical mode; use read() or readUntil() instead",
+        e.what());
       throw;
     }
   }, libserial::IOException);
