@@ -278,16 +278,19 @@ TEST_F(PseudoTerminalTest, ReadTimeout) {
   serial_port.setBaudRate(9600);
 
   // Set a short read timeout
-  serial_port.setReadTimeout(std::chrono::milliseconds(100));
+  int time_out_ms = 100;
+  serial_port.setReadTimeout(std::chrono::milliseconds(time_out_ms));
 
   auto read_buffer = std::make_shared<std::string>();
+
+  auto expected_what = "Read operation timed out after " + std::to_string(time_out_ms) + " milliseconds";
 
   EXPECT_THROW({
     try {
       serial_port.read(read_buffer);
     }
     catch (const libserial::IOException& e) {
-      GTEST_LOG_(INFO) << "Exception: " << e.what();
+      EXPECT_STREQ(expected_what.c_str(), e.what());
       throw;
     }
   }, libserial::IOException);
@@ -369,7 +372,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithNullBuffer) {
       serial_port.readBytes(null_buffer, 10);
     }
     catch (const libserial::IOException& e) {
-      GTEST_LOG_(INFO) << "Exception: " << e.what();
+      EXPECT_STREQ("Null pointer passed to readBytes function", e.what());
       throw;
     }
   }, libserial::IOException);
@@ -389,7 +392,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithInvalidNumBytes) {
       serial_port.readBytes(read_buffer, 0);
     }
     catch (const libserial::IOException& e) {
-      GTEST_LOG_(INFO) << "Exception: " << e.what();
+      EXPECT_STREQ("Number of bytes requested must be greater than zero", e.what());
       throw;
     }
   }, libserial::IOException);
@@ -410,7 +413,7 @@ TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
       ADD_FAILURE() << "Expected SerialException but no exception was thrown";
     }
     catch (const libserial::IOException& e) {
-      GTEST_LOG_(INFO) << "Exception: " << e.what();
+      EXPECT_STREQ("readBytes() is not supported in canonical mode; use read() or readUntil() instead", e.what());
       throw;
     }
   }, libserial::IOException);

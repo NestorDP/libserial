@@ -81,7 +81,7 @@ size_t Serial::read(std::shared_ptr<std::string> buffer) {
     throw IOException(std::string("Error in poll(): ") + strerror(errno));
   }
   if (pr == 0) {
-    throw IOException("Read operation timed out after " + std::to_string(timeout_ms) + "ms");
+    throw IOException("Read operation timed out after " + std::to_string(timeout_ms) + " milliseconds");
   }
 
   // Data available: do the read
@@ -104,7 +104,7 @@ size_t Serial::readBytes(std::shared_ptr<std::string> buffer, size_t num_bytes) 
   }
 
   if (num_bytes == 0) {
-    throw IOException("Invalid number of bytes requested");
+    throw IOException("Number of bytes requested must be greater than zero");
   }
 
   buffer->clear();

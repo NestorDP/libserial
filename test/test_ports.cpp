@@ -57,7 +57,6 @@ TEST_F(PortsTest, ScanPortsThrowsWhenPathMissing) {
     FAIL() << "Expected libserial::SerialException to be thrown";
   }
   catch (const libserial::SerialException& e) {
-    GTEST_LOG_(INFO) << "Exception: " << e.what();
     // Optionally assert something about the message:
     EXPECT_NE(std::string(e.what()).find("Error while reading"), std::string::npos);
   }
