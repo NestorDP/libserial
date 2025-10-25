@@ -333,17 +333,25 @@ void setSystemCallFunctions(
 #endif
 
 private:
-// Function pointers for system calls
+/**
+ * @brief Poll system call function wrapper
+ * 
+ * Allows injection of custom poll function for testing.
+ */
 std::function<int(struct pollfd*, nfds_t, int)> poll_ =
   [](struct pollfd* f, nfds_t n, int t) {
     return ::poll(f, n, t);
   };
 
+/**
+ * @brief Read system call function wrapper
+ * 
+ * Allows injection of custom read function for testing.
+ */
 std::function<ssize_t(int, void*, size_t)> read_ =
   [](int fd, void* buf, size_t sz) {
     return ::read(fd, buf, sz);
   };
-
 
 /**
  * @brief Applies terminal settings to the port
