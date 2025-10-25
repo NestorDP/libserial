@@ -8,13 +8,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <poll.h>
 #include <asm/ioctls.h>
 #include <asm/termbits.h>
 #include <sys/ioctl.h>
+#include <sys/types.h>
 
 #include <chrono>
 #include <iostream>
 #include <memory>
+#include <functional>
 #include <string>
 #include <thread>
 #include <vector>
@@ -227,7 +230,7 @@ void setDataLength(DataLength nbits);
  * @param parity The desired parity setting (ENABLE or DISABLE)
  * @throws SerialException if parity cannot be set
  */
-void setParity([[maybe_unused]] Parity parity);
+void setParity(Parity parity);
 
 /**
  * @brief Sets the stop bits configuration
@@ -237,7 +240,7 @@ void setParity([[maybe_unused]] Parity parity);
  * @param stop_bits The desired stop bits setting (ONE, ONE_AND_HALF, or TWO)
  * @throws SerialException if stop bits cannot be set
  */
-void setStopBits([[maybe_unused]] StopBits stop_bits);
+void setStopBits(StopBits stop_bits);
 
 /**
  * @brief Sets the flow control configuration
@@ -315,9 +318,33 @@ int getBaudRate() const;
 void setFdForTest(int fd) {
   fd_serial_port_ = fd;
 }
+
+// For testing - allow injection of mock functions
+void setSystemCallFunctions(
+  std::function<int(struct pollfd*, nfds_t, int)> poll_func,
+  std::function<ssize_t(int, void*, size_t)> read_func) {
+  poll_ = [poll_func](struct pollfd* f, nfds_t n, int t) {
+            return poll_func(f, n, t);
+          };
+  read_ = [read_func](int fd, void* buf, size_t sz) {
+            return read_func(fd, buf, sz);
+          };
+}
 #endif
 
 private:
+// Function pointers for system calls
+std::function<int(struct pollfd*, nfds_t, int)> poll_ =
+  [](struct pollfd* f, nfds_t n, int t) {
+    return ::poll(f, n, t);
+  };
+
+std::function<ssize_t(int, void*, size_t)> read_ =
+  [](int fd, void* buf, size_t sz) {
+    return ::read(fd, buf, sz);
+  };
+
+
 /**
  * @brief Applies terminal settings to the port
  *

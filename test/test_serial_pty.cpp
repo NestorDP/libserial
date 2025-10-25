@@ -293,6 +293,42 @@ TEST_F(PseudoTerminalTest, ReadTimeout) {
   }, libserial::IOException);
 }
 
+TEST_F(PseudoTerminalTest, ReadWithReadFail) {
+  libserial::Serial serial_port;
+  auto read_buffer = std::make_shared<std::string>();
+
+  const std::vector<std::pair<int, std::string> > errorScenarios = {
+    {EBADF, "Bad file descriptor"},
+    {EIO, "Input/output error"},
+    {EINTR, "Interrupted system call"},
+    {EAGAIN, "Resource temporarily unavailable"},
+    {EISDIR, "Is a directory"}
+  };
+
+  for (const auto& [error_num, error_msg] : errorScenarios) {
+    serial_port.setSystemCallFunctions(
+      [](struct pollfd*, nfds_t, int) -> int {
+      return 1;
+    },
+      [error_num](int, void*, size_t) -> ssize_t {
+      errno = error_num;
+      return -1;
+    });
+
+    auto expected_what = "Error reading from serial port: " + error_msg;
+
+    EXPECT_THROW({
+      try {
+        serial_port.read(read_buffer);
+      }
+      catch (const libserial::IOException& e) {
+        EXPECT_STREQ(expected_what.c_str(), e.what());
+        throw;
+      }
+    }, libserial::IOException);
+  }
+}
+
 TEST_F(PseudoTerminalTest, ReadBytesNonCanonicalMode) {
   libserial::Serial serial_port;
 
