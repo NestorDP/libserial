@@ -57,12 +57,35 @@ void SetUp() override {
     FAIL() << "Failed to open slave pseudo-terminal";
     return;
   }
+
+  erros_poll_ = {
+    {EAGAIN, "Resource temporarily unavailable"},
+    {ENOMEM, "Cannot allocate memory"},
+    {EINVAL, "Invalid argument"},
+    {EPERM, "Operation not permitted"},
+    {EBADF, "Bad file descriptor"},
+    {EEXIST, "File exists"},
+    {ENOENT, "No such file or directory"},
+    {EINTR, "Interrupted system call"}
+  };
+
+  erros_read_ = {
+    {EBADF, "Bad file descriptor"},
+    {EIO, "Input/output error"},
+    {EINTR, "Interrupted system call"},
+    {EAGAIN, "Resource temporarily unavailable"},
+    {EISDIR, "Is a directory"}
+  };
 }
 
 void TearDown() override {
   if (master_fd_ != -1) close(master_fd_);
   if (slave_fd_ != -1) close(slave_fd_);
 }
+
+std::vector<std::pair<int, std::string>> erros_poll_;
+std::vector<std::pair<int, std::string>> erros_read_;
+
 };
 
 TEST_F(PseudoTerminalTest, OpenClosePort) {
@@ -301,17 +324,7 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  const std::vector<std::pair<int, std::string> > error_scenarios = {
-    {EBADF, "Bad file descriptor"},
-    {EIO, "Input/output error"},
-    {EINTR, "Interrupted system call"},
-    {EAGAIN, "Resource temporarily unavailable"},
-    {EISDIR, "Is a directory"}
-  };
-
-  ASSERT_EQ(error_scenarios.size(), 5);
-
-  for (const auto& [error_num, error_msg] : error_scenarios) {
+  for (const auto& [error_num, error_msg] : erros_read_) {
     serial_port.setSystemCallFunctions(
       [](struct pollfd*, nfds_t, int) -> int {
       return 1;
@@ -339,20 +352,7 @@ TEST_F(PseudoTerminalTest, ReadWithPollFail) {
   libserial::Serial serial_port;
   auto read_buffer = std::make_shared<std::string>();
 
-  const std::vector<std::pair<int, std::string> > error_scenarios = {
-    {EAGAIN, "Resource temporarily unavailable"},
-    {ENOMEM, "Cannot allocate memory"},
-    {EINVAL, "Invalid argument"},
-    {EPERM, "Operation not permitted"},
-    {EBADF, "Bad file descriptor"},
-    {EEXIST, "File exists"},
-    {ENOENT, "No such file or directory"},
-    {EINTR, "Interrupted system call"}
-  };
-
-  ASSERT_EQ(error_scenarios.size(), 8);
-
-  for (const auto& [error_num, error_msg] : error_scenarios) {
+  for (const auto& [error_num, error_msg] : erros_poll_) {
     serial_port.setSystemCallFunctions(
       [error_num](struct pollfd*, nfds_t, int) -> int {
       errno = error_num;
