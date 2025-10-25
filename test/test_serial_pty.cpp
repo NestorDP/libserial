@@ -74,6 +74,7 @@ void SetUp() override {
     {EIO, "Input/output error"},
     {EINTR, "Interrupted system call"},
     {EAGAIN, "Resource temporarily unavailable"},
+    {EWOULDBLOCK, "Resource temporarily unavailable"},
     {EISDIR, "Is a directory"}
   };
 }
@@ -83,9 +84,8 @@ void TearDown() override {
   if (slave_fd_ != -1) close(slave_fd_);
 }
 
-std::vector<std::pair<int, std::string>> erros_poll_;
-std::vector<std::pair<int, std::string>> erros_read_;
-
+std::vector<std::pair<int, std::string> > erros_poll_;
+std::vector<std::pair<int, std::string> > erros_read_;
 };
 
 TEST_F(PseudoTerminalTest, OpenClosePort) {
@@ -121,6 +121,34 @@ TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
   // Get the baud rate and verify
   EXPECT_NO_THROW({ baud_rate = serial_port.getBaudRate(); });
   EXPECT_EQ(baud_rate, 115200);
+
+  serial_port.close();
+}
+
+TEST_F(PseudoTerminalTest, SetParity) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+
+  // Set parity to ENABLE
+  EXPECT_NO_THROW({ serial_port.setParity(libserial::Parity::ENABLE); });
+
+  // Set parity to ODD
+  EXPECT_NO_THROW({ serial_port.setParity(libserial::Parity::DISABLE); });
+
+  serial_port.close();
+}
+
+TEST_F(PseudoTerminalTest, SetStopBits) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+
+  // Set stop bits to 1
+  EXPECT_NO_THROW({ serial_port.setStopBits(libserial::StopBits::ONE); });
+
+  // Set stop bits to 2
+  EXPECT_NO_THROW({ serial_port.setStopBits(libserial::StopBits::TWO); });
 
   serial_port.close();
 }
