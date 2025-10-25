@@ -309,6 +309,8 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
     {EISDIR, "Is a directory"}
   };
 
+  ASSERT_EQ(error_scenarios.size(), 5);
+
   for (const auto& [error_num, error_msg] : error_scenarios) {
     serial_port.setSystemCallFunctions(
       [](struct pollfd*, nfds_t, int) -> int {
@@ -347,6 +349,8 @@ TEST_F(PseudoTerminalTest, ReadWithPollFail) {
     {ENOENT, "No such file or directory"},
     {EINTR, "Interrupted system call"}
   };
+
+  ASSERT_EQ(error_scenarios.size(), 8);
 
   for (const auto& [error_num, error_msg] : error_scenarios) {
     serial_port.setSystemCallFunctions(
