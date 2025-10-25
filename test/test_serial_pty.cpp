@@ -150,50 +150,6 @@ TEST_F(PseudoTerminalTest, GetAvailableData) {
   EXPECT_EQ(available, bytes_written);
 }
 
-TEST_F(PseudoTerminalTest, ReadUntil) {
-  libserial::Serial serial_port;
-
-  serial_port.open(slave_port_);
-  serial_port.setBaudRate(9600);
-
-  const std::string test_message = "Read Until! Test!\n";
-
-  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
-  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
-
-  // Give time for data to propagate
-  fsync(master_fd_);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-  // Test reading with shared pointer - only read what's available
-  auto read_buffer = std::make_shared<std::string>();
-
-  EXPECT_NO_THROW({serial_port.readUntil(read_buffer, '!'); });
-
-  EXPECT_EQ(*read_buffer, "Read Until!");
-}
-
-TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
-  libserial::Serial serial_port;
-
-  serial_port.open(slave_port_);
-  serial_port.setBaudRate(9600);
-
-  const std::string test_message = "Read Until Test";
-
-  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
-  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
-
-  // Give time for data to propagate
-  fsync(master_fd_);
-  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-  // Test reading with shared pointer - only read what's available
-  auto read_buffer = std::make_shared<std::string>();
-
-  EXPECT_THROW({serial_port.readUntil(read_buffer, '!'); }, libserial::IOException);
-}
-
 TEST_F(PseudoTerminalTest, WriteTest) {
   libserial::Serial serial_port;
 
@@ -463,4 +419,76 @@ TEST_F(PseudoTerminalTest, ReadBytesCanonicalMode) {
       throw;
     }
   }, libserial::IOException);
+}
+
+TEST_F(PseudoTerminalTest, ReadUntil) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+
+  const std::string test_message = "Read Until! Test!\n";
+
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Test reading with shared pointer - only read what's available
+  auto read_buffer = std::make_shared<std::string>();
+
+  EXPECT_NO_THROW({serial_port.readUntil(read_buffer, '!'); });
+
+  EXPECT_EQ(*read_buffer, "Read Until!");
+}
+
+TEST_F(PseudoTerminalTest, ReadUntilTimeout) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+  serial_port.setBaudRate(9600);
+
+  const std::string test_message = "Read Until Test";
+
+  ssize_t bytes_written = write(master_fd_, test_message.c_str(), test_message.length());
+  ASSERT_GT(bytes_written, 0) << "Failed to write to master end";
+
+  // Give time for data to propagate
+  fsync(master_fd_);
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+  // Test reading with shared pointer - only read what's available
+  auto read_buffer = std::make_shared<std::string>();
+
+  EXPECT_THROW({serial_port.readUntil(read_buffer, '!'); }, libserial::IOException);
+}
+
+TEST_F(PseudoTerminalTest, ReadUntilWithPollFail) {
+  libserial::Serial serial_port;
+  auto read_buffer = std::make_shared<std::string>();
+
+  for (const auto& [error_num, error_msg] : erros_poll_) {
+    serial_port.setSystemCallFunctions(
+      [error_num](struct pollfd*, nfds_t, int) -> int {
+      errno = error_num;
+      return -1;
+    },
+      [](int, void*, size_t) -> ssize_t {
+      return 1;
+    });
+
+    auto expected_what = "Error in poll(): " + error_msg;
+
+    EXPECT_THROW({
+      try {
+        serial_port.readUntil(read_buffer, '!');
+      }
+      catch (const libserial::IOException& e) {
+        EXPECT_STREQ(expected_what.c_str(), e.what());
+        throw;
+      }
+    }, libserial::IOException);
+  }
 }
