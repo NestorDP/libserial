@@ -344,7 +344,8 @@ TEST_F(PseudoTerminalTest, ReadWithPollFail) {
     {EPERM, "Operation not permitted"},
     {EBADF, "Bad file descriptor"},
     {EEXIST, "File exists"},
-    {ENOENT, "No such file or directory"}
+    {ENOENT, "No such file or directory"},
+    {EINTR, "Interrupted system call"}
   };
 
   for (const auto& [error_num, error_msg] : error_scenarios) {
