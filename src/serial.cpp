@@ -189,7 +189,7 @@ size_t Serial::readUntil(std::shared_ptr<std::string> buffer, char terminator) {
 }
 
 void Serial::flushInputBuffer() {
-  if (ioctl(fd_serial_port_, TCFLSH, TCIFLUSH) != 0) {
+  if (ioctl_(fd_serial_port_, TCFLSH, TCIFLUSH) != 0) {
     throw SerialException("Error flushing input buffer: " + std::string(strerror(errno)));
   }
 }
@@ -208,7 +208,7 @@ void Serial::setBaudRate(BaudRate baud_rate) {
 }
 
 void Serial::setTermios2() {
-  ssize_t error = ioctl(fd_serial_port_, TCSETS2, &options_);
+  ssize_t error = ioctl_(fd_serial_port_, TCSETS2, &options_);
   if (error < 0) {
     throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
   }
@@ -355,7 +355,7 @@ size_t Serial::getMaxSafeReadSize() const {
 
 int Serial::getAvailableData() const {
   int bytes_available;
-  if (ioctl(fd_serial_port_, FIONREAD, &bytes_available) < 0) {
+  if (ioctl_(fd_serial_port_, FIONREAD, &bytes_available) < 0) {
     throw SerialException("Error getting available data: " + std::string(strerror(errno)));
   }
   return bytes_available;
@@ -367,7 +367,7 @@ int Serial::getBaudRate() const {
 }
 
 void Serial::getTermios2() const {
-  ssize_t error = ioctl(fd_serial_port_, TCGETS2, &options_);
+  ssize_t error = ioctl_(fd_serial_port_, TCGETS2, &options_);
   if (error < 0) {
     throw SerialException("Error get Termios2: " + std::string(strerror(errno)));
   }

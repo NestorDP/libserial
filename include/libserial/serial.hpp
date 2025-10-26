@@ -355,6 +355,16 @@ void setSystemCallFunctions(
 
 private:
 /**
+ * @brief Ioctl system call function wrapper
+ *
+ * Allows injection of custom ioctl function for testing.
+ */
+std::function<int(int, unsigned long, void*)> ioctl_ =
+  [](int fd, unsigned long request, void* arg) {
+    return ::ioctl(fd, request, arg);
+  };
+
+/**
  * @brief Poll system call function wrapper
  *
  * Allows injection of custom poll function for testing.
