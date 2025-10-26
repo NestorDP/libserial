@@ -309,10 +309,11 @@ TEST_F(PseudoTerminalTest, ReadWithReadFail) {
   auto read_buffer = std::make_shared<std::string>();
 
   for (const auto& [error_num, error_msg] : errors_read_) {
-    serial_port.setSystemCallFunctions(
+    serial_port.setPollSystemFunction(
       [](struct pollfd*, nfds_t, int) -> int {
       return 1;
-    },
+    });
+    serial_port.setReadSystemFunction(
       [error_num](int, void*, size_t) -> ssize_t {
       errno = error_num;
       return -1;
@@ -337,13 +338,10 @@ TEST_F(PseudoTerminalTest, ReadWithPollFail) {
   auto read_buffer = std::make_shared<std::string>();
 
   for (const auto& [error_num, error_msg] : errors_poll_) {
-    serial_port.setSystemCallFunctions(
+    serial_port.setPollSystemFunction(
       [error_num](struct pollfd*, nfds_t, int) -> int {
       errno = error_num;
       return -1;
-    },
-      [](int, void*, size_t) -> ssize_t {
-      return 1;
     });
 
     auto expected_what = "Error in poll(): " + error_msg;
@@ -436,10 +434,7 @@ TEST_F(PseudoTerminalTest, ReadBytesWithReadFail) {
   auto read_buffer = std::make_shared<std::string>();
 
   for (const auto& [error_num, error_msg] : errors_read_) {
-    serial_port.setSystemCallFunctions(
-      [](struct pollfd*, nfds_t, int) -> int {
-      return 1;
-    },
+    serial_port.setReadSystemFunction(
       [error_num](int, void*, size_t) -> ssize_t {
       errno = error_num;
       return -1;
@@ -554,10 +549,11 @@ TEST_F(PseudoTerminalTest, ReadUntilWithReadFail) {
       // Skip these as they are handled differently in readUntil
       continue;
     }
-    serial_port.setSystemCallFunctions(
+    serial_port.setPollSystemFunction(
       [](struct pollfd*, nfds_t, int) -> int {
       return 1;
-    },
+    });
+    serial_port.setReadSystemFunction(
       [error_num](int, void*, size_t) -> ssize_t {
       errno = error_num;
       return -1;
@@ -582,13 +578,10 @@ TEST_F(PseudoTerminalTest, ReadUntilWithPollFail) {
   auto read_buffer = std::make_shared<std::string>();
 
   for (const auto& [error_num, error_msg] : errors_poll_) {
-    serial_port.setSystemCallFunctions(
+    serial_port.setPollSystemFunction(
       [error_num](struct pollfd*, nfds_t, int) -> int {
       errno = error_num;
       return -1;
-    },
-      [](int, void*, size_t) -> ssize_t {
-      return 1;
     });
 
     auto expected_what = "Error in poll(): " + error_msg;
