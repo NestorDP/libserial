@@ -102,6 +102,31 @@ TEST_F(PseudoTerminalTest, ParameterizedConstructor) {
   libserial::Serial serial_port(slave_port_);
 }
 
+TEST_F(PseudoTerminalTest, SetTermios2WithFail) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+
+  // Inject failure into ioctl for setTermios2
+  serial_port.setIoctlSystemFunction(
+    [](int, unsigned long, void*) -> int {
+      errno = EIO;
+      return -1;
+    });
+
+  EXPECT_THROW({
+    serial_port.setBaudRate(9600);
+  }, libserial::SerialException);
+
+  // Restore ioctl function for cleanup
+  serial_port.setIoctlSystemFunction(
+    [](int fd, unsigned long request, void* arg) -> int {
+      return ::ioctl(fd, request, arg);
+    });
+
+  serial_port.close();
+}
+
 TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
   libserial::Serial serial_port;
 
