@@ -349,21 +349,21 @@ void setPollSystemFunction(
   poll_ = [poll_func](struct pollfd* f, nfds_t n, int t) {
             return poll_func(f, n, t);
           };
-  }
+}
 
 void setReadSystemFunction(
   std::function<ssize_t(int, void*, size_t)> read_func) {
   read_ = [read_func](int fd, void* buf, size_t sz) {
             return read_func(fd, buf, sz);
           };
-  }
+}
 
 void setIoctlSystemFunction(
-  std::function<int(int, unsigned long, void*)> ioctl_func) {
-  ioctl_ = [ioctl_func](int fd, unsigned long request, void* arg) {
-              return ioctl_func(fd, request, arg);
-            };
-  }
+  std::function<int(int, unsigned long, void*)> ioctl_func) {         // NOLINT
+  ioctl_ = [ioctl_func](int fd, unsigned long request, void* arg) {   // NOLINT
+             return ioctl_func(fd, request, arg);
+           };
+}
 #endif
 
 private:
@@ -372,10 +372,11 @@ private:
  *
  * Allows injection of custom ioctl function for testing.
  */
-std::function<int(int, unsigned long, void*)> ioctl_ =
-  [](int fd, unsigned long request, void* arg) {
-    return ::ioctl(fd, request, arg);
-  };
+std::function<int(int, unsigned long, void*)> ioctl_ =  // NOLINT
+                                                       [](int fd, unsigned long request,
+                                                          void* arg) { // NOLINT
+                                                         return ::ioctl(fd, request, arg);
+                                                       };
 
 /**
  * @brief Poll system call function wrapper

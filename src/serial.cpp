@@ -367,11 +367,11 @@ DataLength Serial::getDataLength() const {
   this->getTermios2();
   std::cout << "Getting data length: " << static_cast<int>(options_.c_cflag & CSIZE) << std::endl;
   switch (options_.c_cflag & CSIZE) {
-    case CS5: return DataLength::FIVE;
-    case CS6: return DataLength::SIX;
-    case CS7: return DataLength::SEVEN;
-    case CS8: return DataLength::EIGHT;
-    default: return DataLength::EIGHT;
+  case CS5: return DataLength::FIVE;
+  case CS6: return DataLength::SIX;
+  case CS7: return DataLength::SEVEN;
+  case CS8: return DataLength::EIGHT;
+  default: return DataLength::EIGHT;
   }
 }
 
