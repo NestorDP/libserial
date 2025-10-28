@@ -373,10 +373,9 @@ private:
  * Allows injection of custom ioctl function for testing.
  */
 std::function<int(int, unsigned long, void*)> ioctl_ =  // NOLINT
-                                                       [](int fd, unsigned long request,
-                                                          void* arg) { // NOLINT
-                                                         return ::ioctl(fd, request, arg);
-                                                       };
+  [](int fd, unsigned long request, void* arg) {        // NOLINT
+    return ::ioctl(fd, request, arg);
+  };
 
 /**
  * @brief Poll system call function wrapper
