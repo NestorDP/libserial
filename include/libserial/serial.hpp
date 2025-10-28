@@ -330,7 +330,13 @@ size_t getMaxSafeReadSize() const;
  */
 int getBaudRate() const;
 
-
+/**
+ * @brief Gets the current data length setting
+ *
+ * Retrieves the number of data bits configured for serial communication.
+ *
+ * @return The current data length (number of data bits)
+ */
 DataLength getDataLength() const;
 
 #ifdef BUILD_TESTING_ON
