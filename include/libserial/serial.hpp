@@ -330,6 +330,15 @@ size_t getMaxSafeReadSize() const;
  */
 int getBaudRate() const;
 
+/**
+ * @brief Gets the current data length setting
+ *
+ * Retrieves the number of data bits configured for serial communication.
+ *
+ * @return The current data length (number of data bits)
+ */
+DataLength getDataLength() const;
+
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
 // and may leave the Serial object in an inconsistent state. It is intended
@@ -341,19 +350,43 @@ void setFdForTest(int fd) {
 // WARNING: Test helper only! This function allows injection of custom
 // system call functions for testing error handling. It should NEVER be
 // used in production code.
-void setSystemCallFunctions(
-  std::function<int(struct pollfd*, nfds_t, int)> poll_func,
-  std::function<ssize_t(int, void*, size_t)> read_func) {
+void setPollSystemFunction(
+  std::function<int(struct pollfd*, nfds_t, int)> poll_func) {
   poll_ = [poll_func](struct pollfd* f, nfds_t n, int t) {
             return poll_func(f, n, t);
           };
+}
+
+void setReadSystemFunction(
+  std::function<ssize_t(int, void*, size_t)> read_func) {
   read_ = [read_func](int fd, void* buf, size_t sz) {
             return read_func(fd, buf, sz);
           };
 }
+
+/* *INDENT-OFF* */
+void setIoctlSystemFunction(
+  std::function<int(int, unsigned long, void*)> ioctl_func) {  // NOLINT
+  ioctl_ = [ioctl_func](int fd, unsigned long request, void* arg) { // NOLINT
+             return ioctl_func(fd, request, arg);
+           };
+}
+/* *INDENT-ON* */
 #endif
 
 private:
+/**
+ * @brief Ioctl system call function wrapper
+ *
+ * Allows injection of custom ioctl function for testing.
+ */
+/* *INDENT-OFF* */
+std::function<int(int, unsigned long, void*)> ioctl_ = // NOLINT
+  [](int fd, unsigned long request, void* arg) {  // NOLINT
+    return ::ioctl(fd, request, arg);
+  };
+/* *INDENT-ON* */
+
 /**
  * @brief Poll system call function wrapper
  *
@@ -455,13 +488,6 @@ uint16_t min_number_char_read_{0};
  * Determines whether canonical (line-based) input processing is enabled (default ENABLE).
  */
 CanonicalMode canonical_mode_{CanonicalMode::ENABLE};
-
-/**
- * @brief Data length setting
- *
- * Specifies the number of data bits per character (default EIGHT).
- */
-DataLength data_length_{DataLength::EIGHT};
 
 /**
  * @brief Line terminator character
