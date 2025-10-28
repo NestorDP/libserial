@@ -109,7 +109,7 @@ TEST_F(PseudoTerminalTest, SetTermios2WithFail) {
 
   // Inject failure into ioctl for setTermios2
   serial_port.setIoctlSystemFunction(
-    [](int, unsigned long, void*) -> int {  // NOLINT
+    [](int, uint64_t, void*) -> int {  // NOLINT
     errno = EIO;
     return -1;
   });
@@ -120,7 +120,7 @@ TEST_F(PseudoTerminalTest, SetTermios2WithFail) {
 
   // Restore ioctl function for cleanup
   serial_port.setIoctlSystemFunction(
-    [](int fd, unsigned long request, void* arg) -> int {  // NOLINT
+    [](int fd, uint64_t request, void* arg) -> int {  // NOLINT
     return ::ioctl(fd, request, arg);
   });
 
