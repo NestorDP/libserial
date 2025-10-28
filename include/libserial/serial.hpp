@@ -364,12 +364,14 @@ void setReadSystemFunction(
           };
 }
 
+/* *INDENT-OFF* */
 void setIoctlSystemFunction(
-  std::function<int(int, uint64_t, void*)> ioctl_func) {
-  ioctl_ = [ioctl_func](int fd, uint64_t request, void* arg) {
+  std::function<int(int, unsigned long, void*)> ioctl_func) {  // NOLINT
+  ioctl_ = [ioctl_func](int fd, unsigned long request, void* arg) { // NOLINT
              return ioctl_func(fd, request, arg);
            };
 }
+/* *INDENT-ON* */
 #endif
 
 private:
@@ -378,10 +380,12 @@ private:
  *
  * Allows injection of custom ioctl function for testing.
  */
-std::function<int(int, uint64_t, void*)> ioctl_ =
-  [](int fd, uint64_t request, void* arg) {
+/* *INDENT-OFF* */
+std::function<int(int, unsigned long, void*)> ioctl_ = // NOLINT
+  [](int fd, unsigned long request, void* arg) {  // NOLINT
     return ::ioctl(fd, request, arg);
   };
+/* *INDENT-ON* */
 
 /**
  * @brief Poll system call function wrapper

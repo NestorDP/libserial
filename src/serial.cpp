@@ -196,7 +196,7 @@ void Serial::flushInputBuffer() {
 
 void Serial::setTermios2() {
   ssize_t error = ioctl_(fd_serial_port_, TCSETS2, &options_);
-  if (error != 0) {
+  if (error < 0) {
     throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
   }
 }
