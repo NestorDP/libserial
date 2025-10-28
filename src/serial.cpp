@@ -208,8 +208,8 @@ void Serial::setBaudRate(BaudRate baud_rate) {
 }
 
 void Serial::setTermios2() {
-  int ret = ioctl_(fd_serial_port_, TCSETS2, &options_);
-  if (ret < 0) {
+  ssize_t error = ioctl_(fd_serial_port_, TCSETS2, &options_);
+  if (error < 0) {
     throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
   }
 }
@@ -227,19 +227,15 @@ void Serial::setDataLength(DataLength nbits) {
   options_.c_cflag &= ~CSIZE;
   switch (nbits) {
   case DataLength::FIVE:
-    std::cout << "FIVE" << std::endl;
     options_.c_cflag |= CS5;
     break;
   case DataLength::SIX:
-    std::cout << "SIX" << std::endl;
     options_.c_cflag |= CS6;
     break;
   case DataLength::SEVEN:
-    std::cout << "SEVEN" << std::endl;
     options_.c_cflag |= CS7;
     break;
   case DataLength::EIGHT:
-    std::cout << "EIGHT" << std::endl;
     options_.c_cflag |= CS8;
     break;
   }
