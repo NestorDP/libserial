@@ -208,8 +208,8 @@ void Serial::setBaudRate(BaudRate baud_rate) {
 }
 
 void Serial::setTermios2() {
-  ssize_t error = ioctl_(fd_serial_port_, TCSETS2, &options_);
-  if (error < 0) {
+  int ret = ioctl_(fd_serial_port_, TCSETS2, &options_);
+  if (ret < 0) {
     throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
   }
 }
@@ -223,22 +223,23 @@ void Serial::setWriteTimeout(std::chrono::milliseconds timeout) {
 }
 
 void Serial::setDataLength(DataLength nbits) {
-  data_length_ = nbits;
-
   this->getTermios2();
-  // Clear bits
   options_.c_cflag &= ~CSIZE;
   switch (nbits) {
   case DataLength::FIVE:
+    std::cout << "FIVE" << std::endl;
     options_.c_cflag |= CS5;
     break;
   case DataLength::SIX:
+    std::cout << "SIX" << std::endl;
     options_.c_cflag |= CS6;
     break;
   case DataLength::SEVEN:
+    std::cout << "SEVEN" << std::endl;
     options_.c_cflag |= CS7;
     break;
   case DataLength::EIGHT:
+    std::cout << "EIGHT" << std::endl;
     options_.c_cflag |= CS8;
     break;
   }
@@ -364,6 +365,18 @@ int Serial::getAvailableData() const {
 int Serial::getBaudRate() const {
   this->getTermios2();
   return (static_cast<int>(options_.c_ispeed));
+}
+
+DataLength Serial::getDataLength() const {
+  this->getTermios2();
+  std::cout << "Getting data length: " << static_cast<int>(options_.c_cflag & CSIZE) << std::endl;
+  switch (options_.c_cflag & CSIZE) {
+    case CS5: return DataLength::FIVE;
+    case CS6: return DataLength::SIX;
+    case CS7: return DataLength::SEVEN;
+    case CS8: return DataLength::EIGHT;
+    default: return DataLength::EIGHT;
+  }
 }
 
 void Serial::getTermios2() const {

@@ -150,6 +150,45 @@ TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
   serial_port.close();
 }
 
+// TEST_F(PseudoTerminalTest, SetAndGetDataLength) {
+//   libserial::Serial serial_port;
+
+//   serial_port.open(slave_port_);
+
+//   // Test multiple data lengths to be more thorough
+//   std::vector<libserial::DataLength> test_lengths = {
+//     libserial::DataLength::FIVE,
+//     libserial::DataLength::SIX, 
+//     libserial::DataLength::SEVEN,
+//     libserial::DataLength::EIGHT
+//   };
+
+//   for (const auto& expected_length : test_lengths) {
+//     // Set data length
+//     EXPECT_NO_THROW({ 
+//       serial_port.setDataLength(expected_length); 
+//     });
+
+//     // Add a small delay and flush
+//     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    
+//     // Force a re-read of the current settings
+//     serial_port.close();
+//     serial_port.open(slave_port_);
+
+//     // Get data length and verify
+//     libserial::DataLength actual_length;
+//     EXPECT_NO_THROW({ 
+//       actual_length = serial_port.getDataLength(); 
+//     });
+    
+//     EXPECT_EQ(actual_length, expected_length) 
+//       << "Failed for data length: " << static_cast<int>(expected_length);
+//   }
+
+//   serial_port.close();
+// }
+
 TEST_F(PseudoTerminalTest, SetParity) {
   libserial::Serial serial_port;
 

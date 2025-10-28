@@ -330,6 +330,9 @@ size_t getMaxSafeReadSize() const;
  */
 int getBaudRate() const;
 
+
+DataLength getDataLength() const;
+
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
 // and may leave the Serial object in an inconsistent state. It is intended
@@ -475,13 +478,6 @@ uint16_t min_number_char_read_{0};
  * Determines whether canonical (line-based) input processing is enabled (default ENABLE).
  */
 CanonicalMode canonical_mode_{CanonicalMode::ENABLE};
-
-/**
- * @brief Data length setting
- *
- * Specifies the number of data bits per character (default EIGHT).
- */
-DataLength data_length_{DataLength::EIGHT};
 
 /**
  * @brief Line terminator character
