@@ -194,6 +194,13 @@ void Serial::flushInputBuffer() {
   }
 }
 
+void Serial::setTermios2() {
+  ssize_t error = ioctl_(fd_serial_port_, TCSETS2, &options_);
+  if (error != 0) {
+    throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
+  }
+}
+
 void Serial::setBaudRate(unsigned int baud_rate) {
   this->getTermios2();
   options_.c_cflag &= ~CBAUD;
@@ -205,13 +212,6 @@ void Serial::setBaudRate(unsigned int baud_rate) {
 
 void Serial::setBaudRate(BaudRate baud_rate) {
   this->setBaudRate(static_cast<unsigned int>(baud_rate));
-}
-
-void Serial::setTermios2() {
-  ssize_t error = ioctl_(fd_serial_port_, TCSETS2, &options_);
-  if (error < 0) {
-    throw SerialException("Error set Termios2: " + std::string(strerror(errno)));
-  }
 }
 
 void Serial::setReadTimeout(std::chrono::milliseconds timeout) {
