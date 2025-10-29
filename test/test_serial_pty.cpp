@@ -206,6 +206,23 @@ TEST_F(PseudoTerminalTest, SetGetReadTimeout) {
   serial_port.close();
 }
 
+TEST_F(PseudoTerminalTest, SetGetMinNumberCharRead) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+
+  // Set minimum number of characters to read
+  uint16_t min_chars_set{5};
+  EXPECT_NO_THROW({ serial_port.setMinNumberCharRead(min_chars_set); });
+
+  // Get minimum number of characters to read and verify
+  uint16_t min_chars_get{0};
+  EXPECT_NO_THROW({ min_chars_get = serial_port.getMinNumberCharRead(); });
+  EXPECT_EQ(min_chars_get, min_chars_set);
+
+  serial_port.close();
+}
+
 TEST_F(PseudoTerminalTest, SetParity) {
   libserial::Serial serial_port;
 
