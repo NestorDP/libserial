@@ -341,14 +341,14 @@ DataLength getDataLength() const;
 
 /**
  * @brief Gets the current read timeout setting
- * 
+ *
  * @return The current read timeout in milliseconds
  */
 std::chrono::milliseconds getReadTimeout() const;
 
 /**
  * @brief Gets the current minimum number of characters to read setting
- * 
+ *
  * @return The current minimum number of characters to read
  */
 uint16_t getMinNumberCharRead() const;
