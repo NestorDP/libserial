@@ -339,6 +339,13 @@ int getBaudRate() const;
  */
 DataLength getDataLength() const;
 
+/**
+ * @brief Gets the current read timeout setting
+ * 
+ * @return The current read timeout in milliseconds
+ */
+std::chrono::milliseconds getReadTimeout() const;
+
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
 // and may leave the Serial object in an inconsistent state. It is intended
@@ -467,13 +474,6 @@ std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in mill
  * Default is 2048 bytes (2KB).
  */
 size_t max_safe_read_size_{2048};  // 2KB limit
-
-/**
- * @brief Timeout value in milliseconds
- *
- * Used for configuring certain serial port timeouts (default 1000ms).
- */
-uint16_t timeout_{1000};
 
 /**
  * @brief Minimum number of characters to read
