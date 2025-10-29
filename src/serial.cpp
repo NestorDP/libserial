@@ -216,6 +216,7 @@ void Serial::setBaudRate(BaudRate baud_rate) {
 
 void Serial::setReadTimeout(std::chrono::milliseconds timeout) {
   read_timeout_ms_ = timeout;
+  this->setTimeOut(static_cast<uint16_t>(timeout.count() / 100));
 }
 
 void Serial::setWriteTimeout(std::chrono::milliseconds timeout) {
@@ -329,9 +330,8 @@ void Serial::setTerminator(Terminator term) {
 }
 
 void Serial::setTimeOut(uint16_t time) {
-  timeout_ = time;
   this->getTermios2();
-  options_.c_cc[VTIME] = timeout_;
+  options_.c_cc[VTIME] = time;
   this->setTermios2();
 }
 
@@ -372,6 +372,16 @@ DataLength Serial::getDataLength() const {
   case CS8: return DataLength::EIGHT;
   default: return DataLength::EIGHT;
   }
+}
+
+std::chrono::milliseconds Serial::getReadTimeout() const {
+  this->getTermios2();
+  return std::chrono::milliseconds(options_.c_cc[VTIME] * 100);
+}
+
+uint16_t Serial::getMinNumberCharRead() const {
+  this->getTermios2();
+  return static_cast<uint16_t>(options_.c_cc[VMIN]);
 }
 
 void Serial::getTermios2() const {

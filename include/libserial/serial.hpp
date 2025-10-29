@@ -196,7 +196,10 @@ int getAvailableData() const;
  * timing out. A value of 0 means no timeout (blocking).
  *
  * @param timeout Timeout in milliseconds
- * @throws SerialException if setting cannot be applied
+ *
+ * @note The system timeout is set in deciseconds (100ms units), so the value
+ *       will be rounded down to the nearest multiple of 100ms. For example,
+ *       1549ms will be set as 1500ms.
  */
 void setReadTimeout(std::chrono::milliseconds timeout);
 
@@ -339,6 +342,20 @@ int getBaudRate() const;
  */
 DataLength getDataLength() const;
 
+/**
+ * @brief Gets the current read timeout setting
+ *
+ * @return The current read timeout in milliseconds
+ */
+std::chrono::milliseconds getReadTimeout() const;
+
+/**
+ * @brief Gets the current minimum number of characters to read setting
+ *
+ * @return The current minimum number of characters to read
+ */
+uint16_t getMinNumberCharRead() const;
+
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
 // and may leave the Serial object in an inconsistent state. It is intended
@@ -467,13 +484,6 @@ std::chrono::milliseconds write_timeout_ms_{1000};    ///< Write timeout in mill
  * Default is 2048 bytes (2KB).
  */
 size_t max_safe_read_size_{2048};  // 2KB limit
-
-/**
- * @brief Timeout value in milliseconds
- *
- * Used for configuring certain serial port timeouts (default 1000ms).
- */
-uint16_t timeout_{1000};
 
 /**
  * @brief Minimum number of characters to read
