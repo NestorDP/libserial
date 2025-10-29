@@ -196,7 +196,10 @@ int getAvailableData() const;
  * timing out. A value of 0 means no timeout (blocking).
  *
  * @param timeout Timeout in milliseconds
- * @throws SerialException if setting cannot be applied
+ *
+ * @note The system timeout is set in deciseconds (100ms units), so the value
+ *       will be rounded down to the nearest multiple of 100ms. For example,
+ *       1549ms will be set as 1500ms.
  */
 void setReadTimeout(std::chrono::milliseconds timeout);
 
