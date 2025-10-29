@@ -375,11 +375,8 @@ DataLength Serial::getDataLength() const {
 }
 
 std::chrono::milliseconds Serial::getReadTimeout() const {
-  if (canonical_mode_ == CanonicalMode::DISABLE) {
-    this->getTermios2();
-    return std::chrono::milliseconds(options_.c_cc[VTIME] * 100);
-  }
-  return read_timeout_ms_;
+  this->getTermios2();
+  return std::chrono::milliseconds(options_.c_cc[VTIME] * 100);
 }
 
 uint16_t Serial::getMinNumberCharRead() const {
