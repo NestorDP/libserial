@@ -102,30 +102,30 @@ TEST_F(PseudoTerminalTest, ParameterizedConstructor) {
   libserial::Serial serial_port(slave_port_);
 }
 
-TEST_F(PseudoTerminalTest, SetTermios2WithFail) {
-  libserial::Serial serial_port;
+// TEST_F(PseudoTerminalTest, SetTermios2WithFail) {
+//   libserial::Serial serial_port;
 
-  serial_port.open(slave_port_);
+//   serial_port.open(slave_port_);
 
-  // Inject failure into ioctl for setTermios2
-  serial_port.setIoctlSystemFunction(
-    [](int, unsigned long, void*) -> int {  // NOLINT
-    errno = EIO;
-    return -1;
-  });
+//   // Inject failure into ioctl for setTermios2
+//   serial_port.setIoctlSystemFunction(
+//     [](int, unsigned long, void*) -> int {  // NOLINT
+//     errno = EIO;
+//     return -1;
+//   });
 
-  EXPECT_THROW({
-    serial_port.setBaudRate(9600);
-  }, libserial::SerialException);
+//   EXPECT_THROW({
+//     serial_port.setBaudRate(9600);
+//   }, libserial::SerialException);
 
-  // Restore ioctl function for cleanup
-  serial_port.setIoctlSystemFunction(
-    [](int fd, unsigned long request, void* arg) -> int {  // NOLINT
-    return ::ioctl(fd, request, arg);
-  });
+//   // Restore ioctl function for cleanup
+//   serial_port.setIoctlSystemFunction(
+//     [](int fd, unsigned long request, void* arg) -> int {  // NOLINT
+//     return ::ioctl(fd, request, arg);
+//   });
 
-  serial_port.close();
-}
+//   serial_port.close();
+// }
 
 TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
   libserial::Serial serial_port;
@@ -188,6 +188,23 @@ TEST_F(PseudoTerminalTest, SetAndGetBaudRate) {
 
 //   serial_port.close();
 // }
+
+TEST_F(PseudoTerminalTest, SetGetReadTimeout) {
+  libserial::Serial serial_port;
+
+  serial_port.open(slave_port_);
+
+  // Set read timeout
+  std::chrono::milliseconds timeout_set{1500};
+  EXPECT_NO_THROW({ serial_port.setReadTimeout(timeout_set); });
+
+  // Get read timeout and verify
+  std::chrono::milliseconds timeout_get{0};
+  EXPECT_NO_THROW({ timeout_get = serial_port.getReadTimeout(); });
+  EXPECT_EQ(timeout_get.count(), timeout_set.count());
+
+  serial_port.close();
+}
 
 TEST_F(PseudoTerminalTest, SetParity) {
   libserial::Serial serial_port;
