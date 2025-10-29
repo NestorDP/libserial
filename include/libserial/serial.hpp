@@ -346,6 +346,13 @@ DataLength getDataLength() const;
  */
 std::chrono::milliseconds getReadTimeout() const;
 
+/**
+ * @brief Gets the current minimum number of characters to read setting
+ * 
+ * @return The current minimum number of characters to read
+ */
+uint16_t getMinNumberCharRead() const;
+
 #ifdef BUILD_TESTING_ON
 // WARNING: Test helper only! This function bypasses normal initialization
 // and may leave the Serial object in an inconsistent state. It is intended

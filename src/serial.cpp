@@ -382,6 +382,11 @@ std::chrono::milliseconds Serial::getReadTimeout() const {
   return read_timeout_ms_;
 }
 
+uint16_t Serial::getMinNumberCharRead() const {
+  this->getTermios2();
+  return static_cast<uint16_t>(options_.c_cc[VMIN]);
+}
+
 void Serial::getTermios2() const {
   ssize_t error = ioctl_(fd_serial_port_, TCGETS2, &options_);
   if (error < 0) {
