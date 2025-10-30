@@ -1,10 +1,11 @@
-# CppSerial
-
+# CppSerial 
 [![release](https://img.shields.io/github/v/release/NestorDP/cppserial)](https://github.com/NestorDP/cppserial/releases)
+
+
 [![unit-tests](https://github.com/NestorDP/cppserial/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/NestorDP/cppserial/actions/workflows/unit-tests.yml)
 [![codecov](https://codecov.io/gh/NestorDP/cppserial/branch/main/graph/badge.svg)](https://codecov.io/gh/NestorDP/cppserial)
-[![Documentation Status](https://readthedocs.org/projects/cppserial/badge/?version=latest)](https://cppserial.readthedocs.io/en/latest/?badge=latest)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/3759133c01204a5c880d0dd65e6175bc)](https://app.codacy.com/gh/NestorDP/cppserial/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Documentation Status](https://readthedocs.org/projects/cppserial/badge/?version=latest)](https://cppserial.readthedocs.io/en/latest/?badge=latest)
 
 <!-- [![License](https://img.shields.io/github/license/NestorDP/cppserial)](https://github.com/NestorDP/cppserial/blob/main/LICENSE) -->
 <!--[![coverage](https://github.com/NestorDP/cppserial/actions/workflows/coverage.yml/badge.svg)](https://github.com/NestorDP/cppserial/actions/workflows/coverage.yml)-->
@@ -97,7 +98,7 @@ cd ..
 sphinx-build -b html docs build/docs/html  
 ``` -->
 
-## Run an Example Application
+<!-- ## Run an Example Application
 
 You can run an example application to test the libserial library in your environment.
 Even without a physical serial device, you can test serial communication using a virtual serial port created with socat.
@@ -159,7 +160,7 @@ You can also run the list_ports example to display all available serial devices 
 
 ```bash
 ./examples/list_ports
-```
+``` -->
 
 
 ### 🤝 Contributing
