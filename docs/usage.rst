@@ -74,7 +74,7 @@ Basic read/write operations:
    
    int main() {
        try {
-           libserial::Serial serial();
+           libserial::Serial serial;
            serial.open("/dev/ttyUSB0");
            
            // Write data
@@ -110,7 +110,7 @@ Configure read timeouts to prevent blocking:
    
    int main() {
        try {
-           libserial::Serial serial();
+           libserial::Serial serial;
            serial.open("/dev/ttyUSB0");
            // Set read timeout to 5 seconds
            serial.setReadTimeout(std::chrono::milliseconds(5000));
@@ -139,7 +139,7 @@ For non-blocking operations:
    
    int main() {
        try {
-           libserial::Serial serial();
+           libserial::Serial serial;
            serial.open("/dev/ttyUSB0");
 
            auto buffer = std::make_shared<std::string>();
