@@ -16,10 +16,10 @@ Opening a Serial Port
    int main() {
        try {
            // Create a Serial object
-           libserial::Serial serial("/dev/ttyUSB0");
+           libserial::Serial serial;
            
            // Open the port
-           serial.open();
+           serial.open("/dev/ttyUSB0");
            
            // Port is now ready for communication
            
@@ -42,15 +42,16 @@ You can configure various serial port parameters:
    
    int main() {
        try {
-           libserial::Serial serial("/dev/ttyUSB0");
+           libserial::Serial serial;
            
            // Configure before opening
            serial.setBaudRate(libserial::BaudRate::BAUD_9600);
-           serial.setDataBits(libserial::DataBits::DATA_8);
-           serial.setParity(libserial::Parity::NONE);
-           serial.setStopBits(libserial::StopBits::STOP_1);
+           serial.setDataLength(libserial::DataBits::SEVEN);
+           serial.setParity(libserial::Parity::ENABLE);
+           serial.setStopBits(libserial::StopBits::ONE);
+           serial.setCanonicalMode(libserial::CanonicalMode::DISABLE);
            
-           serial.open();
+           serial.open("/dev/ttyUSB0");
            
        } catch (const libserial::SerialException& e) {
            std::cerr << "Error: " << e.what() << std::endl;
@@ -73,20 +74,16 @@ Basic read/write operations:
    
    int main() {
        try {
-           libserial::Serial serial("/dev/ttyUSB0");
-           serial.open();
+           libserial::Serial serial();
+           serial.open("/dev/ttyUSB0");
            
            // Write data
-           std::string message = "Hello, Serial!";
+           auto message = std::make_shared<std::string>("Hello from libserial!");
            serial.write(message);
            
            // Read response
-           std::string response = serial.read(100); // Read up to 100 bytes
-           std::cout << "Received: " << response << std::endl;
-           
-           // Read a single byte
-           char byte = serial.readByte();
-           std::cout << "Single byte: " << static_cast<int>(byte) << std::endl;
+           auto buffer = std::make_shared<std::string>();
+           size_t bytes_read = serial.read(buffer);
            
            serial.close();
            
@@ -113,14 +110,14 @@ Configure read timeouts to prevent blocking:
    
    int main() {
        try {
-           libserial::Serial serial("/dev/ttyUSB0");
-           serial.open();
-           
+           libserial::Serial serial();
+           serial.open("/dev/ttyUSB0");
            // Set read timeout to 5 seconds
-           serial.setTimeout(std::chrono::seconds(5));
-           
+           serial.setReadTimeout(std::chrono::milliseconds(5000));
+
            // This will timeout after 5 seconds if no data is available
-           std::string data = serial.read(100);
+           auto buffer = std::make_shared<std::string>();
+           size_t bytes_read = serial.read(buffer);
            
        } catch (const libserial::TimeoutException& e) {
            std::cout << "Read operation timed out" << std::endl;
@@ -142,12 +139,14 @@ For non-blocking operations:
    
    int main() {
        try {
-           libserial::Serial serial("/dev/ttyUSB0");
-           serial.open();
+           libserial::Serial serial();
+           serial.open("/dev/ttyUSB0");
+
+           auto buffer = std::make_shared<std::string>();
            
            // Check if data is available before reading
-           if (serial.available() > 0) {
-               std::string data = serial.read();
+           if (serial.getAvailableData() > 0) {
+               size_t bytes_read = serial.read(buffer);
                // Process data...
            }
            
